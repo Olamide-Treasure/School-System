@@ -10,10 +10,10 @@ app.secret_key = 'SECRET_KEY'
 
 
 mydb = mysql.connector.connect(
-    host="localhost",
-    user="user",
-    password="password",
-    database="university"
+    host="phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com",
+    user="admin",
+    password="phasetwo7",
+    database="integration"
 )
 
 ####################################################
@@ -24,10 +24,10 @@ mydb = mysql.connector.connect(
 def _reconnect():
     global mydb
     mydb = mysql.connector.connect(
-        host="localhost",
-        user="user",
-        password="password",
-        database="university"
+        host="phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com",
+        user="admin",
+        password="phasetwo7",
+        database="integration"
     )
 
 

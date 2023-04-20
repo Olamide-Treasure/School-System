@@ -1,10 +1,10 @@
-DROP DATABASE IF EXISTS university;
+DROP DATABASE IF EXISTS integration;
 
-CREATE DATABASE university;
+CREATE DATABASE integration;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-USE university;
+USE integration;
 
 
 
