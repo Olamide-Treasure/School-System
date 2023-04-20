@@ -1,9 +1,9 @@
 import mysql.connector as connection
 from flask import Flask, session, render_template, redirect, url_for, request, flash
 import time, random, datetime
-app = Flask('app')
-app.secret_key = "sameen"
 
+app = Flask('app')
+app.secret_key = 'SECRET_KEY'
 
 db = connection.connect(
     host="phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com",
@@ -26,13 +26,13 @@ def _reconnect():
         database="integration"
     )
 
+
 def sessionStatus():
     return session['user_id']
 
 
 def sessionType():
     return session['type']
-
 
 
 ####################################################
