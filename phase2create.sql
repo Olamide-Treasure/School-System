@@ -7,8 +7,6 @@ CREATE TABLE students (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
   admit_year   INT(4) NOT NULL,
-  need_advisor BOOLEAN,
-  status       varchar(50) NOT NULL,
   PRIMARY KEY (student_id),
   FOREIGN KEY (student_id) REFERENCES user(user_id)
 );
@@ -155,8 +153,7 @@ CREATE TABLE alumni (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
 	grad_year int(4) NOT NULL,
-  PRIMARY KEY (student_id),
-	FOREIGN KEY (student_id) REFERENCES students(student_id)
+  PRIMARY KEY (student_id)
 );
 
 
@@ -295,10 +292,6 @@ insert into user values (11111111, 1, 'Bhagirath', 'Narahari', 'bhagi', 'jkjfd09
 insert into user values (22222222, 1, 'Gabriel', 'Parmer', 'gparmer', 'uofd0932', '2033 L St NW, Washington, DC 20052', '202-222-1000', '231-34-2343', 'gparmer@gwu.edu' );
 
 
-
-
-
-
 insert into alumni values (77777777, 20, 2014);
 
 
@@ -318,51 +311,51 @@ insert into student_advisors values(66666666, 22222222);
 insert into student_advisors values(99999999, 22222222);
 
 
-insert into student_courses values(55555555, 100, 'A');
-insert into student_courses values(55555555, 102, 'A');
-insert into student_courses values(55555555, 101 , 'A');
-insert into student_courses values(55555555, 104, 'A');
-insert into student_courses values(55555555, 105, 'A');
-insert into student_courses values(55555555, 106, 'B');
-insert into student_courses values(55555555, 108, 'B');
-insert into student_courses values(55555555, 112, 'B');
-insert into student_courses values(55555555, 113, 'B');
-insert into student_courses values(55555555, 107, 'B');
+insert into student_courses values(55555555, 100, 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 102, 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 101 , 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 104, 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 105, 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 106, 'B', 'Fall', '2021');
+insert into student_courses values(55555555, 108, 'B', 'Fall', '2021');
+insert into student_courses values(55555555, 112, 'B', 'Fall', '2021');
+insert into student_courses values(55555555, 113, 'B', 'Fall', '2021');
+insert into student_courses values(55555555, 107, 'B', 'Fall', '2021');
 
-insert into student_courses values(66666666, 120, 'C');
-insert into student_courses values(66666666, 100, 'B');
-insert into student_courses values(66666666, 101, 'B');
-insert into student_courses values(66666666, 102, 'B');
-insert into student_courses values(66666666, 104, 'B');
-insert into student_courses values(66666666, 105, 'B');
-insert into student_courses values(66666666, 106, 'B');
-insert into student_courses values(66666666, 107, 'B');
-insert into student_courses values(66666666, 113, 'B');
-insert into student_courses values(66666666, 114, 'B');
+insert into student_courses values(66666666, 120, 'C', 'Fall', '2021');
+insert into student_courses values(66666666, 100, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 101, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 102, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 104, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 105, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 106, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 107, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 113, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 114, 'B', 'Fall', '2021');
 
-insert into student_courses values(99999999, 100, 'A');
-insert into student_courses values(99999999, 102, 'A');
-insert into student_courses values(99999999, 103, 'A');
-insert into student_courses values(99999999, 105, 'A');
-insert into student_courses values(99999999, 106, 'A');
-insert into student_courses values(99999999, 107, 'A');
-insert into student_courses values(99999999, 110, 'A');
-insert into student_courses values(99999999, 111, 'A');
-insert into student_courses values(99999999, 112, 'A');
-insert into student_courses values(99999999, 115, 'A');
-insert into student_courses values(99999999, 116, 'A');
-insert into student_courses values(99999999, 117, 'A');
+insert into student_courses values(99999999, 100, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 102, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 103, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 105, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 106, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 107, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 110, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 111, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 112, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 115, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 116, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 117, 'A', 'Fall', '2021');
 
-insert into student_courses values(77777777, 100, 'B');
-insert into student_courses values(77777777, 102, 'B');
-insert into student_courses values(77777777, 101, 'B');
-insert into student_courses values(77777777, 104, 'B');
-insert into student_courses values(77777777, 105, 'B');
-insert into student_courses values(77777777, 106, 'B');
-insert into student_courses values(77777777, 107, 'B');
-insert into student_courses values(77777777, 113, 'A');
-insert into student_courses values(77777777, 114, 'A');
-insert into student_courses values(77777777, 115, 'A');
+insert into student_courses values(77777777, 100, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 102, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 101, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 104, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 105, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 106, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 107, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 113, 'A', 'Fall', '2021');
+insert into student_courses values(77777777, 114, 'A', 'Fall', '2021');
+insert into student_courses values(77777777, 115, 'A', 'Fall', '2021');
 
 
 INSERT INTO prerequisite VALUES ("CSCI", 6233, "1", "CSCI", 6232);
