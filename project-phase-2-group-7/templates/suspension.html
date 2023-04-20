@@ -1,0 +1,24 @@
+<html>
+  <head>
+    <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+    <title> Suspension </title>
+  </head>
+  <body>
+    <h1 style="text-align:center;"> All Students Under Academic Suspension </h1>
+    <p> {% for student in suspended_students_names %}
+        <li> {{student[0]['fname']}} {{student[0]['lname']}}</li>
+    {% endfor %}
+    </p>
+
+    <hr color=#3F000F;>
+    
+    <form action="/gradsec"> 
+      <button type="submit">All students</button>
+    </form>
+
+    <form action="/logout"> 
+      <button type="submit">Log Out</button>
+    </form>
+    
+  </body>
+</html>
