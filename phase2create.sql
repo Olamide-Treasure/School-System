@@ -1,14 +1,8 @@
-DROP DATABASE IF EXISTS university;
-
-CREATE DATABASE university;
+use integration;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-USE university;
 
-
-
--- DEGREES --
 DROP TABLE IF EXISTS degrees;
 CREATE TABLE degrees (
 	degree_id int(2) not null,
@@ -16,7 +10,7 @@ CREATE TABLE degrees (
   primary key(degree_id)
 );
 
--- USER TYPE --
+
 DROP TABLE IF EXISTS user_type;
 CREATE TABLE user_type (
   id int(1) NOT NULL,
@@ -24,7 +18,7 @@ CREATE TABLE user_type (
   primary key(id)
 );
 
--- APPLICATIONS -- 
+
 DROP TABLE IF EXISTS applications;
 CREATE TABLE applications ( 
   status varchar(30),
@@ -398,5 +392,3 @@ INSERT INTO class_section VALUES (20, "Fall", "2023", "R", "16:00-18:30", 111111
 INSERT INTO faculty VALUES (11111111, "CSCI");
 INSERT INTO faculty VALUES (12121212, "ECE");
 INSERT INTO faculty VALUES (12312312, "MATH");
-
-
