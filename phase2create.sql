@@ -4,11 +4,19 @@ CREATE DATABASE integration;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
-USE integration;
+use integration;
 
+SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS students;
+CREATE TABLE students (
+	student_id int(8) NOT NULL,
+	degree_id int(2) NOT NULL,
+  admit_year   INT(4) NOT NULL,
+  PRIMARY KEY (student_id),
+  FOREIGN KEY (student_id) REFERENCES user(user_id)
+);
 
--- DEGREES --
 DROP TABLE IF EXISTS degrees;
 CREATE TABLE degrees (
 	degree_id int(2) not null,
@@ -16,7 +24,7 @@ CREATE TABLE degrees (
   primary key(degree_id)
 );
 
--- USER TYPE --
+
 DROP TABLE IF EXISTS user_type;
 CREATE TABLE user_type (
   id int(1) NOT NULL,
@@ -24,11 +32,11 @@ CREATE TABLE user_type (
   primary key(id)
 );
 
--- APPLICATIONS -- 
+
 DROP TABLE IF EXISTS applications;
 CREATE TABLE applications ( 
   status varchar(30),
-  student_id varchar(8),
+  student_id int(8),
   semester varchar(10),
   s_year year,
   degree_type varchar(10),
@@ -55,11 +63,21 @@ CREATE TABLE applications (
   foreign key(student_id) references students(student_id) ON DELETE CASCADE
 );
 
+DROP TABLE IF EXISTS faculty;
+CREATE TABLE faculty (
+  faculty_id      INT(8) NOT NULL,
+  department      VARCHAR(50) NOT NULL,
+  instructor      BOOLEAN,
+  advisor         BOOLEAN,
+  reviewr         BOOLEAN,
+  PRIMARY KEY (faculty_id),
+  FOREIGN KEY (faculty_id) REFERENCES user(user_id) ON DELETE CASCADE
+);
 
 DROP TABLE IF EXISTS review;
 CREATE TABLE review (
-  review_id varchar(8),
-  student_id varchar(8),
+  review_id int(8),
+  student_id int(8),
   p_semester varchar(10),
   p_year year,
   rev_rating varchar (10),
@@ -77,14 +95,14 @@ CREATE TABLE review (
 
 DROP TABLE IF EXISTS letter;
 CREATE TABLE letter (
-  user_id varchar(8),
+  user_id int(8),
   letter_id int(5),
   contents varchar(600),
   recommenderName varchar(20),
   recommenderAffil varchar(20),
   recommenderEmail varchar(20),
-  primary key(letterID),
-  foreign key(userID) references students(student_id) ON DELETE CASCADE
+  primary key(letter_id),
+  foreign key(user_id) references students(student_id) ON DELETE CASCADE
 );
 
 
@@ -141,31 +159,20 @@ CREATE TABLE alumni (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
 	grad_year int(4) NOT NULL,
-  PRIMARY KEY (student_id),
-	FOREIGN KEY (student_id) REFERENCES students(user_id)
+  PRIMARY KEY (student_id)
 );
 
-DROP TABLE IF EXISTS faculty;
-CREATE TABLE faculty (
-  faculty_id      INT(8) NOT NULL,
-  department      VARCHAR(50) NOT NULL,
-  instructor      BOOLEAN,
-  advisor         BOOLEAN,
-  reviewr         BOOLEAN,
-  PRIMARY KEY (faculty_id),
-  FOREIGN KEY (faculty_id) REFERENCES user(user_id) ON DELETE CASCADE
-);
 
-DROP TABLE IF EXISTS students;
-CREATE TABLE students (
+DROP TABLE IF EXISTS application;
+CREATE TABLE application (
+	gs_id  varchar(50) NOT NULL,
+	app_status  varchar(50) NOT NULL,
 	student_id int(8) NOT NULL,
-	degree_id int(2) NOT NULL,
-  admit_year   INT(4) NOT NULL,
-  need_advisor BOOLEAN,
-  status       varchar(50) NOT NULL,
-  PRIMARY KEY (student_id),
-  FOREIGN KEY (student_id) REFERENCES user(user_id)
+	remarks varchar(50),
+	FOREIGN KEY (student_id) REFERENCES user(user_id)
 );
+
+
 
 DROP TABLE IF EXISTS prerequisite;
 CREATE TABLE prerequisite (
@@ -173,7 +180,7 @@ CREATE TABLE prerequisite (
     prereq_type       ENUM("1", "2") NOT NULL,
     prereq_id         INT(6) NOT NULL,
     PRIMARY KEY(course_id, prereq_type),
-    FOREIGN KEY (prereq_id) REFERENCES course(course_id) ON DELETE CASCADE
+    FOREIGN KEY (prereq_id) REFERENCES course(id) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS class_section;
@@ -186,24 +193,24 @@ CREATE TABLE class_section (
     course_id           INT(6) NOT NULL,
     faculty_id          INT(8) NOT NULL,
     PRIMARY KEY (class_id, csem, cyear),
-    FOREIGN KEY (course_id) REFERENCES course(course_id) ON DELETE CASCADE,
+    FOREIGN KEY (course_id) REFERENCES course(id) ON DELETE CASCADE,
     FOREIGN KEY (faculty_id) REFERENCES faculty(faculty_id) ON DELETE CASCADE
 ); 
 
 DROP TABLE IF EXISTS graduation;
 CREATE TABLE graduation (
-	gs_id  varchar(50) NOT NULL,
+	gs_id  int(8) NOT NULL,
 	app_status  varchar(50) NOT NULL,
 	student_id int(8) NOT NULL,
 	remarks varchar(50),
 	FOREIGN KEY (student_id) REFERENCES students(student_id),
-  Foreign Key (gs_id) REFERENCES users(user_id)
+  Foreign Key (gs_id) REFERENCES user(user_id)
 );
 
 DROP TABLE IF EXISTS phd_req;
 CREATE TABLE phd_req (
 	student_id int(8) NOT NULL,
-	thesisapproved varchar(5) NOT NULL
+	thesisapproved varchar(5) NOT NULL,
   Primary Key(student_id),
   Foreign Key (student_id) REFERENCES students(student_id)
 );
@@ -215,13 +222,25 @@ CREATE TABLE applied_grad (
   PRIMARY KEY (student_id)
 );
 
+DROP TABLE IF EXISTS need_advisor;
+CREATE TABLE need_advisor (
+	student_id int(8) NOT NULL
+);
+
 
 DROP TABLE IF EXISTS form1answer;
 CREATE TABLE form1answer (
   student_id int(8) NOT NULL,
-  courseID int(6) NOT NULL
+  courseID int(6) NOT NULL,
   Primary Key(student_id),
-  Foreign Key (courseID) REFERENCES course(course_id)
+  Foreign Key (courseID) REFERENCES course(id)
+);
+
+DROP TABLE IF EXISTS student_status;
+CREATE TABLE student_status (
+	student_id int(8) NOT NULL,
+  	status varchar(50) NOT NULL,
+   FOREIGN KEY (student_id) REFERENCES user(user_id)
 );
 
 
@@ -278,10 +297,6 @@ insert into user values (11111111, 1, 'Bhagirath', 'Narahari', 'bhagi', 'jkjfd09
 
 insert into user values (22222222, 1, 'Gabriel', 'Parmer', 'gparmer', 'uofd0932', '2033 L St NW, Washington, DC 20052', '202-222-1000', '231-34-2343', 'gparmer@gwu.edu' );
 
-insert into user values (12121212, 1, 'Hyeong-Ah', 'Choi', 'hchoi', 'testpass', '2033 L St NW, Washington, DC 20052', '202-222-1000', '231-34-2346', 'hchoi@gwu.edu' );
-
-
-
 
 insert into alumni values (77777777, 20, 2014);
 
@@ -302,51 +317,51 @@ insert into student_advisors values(66666666, 22222222);
 insert into student_advisors values(99999999, 22222222);
 
 
-insert into student_courses values(55555555, 100, 'A');
-insert into student_courses values(55555555, 102, 'A');
-insert into student_courses values(55555555, 101 , 'A');
-insert into student_courses values(55555555, 104, 'A');
-insert into student_courses values(55555555, 105, 'A');
-insert into student_courses values(55555555, 106, 'B');
-insert into student_courses values(55555555, 108, 'B');
-insert into student_courses values(55555555, 112, 'B');
-insert into student_courses values(55555555, 113, 'B');
-insert into student_courses values(55555555, 107, 'B');
+insert into student_courses values(55555555, 100, 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 102, 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 101 , 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 104, 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 105, 'A', 'Fall', '2021');
+insert into student_courses values(55555555, 106, 'B', 'Fall', '2021');
+insert into student_courses values(55555555, 108, 'B', 'Fall', '2021');
+insert into student_courses values(55555555, 112, 'B', 'Fall', '2021');
+insert into student_courses values(55555555, 113, 'B', 'Fall', '2021');
+insert into student_courses values(55555555, 107, 'B', 'Fall', '2021');
 
-insert into student_courses values(66666666, 120, 'C');
-insert into student_courses values(66666666, 100, 'B');
-insert into student_courses values(66666666, 101, 'B');
-insert into student_courses values(66666666, 102, 'B');
-insert into student_courses values(66666666, 104, 'B');
-insert into student_courses values(66666666, 105, 'B');
-insert into student_courses values(66666666, 106, 'B');
-insert into student_courses values(66666666, 107, 'B');
-insert into student_courses values(66666666, 113, 'B');
-insert into student_courses values(66666666, 114, 'B');
+insert into student_courses values(66666666, 120, 'C', 'Fall', '2021');
+insert into student_courses values(66666666, 100, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 101, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 102, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 104, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 105, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 106, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 107, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 113, 'B', 'Fall', '2021');
+insert into student_courses values(66666666, 114, 'B', 'Fall', '2021');
 
-insert into student_courses values(99999999, 100, 'A');
-insert into student_courses values(99999999, 102, 'A');
-insert into student_courses values(99999999, 103, 'A');
-insert into student_courses values(99999999, 105, 'A');
-insert into student_courses values(99999999, 106, 'A');
-insert into student_courses values(99999999, 107, 'A');
-insert into student_courses values(99999999, 110, 'A');
-insert into student_courses values(99999999, 111, 'A');
-insert into student_courses values(99999999, 112, 'A');
-insert into student_courses values(99999999, 115, 'A');
-insert into student_courses values(99999999, 116, 'A');
-insert into student_courses values(99999999, 117, 'A');
+insert into student_courses values(99999999, 100, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 102, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 103, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 105, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 106, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 107, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 110, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 111, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 112, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 115, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 116, 'A', 'Fall', '2021');
+insert into student_courses values(99999999, 117, 'A', 'Fall', '2021');
 
-insert into student_courses values(77777777, 100, 'B');
-insert into student_courses values(77777777, 102, 'B');
-insert into student_courses values(77777777, 101, 'B');
-insert into student_courses values(77777777, 104, 'B');
-insert into student_courses values(77777777, 105, 'B');
-insert into student_courses values(77777777, 106, 'B');
-insert into student_courses values(77777777, 107, 'B');
-insert into student_courses values(77777777, 113, 'A');
-insert into student_courses values(77777777, 114, 'A');
-insert into student_courses values(77777777, 115, 'A');
+insert into student_courses values(77777777, 100, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 102, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 101, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 104, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 105, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 106, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 107, 'B', 'Fall', '2021');
+insert into student_courses values(77777777, 113, 'A', 'Fall', '2021');
+insert into student_courses values(77777777, 114, 'A', 'Fall', '2021');
+insert into student_courses values(77777777, 115, 'A', 'Fall', '2021');
 
 
 INSERT INTO prerequisite VALUES ("CSCI", 6233, "1", "CSCI", 6232);
@@ -398,5 +413,3 @@ INSERT INTO class_section VALUES (20, "Fall", "2023", "R", "16:00-18:30", 111111
 INSERT INTO faculty VALUES (11111111, "CSCI");
 INSERT INTO faculty VALUES (12121212, "ECE");
 INSERT INTO faculty VALUES (12312312, "MATH");
-
-
