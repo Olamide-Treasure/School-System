@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en-us">
+
+    <head>
+        <title>Faculty Info</title>
+
+        <!-- Bootstrap Code -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+
+        <!-- Project Files -->
+        <!-- <link rel="stylesheet" type="text/css" href="static/variables.css">
+        <link rel="stylesheet" type="text/css" href="static/base.css"> -->
+
+
+        <!-- Font Imports -->
+        <link href='https://fonts.googleapis.com/css?family=Cinzel' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=PT Serif Caption' rel='stylesheet'>
+    </head>
+
+
+    <body>
+        <nav class="navbar navbar-expand-md bg-body p-3 shadow-sm mb-3" id="nav">  
+            <!-- Edit this to inlclude logo link -->
+            <a class="navbar-brand" href="/">Logo</a>
+
+            <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+
+            <!-- Collapsable navbar for buttons -->
+            <div class="collapse navbar-collapse" id="main-navigation">
+                <ul class="navbar-nav">
+
+                    <!-- All items on the navbar -->
+                    <!-- Change links to other webpages -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('home')}}">Home</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/catalog">Catalog</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/account">Account</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+
+
+        <div class="container">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+                <div class="alert alert-dismissible alert-warning fade show mb-5" role="alert">
+                    {{message}}
+                    <button type="button" class="btn-close" aria-label="Close" data-dismiss="alert" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        </div>
+    
+
+        <div class="container mb-5">
+            <div class="row">
+                <div class="col">
+                    <h1>Hello {{faculty[0]['fname']}} {{faculty[0]['lname']}}!</h1>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-4">
+                    <hr class="hr" />
+                </div>
+            </div>
+            
+
+            <div class="row">
+                <div class="col-4">
+                    <h5><small>Welcome to the Faculty Page! As a professor, we understand that you need 
+                        quick and easy access to important information about your courses and students.
+                        That's why we've created this user-friendly platform where you can submit grades
+                        and view all the necessary information in one place.</small></h5>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="container mb-5">
+            <nav>
+                <div class="nav nav-tabs" id="nav-tab" role="tablist">
+                    <button class="nav-link active" id="nav-info-tab" data-bs-toggle="tab" data-bs-target="#nav-info" type="button" role="tab" aria-controls="nav-info" aria-selected="true">Info</button>
+                    <button class="nav-link" id="nav-classes-tab" data-bs-toggle="tab" data-bs-target="#nav-classes" type="button" role="tab" aria-controls="nav-classes" aria-selected="false">Classes</button>
+                    <button class="nav-link" id="nav-edit-tab" data-bs-toggle="tab" data-bs-target="#nav-edit" type="button" role="tab" aria-controls="nav-edit" aria-selected="false">Edit</button>
+                </div>
+            </nav>
+
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="nav-info" role="tabpanel" aria-labelledby="nav-info-tab">
+
+                    <div class="container mt-3">
+                        <div class="row mb-2">
+                            <h2>Faculty Info</h2>
+                        </div>
+            
+                        <div class="row">
+                            <div class="col-6">
+                                <div class="container border h-100 py-2">
+                                    <h3><strong>University Info</strong></h3>
+                                    <h5><i>University ID</i>: {{faculty[0]['uni_id']}}</h5>
+                                    <h5><i>Department</i>: {{faculty[0]['dname']}}</h5>
+                                </div>
+                            </div>
+
+                            <div class="col-6">
+                                <div class="container border py-2">
+                                    <h3><strong>Personal Info</strong></h3>
+                                    <h5><i>Full Name</i>: {{faculty[0]['fname']}} {{faculty[0]['lname']}}</h5>
+                                    <h5><i>Birthday</i>: {{faculty[0]['bday']}}</h5>
+                                    <!-- <form action="/update_birthday" method="POST">
+                                        <input type="date" name="birthday" id="birthday" placeholder="Change birthday"/>
+                                        <input type="hidden" name="user_id" id="user_id" value="{{faculty[0]['uni_id']}}">
+                                        <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                                    </form> -->
+                                    <h5><i>Address</i>: {{faculty[0]['user_address']}}</h5>
+                                    <!-- <form action="/update_address" method="POST">
+                                        <input name="address" id="address" placeholder="Change address"/>
+                                        <input type="hidden" name="user_id" id="user_id" value="{{faculty[0]['uni_id']}}">
+                                        <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                                    </form> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="tab-pane fade" id="nav-classes" role="tabpanel" aria-labelledby="nav-classes-tab">
+                    <div class="container mt-3">
+                        <div class="row mb-2">
+                            <h2>Taught Classes</h2>
+                        </div>
+
+                        <div class="row">
+                            <div class="accordion" id="accordionPanel">
+                                {% for sem in semesters %}
+                                    <div class="accordion-item">
+                                        <h2 class="accordion-header">
+                                            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#panelsStayOpen-{{sem['csem']}}{{sem['cyear']}}" aria-expanded="false" aria-controls="panelsStayOpen-{{sem['csem']}}{{sem['cyear']}}">
+                                                {{sem['csem']}} {{sem['cyear']}}
+                                            </button>
+                                        </h2>
+                                        <div id="panelsStayOpen-{{sem['csem']}}{{sem['cyear']}}" class="accordion-collapse collapse">
+                                            <div class="accordion-body">
+                                                {% for row1 in course %}
+                                                    <div class="container">
+                                                        {% if row1['csem'] == sem['csem'] and row1['cyear'] == sem['cyear'] %}
+                                                            <div class="row mb-4">
+                                                                <div class="col-3">
+                                                                    <div class="container">
+                                                                        <h4><strong>{{row1['title']}}</strong></h4>
+                                                                        <h5>({{row1['dname']}} {{row1['cnum']}})</h5>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="col-9 p-0">
+                                                                    <div class="container-fluid float-left p-0">
+                                                                        {% if not student[row1['cid']] %}
+                                                                            No students enrolled
+                                                                        {% else %}
+                                                                            
+                                                                            <table class="table caption-top table-striped table-bordered">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th class="col-3">Student Name</th>
+                                                                                        <th class="col-3">ID</th>
+                                                                                        <th class="col-2">Final Grade</th>
+                                                                                        <th class="col-4">Submit Grade</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                    {% for row2 in student[row1['cid']] %}
+                                                                                        {% if row2['csem'] == sem['csem'] and row2['cyear'] == sem['cyear'] %}
+                                                                                            <tbody>
+                                                                                                <tr>
+                                                                                                    <td class="col-3">{{row2['fname']}} {{row2['lname']}}</td>
+                                                                                                    <td class="col-3">{{row2['uni_id']}}</td>
+                                                                                                    {% if not row2['grade'] %}
+                                                                                                        <td class="col-2">IP</td>
+                                                                                                        <td class="col-4">
+                                                                                                            <form action="/update_grade" method="POST">
+                                                                                                                <label for="grade">Grade</label>
+                                                                                                                <select name="grade" id="grade">
+                                                                                                                    <option value="A">A</option>
+                                                                                                                    <option value="A-">A-</option>
+                                                                                                                    <option value="B+">B+</option>
+                                                                                                                    <option value="B">B</option>
+                                                                                                                    <option value="B-">B-</option>
+                                                                                                                    <option value="C+">C+</option>
+                                                                                                                    <option value="C">C</option>
+                                                                                                                    <option value="F">F</option>
+                                                                                                                </select>
+                                                                                                                <input type="hidden" name="class" id="class" value="{{row1['cid']}}">
+                                                                                                                <input type="hidden" name="student" id="student" value="{{row2['uni_id']}}">
+                                                                                                                <input type="submit" class="btn btn-sm btn-outline-secondary">
+                                                                                                            </form>
+                                                                                                        </td>
+                                                                                                    {% else %}
+                                                                                                        <td class="col-2">{{row2['grade']}}</td>
+                                                                                                        <td class="col-4">Grade Finalized</td>
+                                                                                                    {% endif %}
+                                                                                                </tr>
+                                                                                            </tbody>
+                                                                                        {% endif %}
+                                                                                    {% endfor %}
+                                                                            </table>
+                                                                            
+                                                                        {% endif %}
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="nav-edit" role="tabpanel" aria-labelledby="nav-edit-tab">
+
+                </div>
+            </div>
+        </div> 
+
+
+    </body>
+
+</html>

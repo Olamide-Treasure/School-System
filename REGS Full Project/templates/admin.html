@@ -1,0 +1,406 @@
+<html lang="en-us">
+
+    <head>
+        <title>Admin Info</title>
+
+        <!-- Bootstrap Code -->
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" >
+        <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" ></script>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.min.js" integrity="sha384-Atwg2Pkwv9vp0ygtn1JAojH0nYbwNJLPhwyoVbhoPwBhjQPR5VtM2+xf0Uwh9KtT" crossorigin="anonymous"></script>
+
+        <!-- Project Files -->
+        <link rel="stylesheet" type="text/css" href="static/admin.css">
+        <link rel="stylesheet" type="text/css" href="static/base.css">
+        <link rel="stylesheet" type="text/css" href="static/variables.css">
+
+
+        <!-- Font Imports -->
+        <link href='https://fonts.googleapis.com/css?family=Cinzel' rel='stylesheet'>
+        <link href='https://fonts.googleapis.com/css?family=PT Serif Caption' rel='stylesheet'>
+    </head>
+
+
+    <body>
+
+        <nav class="navbar navbar-expand-md" id="nav">
+            <!-- Edit this to inlclude logo link -->
+            <a class="navbar-brand" href="/">Logo</a>
+
+            <button class="navbar-toggler navbar-dark" type="button" data-toggle="collapse" data-target="#main-navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+
+            <!-- Collapsable navbar for buttons -->
+            <div class="collapse navbar-collapse" id="main-navigation">
+                <ul class="navbar-nav">
+
+                    <!-- All items on the navbar -->
+                    <!-- Change links to other webpages -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{url_for('home')}}">Home</a>
+                    </li>
+                    
+                    <li class="nav-item">
+                        <a class="nav-link" href="/catalog">Catalog</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/account">Account</a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/logout">Logout</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+       
+
+        <div class="container-fluid">
+            <h1>Admin Info</h1>
+        </div>
+
+        <!--User Registration-->
+        <div class="container-fluid">
+            <h2>Register New User</h2>
+        </div>
+
+        <div class="container">
+            {% for category, message in get_flashed_messages(with_categories=true) %}
+            <div class="alert alert-warning">
+                {% if category == 'error'  %}
+                  <p class ="error"> {{ message }}</p>
+                {% elif category == 'success'  %}
+                  <p class ="success"> {{ message }}</p>
+                {%endif%}
+            </div>
+            {% endfor %}
+        </div>
+
+        <br>
+            <div class="container">
+                <div class="col-6">
+                    <form class="signup-form" action="/signup" method = "POST">
+                        <div class="form-group">
+                            <label for="fname">First Name</label>
+                            <input class="form-control" type="text" id="fname" placeholder="First Name" name="fname" maxlength="50" minlength="1">
+                            <label for="lname">Last Name</label>
+                            <input class="form-control" type="text" id="lname" placeholder="Last Name" name="lname" maxlength="50" minlength="1">
+                        </div>
+            
+                        <div class="form-group">
+                            <label for="password">Password</label>
+                            <input class="form-control" type="text" id="password" placeholder="Password" name="password" maxlength="50" minlength="1">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="bday">Birthday</label>
+                            <input class="form-control" type="date" id="bday" placeholder="Birthday" name="bday" maxlength="50" minlength="1">
+                            <label for="address">Address</label>
+                            <input class="form-control" type="text" id="address" placeholder="Address" name="address" maxlength="100" minlength="1">
+                        </div>
+            
+                        <div class="form-group">
+                            <label for="year">Year of Admittance</label>
+                            <input class="form-control" type="text" id="year" placeholder="Year of Admittance" name="year" maxlength="4" minlength="4">
+                            <label for="dname">Department</label>
+                            <input class="form-control" type="text" id="dname" placeholder="Department" name="dname" maxlength="50" minlength="1">
+                        </div>
+            
+                        <label for="checks">Status</label>
+                        <div id="checks" class="form-group">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="master" name="user_type" value="master's" checked>
+                                <label class="form-check-label" for="master">Master's Program</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="phd" name="user_type" value="phd">
+                                <label class="form-check-label" for="phd">PhD Program</label>
+                            </div>
+                            <div class="form-check form-check-inline"> 
+                                <input class="form-check-input" type="radio" id="faculty" name="user_type" value="faculty">
+                                <label class="form-check-label" for="faculty">Faculty</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="secretary" name="user_type" value ="secretary">
+                                <label class="form-check-label" for="secretary">Grade Secretary</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" id="admin" name="user_type" value="administrator">
+                                <label class="form-check-label" for="admin">Administrator</label>
+                            </div>
+                        </div>
+                        <br>
+                        <div class="form-group">
+                            <button class="btn btn-md btn-outline-secondary">Create User</button>
+                        </div>
+                    </form>
+                </div>
+            </div>      
+        <br>
+        <!--Search-->
+        <div class="container-fluid">
+            <h2>Search for User</h2>
+        </div>
+
+        <div class="container">
+            <form class="signup-form" action="/account" method = "POST">
+                <div class="form-row">
+                    <div class="col-6">
+                        <label for="firstname">First Name</label>
+                        <input id="firstname" class="form-control" type="text" placeholder="First Name" name="fname">
+                        <label for="lastname">Last Name</label>
+                        <input id="lastname" class="form-control" type="text" placeholder="Last Name" name="lname">
+                    </div>
+                    <div class="col-6">
+                        <label for="uid">User ID</label>
+                        <input id="uid" class="form-control" type="text" placeholder="User ID" name="uni_id">
+                    </div>
+                    <br>
+                    <div class="form-group">
+                        <button class="btn btn-md btn-outline-secondary">Search</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <br>
+        <!-- STUDENTS -->
+        <div class="container-fluid">
+            <h2>Students</h2>
+        </div>
+        {% for student in students %}
+            <div class="container-fluid">
+                <h3><i>{{student['fname']}} {{student['lname']}}</i></h3>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4><strong>University Info</strong></h4>
+                            <h5>University ID: {{student['uni_id']}}</h5>
+                            <h5>Admitted Year: {{student['admit_year']}}</h5>
+                            <h5>Program: {{student['stud_program']|capitalize}}</h5>
+                        </div>
+
+                        <div class="col-6">
+                            <h4><strong>Personal Info</strong></h4>
+                            <h5>Full Name: {{student['fname']}} {{student['lname']}}</h5>
+                            <h5>Birthday: {{student['bday']}}</h5>
+                            <form action="/update_birthday" method="POST">
+                                <input type="date" name="birthday" id="birthday" placeholder="Change birthday"/>
+                                <input type="hidden" name="student" id="student" value="{{student['uni_id']}}">
+                                <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                            </form>
+                            <h5>Address: {{student['user_address']}}</h5>
+                            <form action="/update_address" method="POST">
+                                <input name="address" id="address" placeholder="Change address"/>
+                                <input type="hidden" name="student" id="student" value="{{student['uni_id']}}">
+                                <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="container-fluid">
+                <h4>Class Info</h4>
+                {% for sem in semesters[student['uni_id']] %}
+                <div class="table-responsive">
+                    <table class="table caption-top table-striped table-bordered w-75">
+                        <caption>{{sem['csem']}} {{sem['cyear']}}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Course Department</th>
+                                <th scope="col">Course Number</th>
+                                <th scope="col">Course Name</th>
+                                <th scope="col">Credits</th>
+                                <th scope="col">Day</th>
+                                <th scope="col">Time</th>
+                                <th scope="col">Grade</th>
+                            </tr>
+                        </thead>
+                            
+                        <tbody>
+                            {% for class in classes[student['uni_id']] %}
+                                {% if class['csem'] == sem['csem'] and class['cyear'] == sem['cyear'] %}
+                                <tr>
+                                    <td>{{class['dname']}}</td>
+                                    <td>{{class['cnum']}}</td>
+                                    <td>{{class['title']}}</td>
+                                    <td>{{class['credits']}}</td>
+                                    <td>{{class['day_of_week']}}</td>
+                                    <td>{{class['class_time']}}</td>
+                                    
+                                    <td>
+                                        {% if class['grade'] %}
+                                            <p>{{class['grade']}}</p>
+                                        {% elif not class['grade'] %} 
+                                            <p>IP</p>
+                                        {% endif %}
+                                        <form action="/update_grade" method="POST">
+                                            <label for="grade">New Grade</label>
+                                            <select name="grade" id="grade">
+                                                <option value="A">A</option>
+                                                <option value="A-">A-</option>
+                                                <option value="B+">B+</option>
+                                                <option value="B">B</option>
+                                                <option value="B-">B-</option>
+                                                <option value="C+">C+</option>
+                                                <option value="C">C</option>
+                                                <option value="F">F</option>
+                                            </select>
+                                            <input type="hidden" name="class" id="class" value="{{class['cid']}}">
+                                            <input type="hidden" name="student" id="student" value="{{student['uni_id']}}">
+                                            <input type="submit" class="btn btn-sm btn-outline-secondary">
+                                        </form>
+                                    </td>
+                                </tr>
+                                
+                                {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div><br>
+            {% endfor %}
+        </div>
+
+        <br><br>
+
+        {% endfor %}
+        <!-- FACULTY -->
+        <div class="container-fluid">
+            <h2>Faculty</h2>
+        </div>
+        {% for professor in faculty %}
+            <div class="container-fluid">
+                <h3>{{professor['fname']}} {{professor['lname']}}</h3>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4><strong>Personal Info</strong></h4>
+                            <h5>Full Name: {{professor['fname']}} {{professor['lname']}}</h5>
+                            <h5>Birthday: {{professor['bday']}}</h5>
+                            <form action="/update_birthday" method="POST">
+                                <input type="date" name="birthday" id="birthday" placeholder="Change birthday"/>
+                                <input type="hidden" name="student" id="student" value="{{professor['uni_id']}}">
+                                <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                            </form>
+                            <h5>Address: {{professor['user_address']}}</h5>
+                            <form action="/update_address" method="POST">
+                                <input name="address" id="address" placeholder="Change address"/>
+                                <input type="hidden" name="student" id="student" value="{{professor['uni_id']}}">
+                                <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="container-fluid">
+                <h2>Class Info</h2>
+                {% for section in sections %}
+                <div class="table-responsive">
+                    <table class="table caption-top table-striped table-bordered w-auto">
+                        <caption>{{section['csem']}} {{section['cyear']}}</caption>
+                        <thead>
+                            <tr>
+                                <th scope="col">Course Department</th>
+                                <th scope="col">Course Number</th>
+                                <th scope="col">Course Name</th>
+                                <th scope="col">Credits</th>
+                                <th scope="col">Day</th>
+                                <th scope="col">Time</th>
+                            </tr>
+                        </thead>
+                            
+                        <tbody>
+                            {% for course in taught[professor['uni_id']] %}
+                            {% if course['csem'] == section['csem'] and course['cyear'] == section['cyear'] %}
+                            <tr>
+                                <td>{{course['dname']}}</td>
+                                <td>{{course['cnum']}}</td>
+                                <td>{{course['title']}}</td>
+                                <td>{{course['credits']}}</td>
+                                <td>{{course['day_of_week']}}</td>
+                                <td>{{course['class_time']}}</td>
+                            </tr>
+                            {% endif %}
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% endfor %}
+            </div><br>
+        {% endfor %}
+        <br><br>
+        <!-- SECRETARY -->
+        <div class="container-fluid">
+            <h2>Secretaries</h2>
+        </div>
+        {% for secretary in secretaries %}
+            <div class="container-fluid">
+                <h2>{{secretary['fname']}} {{secretary['lname']}}</h2>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4><strong>Personal Info</strong></h4>
+                            <h5>Full Name: {{secretary['fname']}} {{secretary['lname']}}</h5>
+                            <h5>Birthday: {{secretary['bday']}}</h5>
+                            <form action="/update_birthday" method="POST">
+                                <input type="date" name="birthday" id="birthday" placeholder="Change birthday"/>
+                                <input type="hidden" name="student" id="student" value="{{secretary['uni_id']}}">
+                                <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                            </form>
+                            <h5>Address: {{secretary['user_address']}}</h5>
+                            <form action="/update_address" method="POST">
+                                <input name="address" id="address" placeholder="Change address"/>
+                                <input type="hidden" name="student" id="student" value="{{secretary['uni_id']}}">
+                                <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>         
+        {% endfor %}
+
+        <br><br>
+
+        <!-- ADMIN -->
+        <div class="container-fluid">
+            <h2>Admins</h2>
+        </div>
+        {% for admin in admins %}
+            <div class="container-fluid">
+                <h2>{{admin['fname']}} {{admin['lname']}}</h2>
+
+                <div class="container">
+                    <div class="row">
+                        <div class="col-6">
+                            <h4><strong>Personal Info</strong></h4>
+                            <h5>Full Name: {{admin['fname']}} {{admin['lname']}}</h5>
+                            <h5>Birthday: {{admin['bday']}}</h5>
+                            <form action="/update_birthday" method="POST">
+                                <input type="date" name="birthday" id="birthday" placeholder="Change birthday"/>
+                                <input type="hidden" name="student" id="student" value="{{admin['uni_id']}}">
+                                <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                            </form>
+                            <h5>Address: {{admin['user_address']}}</h5>
+                            <form action="/update_address" method="POST">
+                                <input name="address" id="address" placeholder="Change address"/>
+                                <input type="hidden" name="student" id="student" value="{{admin['uni_id']}}">
+                                <input type="submit" class="btn btn-sm btn-outline-secondary"/>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </body>
+
+</html>
