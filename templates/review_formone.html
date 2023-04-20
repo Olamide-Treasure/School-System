@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        {% if form_one %}
+            {% for entry in form_one %}
+                <h2>Name: {{ entry['fname'] }} {{ entry['lname'] }}</h2>
+                <h4>Email: {{ entry['email'] }}</h4>
+                <h4>Course ID: {{ entry['course_id'] }}</h4>
+                <h4>Course Name: {{ entry['course_name'] }}</h4>
+                <h4></h4>
+                <h4>Course Number: {{ entry['course_num'] }}</h4>
+
+
+                {% if entry['thesisapproved'] == "True"  %}
+
+
+                <h4 style="color:green; ">Thesis Status: Approved</h4>
+
+
+
+                {% else  %}
+
+                <h4 style="color:red; ">Thesis Status: Not  Approved</h4>
+
+                {% endif   %}
+
+
+                <form action="" method="post">
+                    <input type="hidden" name="student_id" value="{{ entry['user_id'] }}"> <!-- Add this line -->
+                    <div class="form-group">
+                        <label for="status">Select an option</label>
+                        <select class="form-control" id="status" name="status">
+                            <option value="" default>Change Approval status</option>
+                           
+                            <option value="True">Approved</option>
+                            <option value="False">Not Approved</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-primary" id="submitBtn">Submit</button>
+                </form>
+            {% endfor %}
+        {% else %}
+            <h2>No information available for this student.</h2>
+        {% endif %}
+    </div>
+
+   
+{% endblock %}

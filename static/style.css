@@ -1,0 +1,177 @@
+.sameen
+{
+  background-image: linear-gradient(
+    -225deg,
+    #e7ca08 0%,
+    #3F000F 29%,
+    #f6c309 67%,
+    #c1bb15 100%
+  );
+  background-clip: border-box;
+  background-size: 250% auto;
+  color: #c9bbbb;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: textanimation 1.5s linear infinite;
+  animation-direction: alternate-reverse;
+
+}   
+
+
+h1 {
+  animation-name: bckground;
+  animation-duration: 9s;
+  animation-iteration-count: infinite;
+  font-family: Lucida Handwriting, Cursive;
+}
+
+@keyframes textanimation {
+  to {
+    background-color: #C19A6B;
+    background-position: 150% center;
+  }
+}
+
+@keyframes bckground {
+    background-color: #C19A6B;
+}
+
+body {
+  background-color:  #C19A6B;
+  color: #3F000F;
+  font-family:Lucida Handwriting, Cursive;
+}
+
+p {
+  color: #3F000F;
+  font-family: Papyrus, Copperplate, Fantasy;
+}
+li {
+    color: #3F000F;
+    font-family: Papyrus, Copperplate, Fantasy;
+}
+
+button {
+  background-color: #3F000F;
+  color: #C19A6B;
+  padding: 5px 5px;
+  font-family:Lucida Handwriting, Cursive;
+}
+
+.buttons {
+  display: flex;
+}
+
+.buttons button {
+  width: 87px;
+  height: 50px;
+  margin-right: 10px;
+  cursor: pointer;
+  border: 2px solid #C19A6B;
+}
+
+
+.buttons input[type=text] {
+  padding: 6px;
+  margin-top: 8px;
+  margin-right: 16px;
+  font-size: 15px;
+  background-color: #C19A6B;
+  color: #3F000F;
+  font-family:Lucida Handwriting, Cursive;
+  cursor: pointer;
+  border: 2px solid #3F000F;
+  width: 100%;
+}
+
+button[type="submit"] {
+  cursor: pointer;
+  border: 2px solid #C19A6B;
+  
+}
+
+input::placeholder {
+    color: #3F000F;
+    font-family:Lucida Handwriting, Cursive;
+     
+}
+
+#grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(auto, 1fr);
+  grid-gap: 20px;
+}
+.product {
+  border: 1px #C19A6B;
+  padding: 20px;
+  text-align: center;
+}
+.product h2 {
+  margin-top: 0;
+}
+.product p {
+  margin-bottom: 5px;
+}
+
+#wrap {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: (1, 1fr);
+  grid-gap: 20px;
+}
+
+
+.link {
+    color: #3F000F;
+  }
+
+
+select {
+  background-color: #C19A6B;
+  color: #3F000F;
+  font-family:Lucida Handwriting, Cursive;
+}
+
+/* Dropdown Button */
+.dropbtn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 16px;
+  font-size: 16px;
+  border: none;
+}
+
+/* The container <div> - needed to position the dropdown content */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+/* Dropdown Content (Hidden by Default) */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #f1f1f1;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+}
+
+/* Links inside the dropdown */
+.dropdown-content a {
+  color: black;
+  padding: 12px 16px;
+  text-decoration: none;
+  display: block;
+}
+
+/* Change color of dropdown links on hover */
+.dropdown-content a:hover {background-color: #ddd;}
+
+/* Show the dropdown menu on hover */
+.dropdown:hover .dropdown-content {display: block;}
+
+/* Change the background color of the dropdown button when the dropdown content is shown */
+.dropdown:hover .dropbtn {background-color: #3e8e41;}
