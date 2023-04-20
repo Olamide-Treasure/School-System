@@ -1,0 +1,67 @@
+<html>
+  <head>
+    <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+    <title>Student Data</title>
+  </head>
+  <body>
+    <h1 style="text-align:center;"> Student Data </h1>
+    <h2> {{student_info[0][0]['fname']}} {{student_info[0][0]['lname']}} </h2>
+    <h3> Personal Information </h3>
+    <li> Email: {{student_info[0][0]['email']}}</li>
+    <li> Phone number: {{student_info[0][0]['user_phoneNUM']}} </li>
+    <li> Address: {{student_info[0][0]['user_address']}}</li>
+
+    <h3> Academic Information </h3>
+    <li> ID: {{student_info[0][0]['user_id']}} </li>
+    <li> {% if student_info[2]['degree_id'] == 20: %}
+            Master's student
+          {% endif %}
+          {% if student_info[2]['degree_id'] == 21: %}
+            PhD student
+            <li> {% if student_info[-1][0]['thesisapproved'] == 'False': %}
+                Thesis status: Not Approved
+                {% endif %}
+                {% if student_info[-1][0]['thesisapproved'] == 'True': %}
+                Thesis status: Approved
+                {% endif %}
+            </li>
+          {% endif%}
+    </li>
+    <li> Advisor: {{student_info[6][0]['fname']}} {{student_info[6][0]['lname']}} 
+        {% if student_info[6][0]['fname'] == 'N/A': %}
+          <form action="/assign_advisor/{{student_info[0][0]['user_id']}}"> 
+            <button type="submit">Assign Advisor</button>
+        </form>
+        {% endif %}
+    </li>
+    <li> GPA: {{student_info[4]['gpa']}} </li>
+    <li> Total credit hours (including classes IP): {{student_info[5]['total_credit_hours']}} </li>
+    <li> {% if student_info[1]['eligible'] == 'False': %}
+            Not eligible for graduation
+            <ul> <li>Reason(s): </li>
+                {% for x in student_info[1]['reason']: %}
+                  <ul> <li> {{x}} </li> </ul>
+                {% endfor %}
+            </ul>
+          {% endif %}
+          {% if student_info[1]['eligible'] == 'True': %}
+            Eligible for graduation
+            <ul> <form action="/graduate/{{student_info[0][0]['user_id']}}"> 
+                  <button type="submit">Approve for Graduation</button>
+                </form>
+            </ul>
+          {% endif %}
+     </li>
+
+    <hr color=#3F000F;>
+
+    <form action="/gradsec"> 
+      <button type="submit">All students</button>
+    </form>
+
+    <form action="/logout"> 
+      <button type="submit">Log Out</button>
+  </form>
+
+  </body>
+</html>

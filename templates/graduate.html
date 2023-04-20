@@ -1,0 +1,27 @@
+<html>
+  <head>
+    <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+    <title> Graduation </title>
+  </head>
+  <body>
+    <h1> Graduation Successful! </h1> 
+    <h2> {% if data[1][0]['degree_id'] == 20 %}
+          {{data[2][0]['fname']}} {{data[2][0]['lname']}} has successfully graduated with a Master's in Computer Science.
+        {% endif %}
+        {% if data[1][0]['degree_id'] == 21 %}
+          {{data[2][0]['fname']}} {{data[2][0]['lname']}} has successfully graduated with a PhD in Computer Science.
+        {% endif %}
+    </h2>
+
+    <hr color=#3F000F;>
+
+    <form action="/gradsec"> 
+      <button type="submit">All students</button>
+    </form>
+
+    <form action="/logout"> 
+      <button type="submit">Log Out</button>
+    </form>
+
+  </body>
+</html>

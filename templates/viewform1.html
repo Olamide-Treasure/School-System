@@ -1,0 +1,42 @@
+<html>
+  <head>
+    <title>Form 1</title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+  </head>
+<body>
+    <center>
+        <h1 class = "sameen"> Form 1 Information </h1>
+     </center>
+
+<ul>
+    {% if not data %}
+      <p>Student did not submit form 1</p>
+      {% else %}
+      Courses Selected in Form 1: 
+      {% for p in data: %}
+        <p> 
+        <li>Course ID: {{p["course_id"]}} 
+          <br>Course:
+          {% for i in courses: %}
+              {% if p["course_id"] == i["id"]: %}
+                  {{i["course_name"]}} {{i["course_num"]}} 
+                  <br>
+                  Credits: {{i["credit_hours"]}} 
+              {% endif %}
+          {% endfor %}
+          <br>
+    
+        </li>
+       </p>
+  {% endfor %}
+  {% endif %}
+  </ul>
+
+
+
+ <form action = "/"> 
+    <button type="submit">Return to Home Page</button>
+    </form>
+        
+</body>
+ </html>
