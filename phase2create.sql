@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS integration;
+
+CREATE DATABASE integration;
+
 use integration;
 
 SET FOREIGN_KEY_CHECKS = 0;

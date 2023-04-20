@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+    <title> Need Advisor </title>
+  </head>
+  <body>
+    <h1> Students that need advisors </h1>
+    <p> {% for student in need_advisor: %}
+        <li> {{student[0]['student_id']}} </li>
+    </p>
+    {% endfor %}
+
+    <p><a href="/advisors_assigned">Assign advisors to students</a></p>
+    <p><a href="/">Return to student data</a></p>
+    
+  </body>
+</html>
