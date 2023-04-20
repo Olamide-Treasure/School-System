@@ -39,9 +39,6 @@ def sessionType():
 #                    HOME PAGE                     #
 ####################################################
 
-
-#BEGINNING OF SAMEEN'S PART
-
 @app.route('/')
 def home_page():
   if 'username' in session: 
@@ -49,7 +46,9 @@ def home_page():
     
   return render_template("home.html", title = 'Home Page')
 
-
+####################################################
+#                    LOGIN PAGE                    #
+####################################################
 
 @app.route('/userlogin', methods=['GET', 'POST'])
 def login():
@@ -68,7 +67,8 @@ def login():
     data = cur.fetchone()
     db.commit()
 
-  
+
+
   if data != None :
     session['username'] = data['username']
     session['user_id'] = data['user_id']
