@@ -18,8 +18,8 @@ db = connection.connect(
 
 # reconnect to database if to referesh any changes made from another device
 def _reconnect():
-    global mydb
-    mydb = connection.connect(
+    global db
+    db = connection.connect(
         host="phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com",
         user="admin",
         password="phasetwo7",
@@ -41,6 +41,8 @@ def sessionType():
 
 @app.route('/')
 def home_page():
+  _reconnect()
+
   if 'username' in session: 
     return redirect('/userloggedin')
     
@@ -53,7 +55,7 @@ def home_page():
 
 @app.route('/userlogin', methods=['GET', 'POST'])
 def login():
-  
+  _reconnect()
 
   if request.method == "GET":
     return render_template("login.html")
@@ -62,7 +64,6 @@ def login():
 
     # Connect to the database
     try:
-      _reconnect()
       cur = db.cursor(dictionary = True)
       uname = (request.form["username"])
       passwrd = (request.form["password"])
@@ -94,6 +95,40 @@ def login():
   return render_template('login.html')
 
 
+####################################################
+#                   CATALOG PAGE                   #
+####################################################
+
+@app.route('/catalog')
+def catalog():
+  _reconnect()
+  
+  cursor = db.cursor(dictionary=True)
+  cursor.execute("SELECT dept_name FROM course GROUP BY dept_name ORDER BY dept_name ASC")
+  dept = cursor.fetchall()
+
+  course = {}
+
+  for row in dept:
+    cursor.execute("SELECT * FROM course WHERE dept_name = %s", (row["dept_name"],))
+    course[row["dept_name"]] = cursor.fetchall()
+
+  cursor.execute("SELECT * FROM course c JOIN prerequisite p ON p.prereq_id = c.id ORDER BY c.course_num")    
+  prereq = cursor.fetchall()
+  
+  for row in prereq:
+    print(row)
+
+  logged = False
+
+  if 'user_id' in session:
+    logged = True
+
+  return render_template('catalog.html', dept=dept, course=course, prereq=prereq, logged=logged)
+
+####################################################
+#                  LOGIN REDIRECT                  #
+####################################################
 
 @app.route('/userloggedin')
 def user():
@@ -112,8 +147,7 @@ def user():
     data = cur.fetchone()
     if(data != None):
       return redirect('/alumnilogging')
-
-
+    
     #check for admin 
     if(session['type'] == 0):
       return redirect('/admin')
@@ -125,11 +159,12 @@ def user():
    #check for grad secretary 
     elif(session['type'] == 3):
       return redirect('/gradsec')
-
-
+    
   return redirect('/')
 
-
+####################################################
+#                  FACULTY PAGE                    #
+####################################################
 
 #faculty login 
 @app.route('/faculty', methods=['GET', 'POST'])
@@ -1686,6 +1721,5 @@ def gs_assign_advisor(student_id):
 
 
 #END OF Sameen's PART
-
 
 app.run(host='0.0.0.0', port=8080)
