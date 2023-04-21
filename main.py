@@ -39,9 +39,6 @@ def sessionType():
 #                    HOME PAGE                     #
 ####################################################
 
-
-#BEGINNING OF SAMEEN'S PART
-
 @app.route('/')
 def home_page():
   if 'username' in session: 
@@ -49,35 +46,52 @@ def home_page():
     
   return render_template("home.html", title = 'Home Page')
 
+####################################################
+#                    LOGIN PAGE                    #
+####################################################
 
 
 @app.route('/userlogin', methods=['GET', 'POST'])
 def login():
-  #connect to the database
-  cur = db.cursor(dictionary = True)
+  
 
   if request.method == "GET":
     return render_template("login.html")
 
   if request.method == 'POST':
-    uname = (request.form["username"])
-    #print(uname)
-    passwrd = (request.form["password"])
-    #print(passwrd)
-    cur.execute("SELECT username, user_password, user_type, user_id, fname, lname FROM user WHERE username = %s and user_password = %s", (uname, passwrd))
-    data = cur.fetchone()
-    db.commit()
 
-  
-  if data != None :
-    session['username'] = data['username']
-    session['user_id'] = data['user_id']
-    session['fname'] = data['fname']
-    session['lname'] = data['lname']
-    session['type'] = data['user_type']
-    return redirect('/userloggedin')
-  else:
-    return render_template("incorrect.html")
+    # Connect to the database
+    try:
+      _reconnect()
+      cur = db.cursor(dictionary = True)
+      uname = (request.form["username"])
+      passwrd = (request.form["password"])
+    except:
+      flash("Error connecting to database. Please try again", "error")
+      return render_template('login.html')
+
+    # Check if there's any input:
+    if uname == "" or passwrd == "":
+        flash("Please enter your username and password", "error")
+        return render_template('login.html') 
+
+    # Check if the username and password are correct
+    try:
+      cur.execute("SELECT username, user_password, user_type, user_id, fname, lname FROM user WHERE username = %s and user_password = %s", (uname, passwrd))
+      data = cur.fetchone()
+      if data:
+        session['username'] = data['username']
+        session['user_id'] = data['user_id']
+        session['fname'] = data['fname']
+        session['lname'] = data['lname']
+        session['type'] = data['user_type']
+        return redirect('/userloggedin')
+      else:
+        flash("Incorrect username and password", "error")
+    except:
+      flash("Error while logging in. Please try again", "error")
+
+  return render_template('login.html')
 
 
 
