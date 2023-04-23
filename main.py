@@ -103,21 +103,20 @@ def login():
 def catalog():
   _reconnect()
   
+  # Get all departments from classes
   cursor = db.cursor(dictionary=True)
   cursor.execute("SELECT dept_name FROM course GROUP BY dept_name ORDER BY dept_name ASC")
   dept = cursor.fetchall()
 
+  # Store all classes for each depatemtn in a dictionary
   course = {}
-
   for row in dept:
     cursor.execute("SELECT * FROM course WHERE dept_name = %s", (row["dept_name"],))
     course[row["dept_name"]] = cursor.fetchall()
 
-  cursor.execute("SELECT * FROM course c JOIN prerequisite p ON p.prereq_id = c.id ORDER BY c.course_num")    
+  # Get all prerequisites
+  cursor.execute("SELECT * FROM prerequisite p JOIN course c ON p.prereq_id = c.id ORDER BY c.course_num ASC")    
   prereq = cursor.fetchall()
-  
-  for row in prereq:
-    print(row)
 
   logged = False
 

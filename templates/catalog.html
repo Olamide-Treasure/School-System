@@ -15,11 +15,20 @@
 
     </head>
 
+
+
     <body>
-        <img class="img-fluid" src="static/pattern1.svg" alt="">
+        <div class="container-fluid background position-absolute top-0 left-0" style="z-index:-1;"></div>
+        <div class="custom-shape-divider-bottom-1682272289">
+            <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none" style="z-index:2;">
+                <path d="M0,0V46.29c47.79,22.2,103.59,32.17,158,28,70.36-5.37,136.33-33.31,206.8-37.5C438.64,32.43,512.34,53.67,583,72.05c69.27,18,138.3,24.88,209.4,13.08,36.15-6,69.85-17.84,104.45-29.34C989.49,25,1113-14.29,1200,52.47V0Z" opacity=".25" class="shape-fill"></path>
+                <path d="M0,0V15.81C13,36.92,27.64,56.86,47.69,72.05,99.41,111.27,165,111,224.58,91.58c31.15-10.15,60.09-26.07,89.67-39.8,40.92-19,84.73-46,130.83-49.67,36.26-2.85,70.9,9.42,98.6,31.56,31.77,25.39,62.32,62,103.63,73,40.44,10.79,81.35-6.69,119.13-24.28s75.16-39,116.92-43.05c59.73-5.85,113.28,22.88,168.9,38.84,30.2,8.66,59,6.17,87.09-7.5,22.43-10.89,48-26.93,60.65-49.24V0Z" opacity=".5" class="shape-fill"></path>
+                <path d="M0,0V5.63C149.93,59,314.09,71.32,475.83,42.57c43-7.64,84.23-20.12,127.61-26.46,59-8.63,112.48,12.24,165.56,35.4C827.93,77.22,886,95.24,951.2,90c86.53-7,172.46-45.71,248.8-84.81V0Z" class="shape-fill"></path>
+            </svg>
+        </div>
 
         <!-- Navbar Code -->
-        <nav class="navbar navbar-expand-md bg-body p-3 shadow-sm" id="nav">
+        <nav class="navbar navbar-expand-md bg-body p-3 shadow-sm" id="nav" style="z-index: 2;">
 
             <!-- Edit this to inlclude logo link -->
             <a class="navbar-brand" href="/">Logo</a>
@@ -66,36 +75,87 @@
             </div>
         </nav>
 
-
-
         <!-- Title -->
-        <div class="container-fluid my-5 h-50">
+        <div class="container-fluid my-5 h-50" style="z-index: 5;">
             <div class="container">
 
                 <div class="overlay">
 
                 </div>
 
-                <div class="row h-100">
-                    <div class="jumbotron-md h-100 bg-light rounded-3 p-5 shadow">
-                        <h2 class="mb-3 display-2"><strong>Course Catalog</strong></h2>
-                        <p class="lead">Welcome to our Engineering Course Catalog!</p>
-
-                        <div class="container w-50 mx-0">
-                            <h5 class="lead">  
-                                <small>Our page provides information on a variety of engineering courses offered by our institution.
-                                Here you will find details on each course's purpose, learning outcomes, prerequisites, and 
-                                topics covered. Our diverse course offerings include everything from core engineering principles 
-                                to cutting-edge topics in emerging technologies. Browse our catalog and find the perfect 
-                                course to take your engineering skills to the next level.</small>
-                            </h5>
-                        </div>  
-                    
+                <div class="row h-100 bg-light rounded-3 shadow p-3">
+                    <!-- Jumbotron -->
+                    <div class="col-6">
+                        <div class="jumbotron-md h-100">
+                            <h2 class="mb-3 display-2"><strong>Course Catalog</strong></h2>
+                            <p class="lead">Welcome to our Engineering Course Catalog!</p>
+    
+                            <div class="container mx-0">
+                                <h5 class="lead">  
+                                    <small>Our page provides information on a variety of engineering courses offered by our institution.
+                                    Here you will find details on each course's purpose, learning outcomes, prerequisites, and 
+                                    topics covered. Our diverse course offerings include everything from core engineering principles 
+                                    to cutting-edge topics in emerging technologies. Browse our catalog and find the perfect 
+                                    course to take your engineering skills to the next level.</small>
+                                </h5>
+                                <h5><i>See a full list of courses below</i></h5>
+                            </div>  
+                        
+                        </div>
                     </div>
-        
+                    <div class="col-1"></div>
+
+                    <!-- Carousel -->
+                    <div class="col-5 d-flex justify-content-center align-items-center">
+                        <div id="carouselExampleInterval" class="carousel slide" data-bs-ride="carousel">
+                            <div class="carousel-inner">
+                                <div class="carousel-item active position-relative" data-bs-interval="5000">
+                                    <div class="container position-absolute p-5 mx-1 my-3" style="color: white; z-index:1;">
+                                        <h1>Computer Science</h1>
+                                        <p>Computer Science courses at Horizon provide students with a comprehensive 
+                                            understanding of programming languages and software development.</p>
+                                        <a href="#CSCI">View Courses</a>
+                                    </div>
+                                    <div class="blur w-100 h-100 overflow-hidden"></div>
+                                    <img src="static/computer_science.jpg" class="d-block w-100" alt="Computer Science">
+                                </div>
+                                <div class="carousel-item" data-bs-interval="5000">
+                                    <div class="container position-absolute p-5 mx-1 my-3" style="color: white; z-index:1;">
+                                        <h1>Electrical Engineering</h1>
+                                        <p>Electrical Engineering courses at Horizon cover a wide range of topics, including 
+                                            power systems, electronics, and telecommunications.</p>
+                                        <a href="#ECE">View Courses</a>
+                                    </div>
+                                    <div class="blur w-100 h-100 overflow-hidden"></div>
+                                    <img src="static/electrical_engineering.jpg" class="d-block w-100" alt="Electrical Engineering">
+                                </div>
+                                <div class="carousel-item" data-bs-interval="5000">
+                                    <div class="container position-absolute p-5 mx-1 my-3" style="color: white; z-index:1;">
+                                        <h1>Mathmatics</h1>
+                                        <p>Mathematics courses at Horizon equip students with the analytical and problem-solving 
+                                            skills necessary for a variety of careers, including finance, engineering, and data 
+                                            analysis.</p>
+                                        <a href="#MATH">View Courses</a>
+                                    </div>
+                                    <div class="blur w-100 h-100 overflow-hidden"></div>
+                                    <img src="static/math.jpg" class="d-block w-100" alt="math">
+                                </div>
+                            </div>
+                            <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Previous</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleInterval" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Next</span>
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>          
+
+        <div class="container h-25 my-5"></div>
 
 
         <!-- Courses -->
@@ -105,9 +165,9 @@
 
                 <div class="col-sm-2">
 
-                    <div class="flex-shrink-0 pt-2 bg-white sticky-top">
+                    <div class="flex-shrink-0 pt-2 bg-white sticky-top py-3 rounded-3">
                         
-                        <h2 class="border-bottom">Courses</h2>
+                        <h2 class="border-bottom px-1">Courses</h2>
                         
                         <ul class="list-unstyled ps-0">
                             {% for row in dept %}
@@ -123,7 +183,7 @@
                                                 <div class="row">
                                                     <div class="col-2"></div>
                                                     <div class="col-10">
-                                                        <li><a class="rounded text-decoration-none" href="#{{row2['id']}}">{{full_title}}</a></li>
+                                                        <li><a class="rounded text-decoration-none" href="#{{full_title}}">{{full_title}}</a></li>
                                                     </div>
                                                 </div>
                                             </div>
@@ -153,13 +213,13 @@
 
                                     <h1 class="mb-2 me-3"><strong>{{name}}</strong></h1>
                                 
-                                    <h5 class="mb-3">({{row["dept_name"]}})</h5>
+                                    <h5 class="mb-3" id="{{row['dept_name']}}">({{row["dept_name"]}})</h5>
                                 </div>
                             </div>
 
                             {% for row2 in course[row["dept_name"]] %}
                                 <div class="row">
-                                    <div class="container-fluid text-start border pt-3 mb-2 shadow-sm" id='{{row2["id"]}}'>
+                                    <div class="container-fluid text-start border pt-3 mb-2 shadow-sm rounded-3" id='{{row2["dept_name"]}} {{row2["course_num"]}}' style="z-index: 3; background-color:white;">
     
                                         <div class="container mx-1 d-flex flex-row align-items-end">
                                             <h2 class="mb-2 me-3"><strong>{{row2["course_name"]}}</strong> - <small>{{row2["dept_name"]}} {{row2["course_num"]}}</small></h2>
@@ -170,7 +230,7 @@
                                             <h5>Prerequisites:
                                                 {% for row3 in prereq %}
                                                     {% if row2['id'] == row3['course_id'] %}
-                                                        <a class="text-decoration-none" href='#{{row3["prereq_"] ~ " " ~ row3["prereq_cnum"]}}'>{{row3['prereq_dname'] ~ " " ~ row3['prereq_cnum']}}</a>
+                                                        <a class="text-decoration-none" href='#{{row3["dept_name"] ~ " " ~ row3["course_num"]}}'>{{row3['dept_name'] ~ " " ~ row3['course_num']}}</a>
                                                     {% endif %}
                                                 {% endfor %}
                                             </h5>
@@ -200,11 +260,13 @@
             </div>
         </div>
     
-        <div class="container mb-3">
+        <div class="container mb-5">
             <div class="row">
                 <a href="#">Back To Top</a>
             </div>
         </div>
+
     </body>
+
 
 </html>
