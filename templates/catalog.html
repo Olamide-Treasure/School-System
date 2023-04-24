@@ -60,7 +60,7 @@
                         {% endif %}
 
                         <li class="nav-item">
-                            <a class="nav-link" href="/account">Account</a>
+                            <a class="nav-link" href="/userloggedin">Account</a>
                         </li>
 
                         <li class="nav-item">
@@ -68,7 +68,7 @@
                         </li>
                     {% else %}
                         <li class="nav-item">
-                            <a class="nav-link" href="/login">Sign In</a>
+                            <a class="nav-link" href="/userlogin">Sign In</a>
                         </li>
                     {% endif %}
                 </ul>
@@ -114,7 +114,7 @@
                                         <h1>Computer Science</h1>
                                         <p>Computer Science courses at Horizon provide students with a comprehensive 
                                             understanding of programming languages and software development.</p>
-                                        <a href="#CSCI">View Courses</a>
+                                        <a href="#CSCI" class="text-decoration-none">View Courses</a>
                                     </div>
                                     <div class="blur w-100 h-100 overflow-hidden"></div>
                                     <img src="static/computer_science.jpg" class="d-block w-100" alt="Computer Science">
@@ -124,7 +124,7 @@
                                         <h1>Electrical Engineering</h1>
                                         <p>Electrical Engineering courses at Horizon cover a wide range of topics, including 
                                             power systems, electronics, and telecommunications.</p>
-                                        <a href="#ECE">View Courses</a>
+                                        <a href="#ECE" class="text-decoration-none">View Courses</a>
                                     </div>
                                     <div class="blur w-100 h-100 overflow-hidden"></div>
                                     <img src="static/electrical_engineering.jpg" class="d-block w-100" alt="Electrical Engineering">
@@ -135,7 +135,7 @@
                                         <p>Mathematics courses at Horizon equip students with the analytical and problem-solving 
                                             skills necessary for a variety of careers, including finance, engineering, and data 
                                             analysis.</p>
-                                        <a href="#MATH">View Courses</a>
+                                        <a href="#MATH" class="text-decoration-none">View Courses</a>
                                     </div>
                                     <div class="blur w-100 h-100 overflow-hidden"></div>
                                     <img src="static/math.jpg" class="d-block w-100" alt="math">
@@ -198,7 +198,7 @@
                 
                 <div class="col-md-10 pt-1 ">
                     {% for row in dept %}
-                        <div class="container mb-5">
+                        <div class="container mb-5" id="{{row['dept_name']}}">
                             <div class="row mb-3">
                                 <div class="container text-start d-flex flex-row align-items-end px-0">
                                     {% set name = None %}
@@ -213,7 +213,7 @@
 
                                     <h1 class="mb-2 me-3"><strong>{{name}}</strong></h1>
                                 
-                                    <h5 class="mb-3" id="{{row['dept_name']}}">({{row["dept_name"]}})</h5>
+                                    <h5 class="mb-3">({{row["dept_name"]}})</h5>
                                 </div>
                             </div>
 
@@ -262,7 +262,7 @@
     
         <div class="container mb-5">
             <div class="row">
-                <a href="#">Back To Top</a>
+                <a href="#" class="text-decoration-none">Back To Top</a>
             </div>
         </div>
 

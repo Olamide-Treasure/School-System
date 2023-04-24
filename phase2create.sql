@@ -301,6 +301,28 @@ insert into student_advisors values(55555555, 11111111);
 insert into student_advisors values(66666666, 22222222);
 insert into student_advisors values(99999999, 22222222);
 
+-- FALL 2023 --
+insert into class_section values(30, 'Fall', '2023', 'M', '15:00-17:30', 100, 11111111);
+insert into class_section values(31, 'Fall', '2023', 'T', '15:00-17:30', 101, 11111111);
+insert into class_section values(32, 'Fall', '2023', 'W', '15:00-17:30', 102, 11111111);
+insert into class_section values(33, 'Fall', '2023', 'M', '18:00-20:30', 104, 11111111);
+insert into class_section values(34, 'Fall', '2023', 'T', '18:00-20:30', 105, 11111111);
+insert into class_section values(35, 'Fall', '2023', 'W', '18:00-20:30', 106, 11111111);
+insert into class_section values(36, 'Fall', '2023', 'R', '18:00-20:30', 107, 11111111);
+insert into class_section values(37, 'Fall', '2023', 'T', '15:00-17:30', 108, 11111111);
+insert into class_section values(38, 'Fall', '2023', 'M', '18:00-20:30', 110, 11111111);
+insert into class_section values(39, 'Fall', '2023', 'M', '15:30-18:00', 111, 11111111);
+insert into class_section values(40, 'Fall', '2023', 'R', '18:00-20:30', 109, 11111111);
+insert into class_section values(41, 'Fall', '2023', 'W', '18:00-20:30', 112, 11111111);
+insert into class_section values(42, 'Fall', '2023', 'T', '18:00-20:30', 113, 11111111);
+insert into class_section values(43, 'Fall', '2023', 'M', '18:00-20:30', 114, 11111111);
+insert into class_section values(44, 'Fall', '2023', 'W', '18:00-20:30', 115, 11111111);
+insert into class_section values(45, 'Fall', '2023', 'W', '15:00-17:30', 118, 11111111);
+insert into class_section values(46, 'Fall', '2023', 'M', '18:00-20:30', 119, 11111111);
+insert into class_section values(47, 'Fall', '2023', 'T', '18:00-20:30', 120, 11111111);
+insert into class_section values(48, 'Fall', '2023', 'W', '18:00-20:30', 121, 11111111);
+insert into class_section values(49, 'Fall', '2023', 'R', '16:00-18:30', 117, 11111111);
+
 -- SPRING 2023 --
 insert into class_section values(30, 'Spring', '2023', 'M', '15:00-17:30', 100, 11111111);
 insert into class_section values(31, 'Spring', '2023', 'T', '15:00-17:30', 101, 11111111);
@@ -370,6 +392,15 @@ insert into class_section values(49, 'Spring', '2022', 'R', '16:00-18:30', 117, 
 
 
 -- STUDENT TRANSCRIPTS --
+
+insert into student_courses values(55555555, 30, 'A', 'Fall', '2023');
+insert into student_courses values(55555555, 32, 'A', 'Fall', '2023');
+insert into student_courses values(55555555, 31, 'A', 'Fall', '2023');
+insert into student_courses values(55555555, 33, 'A', 'Fall', '2023');
+insert into student_courses values(55555555, 36, 'A', 'Fall', '2023');
+
+
+
 insert into student_courses values(55555555, 30, 'A', 'Fall', '2022');
 insert into student_courses values(55555555, 32, 'A', 'Fall', '2022');
 insert into student_courses values(55555555, 31, 'A', 'Fall', '2022');
