@@ -1,6 +1,7 @@
 import mysql.connector as connection
 from flask import Flask, session, render_template, redirect, url_for, request, flash
-import time, random, datetime
+import time, random
+from datetime import datetime
 
 app = Flask('app')
 app.secret_key = 'SECRET_KEY'
@@ -18,22 +19,103 @@ db = connection.connect(
 
 # reconnect to database if to referesh any changes made from another device
 def _reconnect():
-    global mydb
-    mydb = connection.connect(
+    global db
+    db = connection.connect(
         host="phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com",
         user="admin",
         password="phasetwo7",
         database="integration"
     )
 
+# given a time string, return the start and end time
+def _process_time(class_time):
+    time_list = class_time.split("-")
+
+    start_time = float(time_list[0][0:2])
+    if str(time_list[0][3]) != '0':
+        start_time += 0.5
+
+    end_time = float(time_list[1][0:2])
+    if str(time_list[1][3]) != '0':
+        end_time += 0.5
+
+    return start_time, end_time
+
+# uses the current time to determine the current semester
+def _get_curr_semester():
+    seasons = {
+            'Spring': ['August','September', 'October', 'November', 'December'],
+            'Fall': ['January', 'February', 'March', 'April', 'May', 'June']
+            }
+    
+    current_time = datetime.now()
+    current_month = current_time.strftime('%B')
+    current_year = int(current_time.strftime('%Y'))
+
+    for season in seasons:
+      if current_month in seasons[season]:
+        if season == 'Spring':
+          current_year += 1
+        return season, current_year
+    return 'Invalid input month'
+
+def _calendar_map(class_time):
+    times = _process_time(class_time)
+    hour1 = times[0] - 12
+    hour2 = times[1] - 12
+    diff = hour2 - hour1
+
+    return hour1, hour2, diff*2+1
+
+
 
 def sessionStatus():
     return session['user_id']
 
-
 def sessionType():
     return session['type']
 
+
+####################################################
+#                WEBSITE FUNCTIONS                 #
+####################################################
+
+# Reset the database
+@app.route('/reset', methods=['GET', 'POST'])
+def reset():
+  cur = db.cursor(dictionary=True)
+  with open('phase2create.sql', 'r') as f:
+    sql_scr = f.read()
+  sql_c = sql_scr.split(';')
+  for c in sql_c:
+    cur.execute(c)
+    db.commit()
+  session.pop('username', None)
+  session.pop('user_id', None)
+  session.pop('fname', None)
+  session.pop('lname', None)
+  session.pop('type', None)
+  session.clear()
+
+  return redirect('/')
+
+# Commits all the saved registered classes to the database
+@app.route('/checkout', methods=['GET', 'POST'])
+def checkout():
+    # Commit data to enrollment table
+    if request.method == 'POST':
+        cursor = db.cursor(dictionary=True)
+        semester = _get_curr_semester()
+        for cid in session["registration"]:
+            cursor.execute("INSERT INTO Enrollment (stud_id, cid, csem, cyear) VALUES (%s, %s, %s, %s)", (id, cid, semester[0], semester[1]))
+            db.commit()
+
+        session["registration"] = []
+        session.modified = True
+
+        flash("You've successfully registered", "success")
+
+    return redirect("/register") 
 
 ####################################################
 #                    HOME PAGE                     #
@@ -41,9 +123,8 @@ def sessionType():
 
 @app.route('/')
 def home_page():
-  if 'username' in session: 
-    return redirect('/userloggedin')
-    
+  _reconnect()
+  
   return render_template("home.html", title = 'Home Page')
 
 ####################################################
@@ -53,7 +134,7 @@ def home_page():
 
 @app.route('/userlogin', methods=['GET', 'POST'])
 def login():
-  
+  _reconnect()
 
   if request.method == "GET":
     return render_template("login.html")
@@ -62,7 +143,6 @@ def login():
 
     # Connect to the database
     try:
-      _reconnect()
       cur = db.cursor(dictionary = True)
       uname = (request.form["username"])
       passwrd = (request.form["password"])
@@ -94,6 +174,39 @@ def login():
   return render_template('login.html')
 
 
+####################################################
+#                   CATALOG PAGE                   #
+####################################################
+
+@app.route('/catalog')
+def catalog():
+  _reconnect()
+  
+  # Get all departments from classes
+  cursor = db.cursor(dictionary=True)
+  cursor.execute("SELECT dept_name FROM course GROUP BY dept_name ORDER BY dept_name ASC")
+  dept = cursor.fetchall()
+
+  # Store all classes for each depatemtn in a dictionary
+  course = {}
+  for row in dept:
+    cursor.execute("SELECT * FROM course WHERE dept_name = %s", (row["dept_name"],))
+    course[row["dept_name"]] = cursor.fetchall()
+
+  # Get all prerequisites
+  cursor.execute("SELECT * FROM prerequisite p JOIN course c ON p.prereq_id = c.id ORDER BY c.course_num ASC")    
+  prereq = cursor.fetchall()
+
+  logged = False
+
+  if 'user_id' in session:
+    logged = True
+
+  return render_template('catalog.html', dept=dept, course=course, prereq=prereq, logged=logged)
+
+####################################################
+#                  LOGIN REDIRECT                  #
+####################################################
 
 @app.route('/userloggedin')
 def user():
@@ -105,15 +218,13 @@ def user():
     data = cur.fetchone()
     if(data != None):
       return redirect('/studentlogging')
-
     
     #check for the alumni 
     cur.execute("SELECT student_id FROM alumni WHERE student_id = %s", (session['user_id'], ))
     data = cur.fetchone()
     if(data != None):
       return redirect('/alumnilogging')
-
-
+    
     #check for admin 
     if(session['type'] == 0):
       return redirect('/admin')
@@ -125,11 +236,107 @@ def user():
    #check for grad secretary 
     elif(session['type'] == 3):
       return redirect('/gradsec')
-
-
+    
   return redirect('/')
 
+####################################################
+#                REGISTRATION PAGE                 #
+####################################################
 
+@app.route('/register', methods=['GET', 'POST'])
+def register():
+    _reconnect()
+
+    # Connect to database
+    cursor = db.cursor(dictionary=True)
+    semester = _get_curr_semester()
+    query = "SELECT * FROM class_section cs \
+            JOIN course c ON cs.course_id = c.id WHERE \
+            cs.csem = %s AND cs.cyear = %s"
+    params = [semester[0], semester[1]]
+
+    # Display the courses
+    if request.method == 'POST':   # If request = POST, query based on form data (i.e search function)
+        dname = request.form["dname"]
+        cnum = request.form["cnum"]
+        cid = request.form["cid"]
+        title = request.form["title"]  
+
+        if dname != "":
+            query += " AND c.dept_name LIKE  %s"
+            params.append(f"%{dname}%")
+        
+        if cnum != "":
+            query += " AND c.course_num = %s"
+            params.append(cnum)
+
+        if cid != "":
+            query += " AND cs.class_id = %s"
+            params.append(cid)
+
+        if title != "":
+            query += " AND c.course_name LIKE %s"
+            params.append(f"%{title}%")
+       
+    cursor.execute(query, params)
+    classes = cursor.fetchall()
+
+    instructor_list = {}
+    for each_class in classes:
+        cursor.execute("SELECT fname, lname FROM user WHERE user_id = %s", (each_class['faculty_id'],))
+        instructor_list[each_class['faculty_id']] = cursor.fetchone()
+
+    cursor.execute("SELECT * FROM prerequisite p JOIN course c ON p.prereq_id = c.id ORDER BY c.course_num")    
+    prereqs = cursor.fetchall()
+
+    renderer = {
+        "cid": "Class ID",
+        "csem": "Semester",
+        "cyear": "Year",
+        "day_of_week": "Day of week",
+        "class_time": "Class Time",
+        "fid": "Instructor",
+        "dname": "Department",
+        "cnum": "Course Number",
+        "class_section": "Class Section",
+        "title": "Title",
+        "credits": "Credits",
+    }
+    cursor.execute('''SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id 
+    AND s.csem = c.csem AND s.cyear = c.cyear JOIN course i ON c.course_id = i.id 
+    WHERE s.student_id = %s AND s.cyear = %s AND s.csem = %s ORDER BY c.class_time, CASE c.day_of_week 
+    WHEN 'M' THEN 1 
+    WHEN 'T' THEN 2 
+    WHEN 'W' THEN 3 
+    WHEN 'R' THEN 4
+    ELSE 5 
+    END''', (session['user_id'], semester[1], semester[0]))   
+    schedule = cursor.fetchall()
+
+    intervals = [("1:00", 1.0),("1:30", 1.5),
+                 ("2:00", 2.0),("2:30", 2.5),
+                 ("3:00", 3.0),("3:30", 3.5),
+                 ("4:00", 4.0),("4:30", 4.5),
+                 ("5:00", 5.0),("5:30", 5.5),
+                 ("6:00", 6.0),("6:30", 6.5),
+                 ("7:00", 7.0),("7:30", 7.5),
+                 ("8:00", 8.0),("8:30", 8.5),
+                 ("9:00", 9.0),("9:30", 9.5),]
+    week = ['M', 'T', 'W', 'R', 'F']
+
+    times = {}
+    for row in schedule:
+      time = _calendar_map(row['class_time'])
+      times[row['class_id']] = [time[0], time[1], time[2], row['day_of_week']]
+
+    return render_template('registration.html', schedule=schedule, renderer=renderer, instructor_list=instructor_list,
+                            classes=classes, prereqs=prereqs, session=session, semester=semester, times=times, 
+                            intervals=intervals, week=week)
+
+
+####################################################
+#                  FACULTY PAGE                    #
+####################################################
 
 #faculty login 
 @app.route('/faculty', methods=['GET', 'POST'])
@@ -1063,26 +1270,6 @@ def addalumni():
 
 
 
-@app.route('/reset', methods=['GET', 'POST'])
-def reset():
-  cur = db.cursor(dictionary=True)
-  with open('create.sql', 'r') as f:
-    sql_scr = f.read()
-  sql_c = sql_scr.split(';')
-  for c in sql_c:
-    cur.execute(c)
-    db.commit()
-  session.pop('username', None)
-  session.pop('user_id', None)
-  session.pop('fname', None)
-  session.pop('lname', None)
-  session.pop('type', None)
-  session.clear()
-
-
-  return redirect('/')
-
-
 
 @app.route('/logout')
 def logout():
@@ -1686,6 +1873,5 @@ def gs_assign_advisor(student_id):
 
 
 #END OF Sameen's PART
-
 
 app.run(host='0.0.0.0', port=8080)
