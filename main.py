@@ -5,7 +5,6 @@ from datetime import datetime
 
 app = Flask('app')
 app.secret_key = 'SECRET_KEY'
-letterID = 0
 db = connection.connect(
     host="phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com",
     user="admin",
@@ -84,8 +83,7 @@ def checkComplete():
     if(app["student_id"]!=None and app["semester"]!=None and app["s_year"]!=None and app["degree_type"]!=None and app["interest"]!=None and app["experience"]!=None):
       cursor.execute("UPDATE applications SET status = 'review' WHERE student_id = %s and semester = %s and s_year = %s", (app["student_id"], app["semester"], app["s_year"]))
       db.commit()
-  global letterID
-  letterID += 1
+  
 
 
 ####################################################
@@ -259,6 +257,10 @@ def user():
     #check for applicant 
     if(session['type'] == 6):
       return redirect('/welcome')
+
+    #check for applicant 
+    if(session['type'] == 7):
+      return redirect('/cac')
 
     #check for faculty advisor
     elif(session['type'] == 1):
@@ -1956,7 +1958,7 @@ def application():
                       (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))
       
-      
+       
        uid = session["user_id"]
        
        rname = request.form["field_rName"]
@@ -1971,7 +1973,7 @@ def application():
        affil2 = request.form["field_affil2"]
        email2 = request.form["field_email2"]
        
-       cursor.execute("INSERT INTO letter (user_id, letter_id, contents, recommenderName, recommenderAffil, recommenderEmail,  recommenderName1, recommenderAffil1, recommenderEmail1,  recommenderName2, recommenderAffil2, recommenderEmail2) VALUES (%s, %s, 'please', %s, %s, %s,%s,%s,%s,%s,%s,%s)", (uid, letterID, rname, affil, email,  rname1, affil1, email1,  rname2, affil2, email2,))
+       cursor.execute("INSERT INTO letter (user_id, letter_id, contents, recommenderName, recommenderAffil, recommenderEmail,  recommenderName1, recommenderAffil1, recommenderEmail1,  recommenderName2, recommenderAffil2, recommenderEmail2) VALUES (%s, '', 'please', %s, %s, %s,%s,%s,%s,%s,%s,%s)", (uid, rname, affil, email,  rname1, affil1, email1,  rname2, affil2, email2,))
       
        db.commit()
        checkComplete()
@@ -2026,8 +2028,7 @@ def incomplete():
        cursor.execute("INSERT INTO applications VALUES ('incomplete', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,'sent','not decided')", 
                       (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))
-      #  global letterID
-      #  letterID += 2
+      
       
        uid = session["user_id"]
        
@@ -2043,7 +2044,7 @@ def incomplete():
        affil2 = request.form["field_affil2"]
        email2 = request.form["field_email2"]
        
-       cursor.execute("INSERT INTO letter (user_id, letter_id, contents, recommenderName, recommenderAffil, recommenderEmail,  recommenderName1, recommenderAffil1, recommenderEmail1,  recommenderName2, recommenderAffil2, recommenderEmail2) VALUES (%s, %s, 'please', %s, %s, %s,%s,%s,%s,%s,%s,%s)", (uid, letterID, rname, affil, email,  rname1, affil1, email1,  rname2, affil2, email2,))
+       cursor.execute("INSERT INTO letter (user_id, letter_id, contents, recommenderName, recommenderAffil, recommenderEmail,  recommenderName1, recommenderAffil1, recommenderEmail1,  recommenderName2, recommenderAffil2, recommenderEmail2) VALUES (%s, '', 'please', %s, %s, %s,%s,%s,%s,%s,%s,%s)", (uid, rname, affil, email,  rname1, affil1, email1,  rname2, affil2, email2,))
        db.commit()
        return redirect('/welcome')
    return render_template("application.html", info = info)
@@ -2107,6 +2108,23 @@ def finalDecision(student_id):
     db.commit()
     return render_template("final.html")
   return render_template("final.html")
+
 #make into a student if yes
+
+@app.route('/cac')
+def cac():
+   cursor = db.cursor(buffered = True)
+   cursor.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s", (6,))
+   applicants = cursor.fetchall()
+   cursor.execute("SELECT user_id, fname, lname, p_semester, p_year FROM review INNER JOIN user on user.user_id = review.review_id")
+   reviews = cursor.fetchall() 
+   return render_template("cac.html", applicants = applicants, reviews = reviews)
+
+@app.route('/cacview')
+def cacview():
+   cursor = db.cursor(buffered = True)
+   cursor.execute("SELECT * from user INNER JOIN applications ON user_id = student_id WHERE user_type = 6")
+   appinfo = cursor.fetchone()
+   return render_template("cacview.html", appinfo = appinfo)
 
 app.run(host='0.0.0.0', port=8080)

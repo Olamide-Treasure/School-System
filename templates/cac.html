@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+<h2> All Applicants </h2>
+{% for applicant in applicants: %}
+<p> {{applicant['fname']}} {{applicant['lname']}}</a>
+  &nbsp&nbsp&nbsp <form action="/cacview"> 
+    <button type="submit">View information</button>
+  </form>
+</p>
+{% endfor %}
+
+<hr color=#3F000F;>
+        <h2> Application needing review </h2>
+        {% for review in reviews: %}
+        <p> {{review['fname']}} {{review['lname']}} {{review['p_semester']}} {{review['p_year']}} application</a>
+          &nbsp&nbsp&nbsp <form action="/appreview">
+            <button type="submit">Make Final decision</button>
+          </form>
+        </p>
+        {% endfor %}
+
+
+
+</body>
+</html>
