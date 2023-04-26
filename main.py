@@ -183,14 +183,11 @@ def add():
       cursor.execute('''SELECT p.prereq_id FROM class_section c
       JOIN course i ON c.course_id = i.id
       JOIN prerequisite p ON i.id = p.course_id
-      WHERE i.id = %s''',(cid, ))
+      WHERE c.class_id = %s''',(cid, ))
       ids = cursor.fetchall()
-      print(ids)
 
       cursor.execute("SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id JOIN course i ON c.course_id = i.id WHERE s.student_id = %s GROUP BY i.id", (session['user_id'],))
       taken = cursor.fetchall()
-      for row in taken:
-        print(row['id'])
       
       for id in ids:
         # Check if the id appears in taken 
