@@ -235,7 +235,7 @@ def catalog():
 #                  LOGIN REDIRECT                  #
 ####################################################
 
-@app.route('/userloggedin')
+@app.route('/userloggedin', methods=['GET', 'POST'])
 def user():
   if 'username' in session: 
     cur = db.cursor(dictionary = True)
