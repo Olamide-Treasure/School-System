@@ -1,3 +1,4 @@
+-- Active: 1682009432499@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
 
 use integration;
 
@@ -408,24 +409,24 @@ insert into class_section values(49, 'Spring', '2022', 'R', '16:00-18:30', 117, 
 
 -- STUDENT TRANSCRIPTS --
 
-insert into student_courses values(55555555, 30, 'A', 'Fall', '2023');
-insert into student_courses values(55555555, 32, 'A', 'Fall', '2023');
-insert into student_courses values(55555555, 31, 'A', 'Fall', '2023');
-insert into student_courses values(55555555, 33, 'A', 'Fall', '2023');
-insert into student_courses values(55555555, 36, 'A', 'Fall', '2023');
+--SW Engineering--
+insert into student_courses values(55555555, 39, 'B', 'Spring','2023'); 
+--Graphics 1--
+insert into student_courses values(55555555, 41, 'F', 'Spring','2023'); 
+--Multimedia--
+insert into student_courses values(55555555, 42, 'B', 'Spring','2023'); 
+--Security 1--
+insert into student_courses values(55555555, 40, 'B', 'Spring','2023'); 
 
-
-
+--SW Paradigms--
 insert into student_courses values(55555555, 30, 'A', 'Fall', '2022');
+--Algorithms--
 insert into student_courses values(55555555, 32, 'A', 'Fall', '2022');
+--Computer Architecture--
 insert into student_courses values(55555555, 31, 'A', 'Fall', '2022');
-insert into student_courses values(55555555, 33, 'A', 'Fall', '2022');
-insert into student_courses values(55555555, 34, 'A', 'Fall', '2022');
-insert into student_courses values(55555555, 35, 'B', 'Fall', '2022');
-insert into student_courses values(55555555, 37, 'B', 'Fall', '2022');
-insert into student_courses values(55555555, 41, 'B', 'Fall', '2022');
-insert into student_courses values(55555555, 42, 'B', 'Fall', '2022');
-insert into student_courses values(55555555, 36, 'B', 'Fall', '2022');
+--Networks 1--
+insert into student_courses values(55555555, 33, 'A', 'Fall', '2022'); 
+
 
 insert into student_courses values(66666666, 47, 'C', 'Fall', '2022');
 insert into student_courses values(66666666, 30, 'B', 'Fall', '2022');
