@@ -1,0 +1,216 @@
+<html>
+  <head>
+    <title>  Apply </title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+    <script>
+      function onlyNumberKey(evt) {
+            
+          // Only ASCII character in that range allowed
+          var ASCIICode = (evt.which) ? evt.which : evt.keyCode
+          if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
+              return false;
+          return true;
+      }
+    </script>
+    <script>
+        function detailssubmit() {
+            alert("Your details were Submitted");
+        }
+        function resetInputs(div) {
+        var inputs = div.getElementsByTagName("input");
+        for (var i = 0; i < inputs.length; i++) {
+          inputs[i].value = "N/A";
+        }
+      }
+      function blankInputs(div) {
+        var inputs = div.getElementsByTagName("input");
+        for (var i = 0; i < inputs.length; i++) {
+          inputs[i].value = "";
+        }
+      }
+    </script>
+  </head>
+  <body class = "bcolor">
+    <form action='/logout'>  <input type="submit" class = "logout button" name="logout" value="logout"> </b> </form>
+   <c class = "note"> <b> Note: if a field does not apply to you, fill in N/A </b></c> <br> 
+
+   <br>
+   <form action = '/application', method="POST">
+    <fieldset> 
+      <legend> Personal Information</legend> 
+      First Name <input type = "text" name = "fname" value = "{{ info['fname'] }}" readonly> 
+        Middle Initial<input type = "text" name = "minit" value = "{{ info['minit'] }}" readonly> 
+        Last Name<input type = "text" name = "lname" value = "{{ info['lname'] }}" readonly> <br>
+        Address <input type = "text" name = "address" value = "{{ info['address'] }}" readonly> 
+        SSN<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "ssn" value = "{{ info['ssn'] }}" readonly> 
+        Email <input type = "text" name = "email" value = "{{ info['email'] }}" readonly>
+        Phone number<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "phone_no" value = "{{ info['phone_no'] }}" readonly> <br>
+     
+    </fieldset>
+   <fieldset>
+    <legend>General Information</legend>
+    <label for="semester">Semester:</label>
+    <select id="semester" name="semester">
+      <option value="">Choose one</option>
+      <option value="FALL">Fall</option>
+      <option value="SPRING">Spring</option>
+    </select><br>
+    <label for="s_year">Year:</label>
+    <select id="s_year" name="s_year">
+      <option value="">Choose one</option>
+      <option value="2021">2021</option>
+      <option value="2022">2022</option>
+      <option value="2023">2023</option>
+      <option value="2024">2024</option>
+    </select><br>
+    <label for="degree_type">Degree applying for:</label>
+    <select id="degree_type" name="degree_type" >
+      <option value="">Choose one</option>
+      <option value="Masters">Masters</option>
+      <option value="PHD">PHD</option>
+    </select>
+  </fieldset>
+
+    <br>
+
+    <fieldset>
+      <legend>Previous Degree Information</legend>
+      Degree type: <select id="prev_degree_type" name="prev_degree_type" ><br>
+        <option value = "">Choose one</option>
+        <option value = "Masters">Masters</option>
+        <option value = "BS/BA">BS/BA</option>
+
+      </select> 
+      <br>
+      <div id="masters" style="display: none">
+      Master's GPA: <input type="text" name="prior_ms_deg_gpa">
+      Master's Major: <input type="text" name="prior_ms_deg_major">
+      Master's Graduation year: <input type="text" name="prior_ms_deg_year" onkeypress="return onlyNumberKey(event)" maxlength="4">
+      Master's University: <input type="text" name="prior_ms_deg_university">
+      </div>
+      <div id="bach" style="display: none">
+        Bachelor's GPA: <input type="text" name="prior_bac_deg_gpa" >
+        Bachelor's Major: <input type="text" name="prior_bac_deg_major">
+        Bachelor's Graduation year: <input type="text" name="prior_bac_deg_year" onkeypress="return onlyNumberKey(event)"  maxlength="4">
+        Bachelor's University: <input type="text" name="prior_bac_deg_university" >
+      </div>
+    </fieldset>
+    
+    <br>
+    
+    <fieldset id="GRE", style="display: none">
+      <legend>Credentials</legend>
+      <label for="GRE_year">Year GRE was taken:</label>
+      <input type="text" id="GRE_year" name="GRE_year" onkeypress="return onlyNumberKey(event)" maxlength="4"><br>
+      <label for="GRE_verbal">GRE Verbal:</label>
+      <input type="text" id="GRE_verbal" name="GRE_verbal" maxlength="3" onkeypress="return onlyNumberKey(event)"><br>
+      <label for="GRE_quatitative">GRE Quantitative:</label>
+      <input type="text" id="GRE_quantitative" name="GRE_quantitative" maxlength="3" onkeypress="return onlyNumberKey(event)"><br>
+      <label for="GRE_advanced_score">GRE Advanced Score:</label>
+      <input type="text" id="GRE_advanced_score" name="GRE_advanced_score" maxlength="3" onkeypress="return onlyNumberKey(event)">
+      Subject: <input type="text" name="GRE_advanced_subject" ><br>
+      <label for="TOEFL_score">TOEFL - Score:</label>
+      <input type="text" id="TOEFL_score" name="TOEFL_score"  onkeypress="return onlyNumberKey(event)">
+      Date of exam: <input type="text" name="TOEFL_date" >
+    </fieldset>
+    <script>
+      const degreeTypeSelect = document.querySelector('#degree_type');
+      const mastersFieldset = document.querySelector('#GRE');
+      const GRE = document.getElementById("GRE");
+
+      const bach = document.querySelector('#bach')
+      const masters = document.querySelector('#masters')
+      degreeTypeSelect.addEventListener('change', () => {
+        if (degreeTypeSelect.value === 'PHD') {
+          mastersFieldset.style.display = 'block';
+          bach.style.display ='block';
+          masters.style.display = 'block';
+        } else if (degreeTypeSelect.value === 'Masters') {
+          bach.style.display = 'block';
+          mastersFieldset.style.display = 'block';
+          masters.style.display = 'none';
+          const resetInputs1 = GRE.getElementsByTagName("input");
+          const resetInputs2 = masters.getElementsByTagName("input");
+
+          // Loop through the inputs and clear their values
+          for (let i = 0; i < resetInputs1.length; i++) {
+            resetInputs1[i].value = "";
+          }
+          for (let i = 0; i < resetInputs2.length; i++) {
+            resetInputs2[i].value = "";
+          }
+        } else {
+          mastersFieldset.style.display = 'none';
+          bach.style.display = 'none';
+          masters.style.display ='none';
+        }
+      });
+
+    </script>
+    <script>
+      const mySelect = document.getElementById("");
+      const hiddenDiv = document.getElementById("hiddenDiv");
+
+      // Add an event listener to the select element
+      mySelect.addEventListener("change", function() {
+        // If the selected option does not show the hidden div
+        if (mySelect.value !== "show") {
+          // Get all inputs in the hidden div
+          const hiddenInputs = hiddenDiv.getElementsByTagName("input");
+          // Loop through the inputs and clear their values
+          for (let i = 0; i < hiddenInputs.length; i++) {
+            hiddenInputs[i].value = "";
+          }
+        }
+      });
+    </script>
+    <br>
+    
+    <fieldset>
+      <legend>Areas of Interest and Experience</legend>
+      Areas of Interest: <input type="text" name="interest" ><br>
+      Experience: <input type="text" name="experience" >
+    </fieldset>
+    <br>
+    
+    <fieldset>
+      <legend>Request Letter</legend>
+      <a class="test">Letter 1:  </a> <br>
+        <input type="text" name="field_rName" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+            <input type="text" name="field_email" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+            <input type="text" name="field_affil" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+            <br>
+      <a class="test">Letter 2</a> <br>
+      <input type="text" name="field_rName1" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_email1" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+      <input type="text" name="field_affil1" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <br>
+      <a class="test">Letter 3</a> <br>
+      <input type="text" name="field_rName2" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_email2" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+      <input type="text" name="field_affil2" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      
+    </fieldset>
+
+    <fieldset>
+      <legend>Transcript</legend>
+      <a class="test"> Request Official Transcript  </a> <br>
+        <input type="text" name="field_rName" placeholder="Name of School" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+        <input type="text" name="field_email" placeholder ="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+        <br>
+        <a class="test">Upload Unofficial Transcript  </a> <br>
+        <input type = "file" id = "myFile" name = "filename">
+
+        </inpuit>
+
+    </fieldset>
+    
+    <br>
+    
+    <button type="submit" class="button" name="submit" id = complete formaction="/application"> SUBMIT </button>
+    <button type="submit" class="button" name="submit" id = completes formaction="/incomplete"> Save and continue later </button>
+  </form>
+
+     
+  </body>
+</html>

@@ -1,4 +1,5 @@
 -- Active: 1682009432499@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
+
 use integration;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -54,8 +55,10 @@ CREATE TABLE applications (
   prior_ms_deg_major varchar(20),
   prior_ms_deg_year varchar(4),
   prior__deg_university varchar(20),
+  transcript varchar(30),
+  student varchar(30),
   primary key(student_id,semester,s_year),
-  foreign key(student_id) references students(student_id) ON DELETE CASCADE
+  foreign key(student_id) references user(user_id) ON DELETE CASCADE
 );
 
 DROP TABLE IF EXISTS faculty;
@@ -82,8 +85,8 @@ CREATE TABLE review (
   decision varchar(30),
   recom_advisor varchar(30),
   primary key(review_id,p_year,p_semester),
-  foreign key(student_id) references students(student_id) ON DELETE CASCADE,
-  foreign key(review_id) references faculty(faculty_id) ON DELETE CASCADE,
+  foreign key(student_id) references user(user_id) ON DELETE CASCADE,
+  foreign key(review_id) references user(user_id) ON DELETE CASCADE,
   foreign key(review_id,p_semester,p_year) references applications(student_id,semester,s_year) ON DELETE CASCADE
 );
 
@@ -96,8 +99,16 @@ CREATE TABLE letter (
   recommenderName varchar(20),
   recommenderAffil varchar(20),
   recommenderEmail varchar(20),
+
+  recommenderName1 varchar(20),
+  recommenderAffil1 varchar(20),
+  recommenderEmail1 varchar(20),
+
+  recommenderName2 varchar(20),
+  recommenderAffil2 varchar(20),
+  recommenderEmail2 varchar(20),
   primary key(letter_id),
-  foreign key(user_id) references students(student_id) ON DELETE CASCADE
+  foreign key(user_id) references user(user_id) ON DELETE CASCADE
 );
 
 
@@ -249,6 +260,7 @@ insert into user_type values (2, 'Alumni');
 insert into user_type values (3, 'Graduate Secretary');
 insert into user_type values (4, 'MS Graduate Student');
 insert into user_type values (5, 'PhD Student');
+insert into user_type values (6, 'applicant');
 
 insert into course values (100, 'CSCI', 6221, 'SW Paradigms', 3);
 insert into course values (101, 'CSCI', 6461, 'Computer Architecture', 3);
@@ -281,6 +293,11 @@ insert into user values (77777777, 2, 'Eric', 'Clapton', 'eclapton', 'jkjfd098',
 insert into user values(33333333, 3, 'Emilia', 'Schmidt', 'semilia', 'jkoplkfd03', '1290 U St NW, Washington, DC 20052', '202-222-1000', '124-86-9834', 'semilia@gwu.edu');
 insert into user values (11111111, 1, 'Bhagirath', 'Narahari', 'bhagi', 'jkjfd098', '2031 G St NW, Washington, DC 20052', '202-222-1000', '342-23-9233', 'bhagi@gwu.edu');
 insert into user values (22222222, 1, 'Gabriel', 'Parmer', 'gparmer', 'uofd0932', '2033 L St NW, Washington, DC 20052', '202-222-1000', '231-34-2343', 'gparmer@gwu.edu' );
+INSERT INTO user VALUES (12312312, 6, 'Lennon', 'John','ljohn', 'passes', '2003 H St NW, Washington, DC 20052', '443-888-9999', '111-111-111', 'ljohn@gwu.edu');
+insert into user values (65656565, 6, 'Rayra', 'Starr', 'rstarr', 'tplgik245', '2005 H St NW, Washington, DC 20052', '202-955-1000', '222-11-1111', 'rstarr@gwu.edu');
+
+INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','');
+INSERT INTO applications VALUES ('incomplete','66666666','Spring','2024','','','','','','','','','','','','','','','','','','','','','','');
 
 insert into alumni values (77777777, 20, 2014);
 
