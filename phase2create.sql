@@ -93,7 +93,7 @@ CREATE TABLE review (
 DROP TABLE IF EXISTS letter;
 CREATE TABLE letter (
   user_id int(8),
-  letter_id int(5),
+  letter_id int(5) AUTO_INCREMENT,
   contents varchar(600),
   recommenderName varchar(20),
   recommenderAffil varchar(20),
@@ -260,6 +260,7 @@ insert into user_type values (3, 'Graduate Secretary');
 insert into user_type values (4, 'MS Graduate Student');
 insert into user_type values (5, 'PhD Student');
 insert into user_type values (6, 'applicant');
+insert into user_type values (7, 'CAC');
 
 insert into course values (100, 'CSCI', 6221, 'SW Paradigms', 3);
 insert into course values (101, 'CSCI', 6461, 'Computer Architecture', 3);
@@ -294,6 +295,7 @@ insert into user values (11111111, 1, 'Bhagirath', 'Narahari', 'bhagi', 'jkjfd09
 insert into user values (22222222, 1, 'Gabriel', 'Parmer', 'gparmer', 'uofd0932', '2033 L St NW, Washington, DC 20052', '202-222-1000', '231-34-2343', 'gparmer@gwu.edu' );
 INSERT INTO user VALUES (12312312, 6, 'Lennon', 'John','ljohn', 'passes', '2003 H St NW, Washington, DC 20052', '443-888-9999', '111-111-111', 'ljohn@gwu.edu');
 insert into user values (65656565, 6, 'Rayra', 'Starr', 'rstarr', 'tplgik245', '2005 H St NW, Washington, DC 20052', '202-955-1000', '222-11-1111', 'rstarr@gwu.edu');
+insert into user values (10101010, 7, 'Chairman', 'Chair', 'cac', 'passed', '2005 F St NW, Washington, DC 20052', '202-443-1000', '222-22-1111', 'cac@gwu.edu');
 
 INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','');
 INSERT INTO applications VALUES ('incomplete','66666666','Spring','2024','','','','','','','','','','','','','','','','','','','','','','');
