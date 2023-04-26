@@ -11,12 +11,68 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
         <script src="https://code.jquery.com/jquery-5.3.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+        <script src="https://kit.fontawesome.com/f16edda68d.js" crossorigin="anonymous"></script>
+
 
         <link href="/static/registration.css" rel="stylesheet" type="text/css">
     </head>
 
+    <!-- Modal Popover -->
+    {% for class in schedule %}
+        <div class="modal fade" id="{{class['class_id']}}Modal" tabindex="-1" aria-labelledby="dropLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h1 class="modal-title fs-5" id="dropLabel">Drop <strong>{{class['course_name']}} ({{class['course_num']}})</strong></h1>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <h6><strong>Are you sure you want to drop this class?</strong></h6>
+                        <p>Dropping this class will remove it from your semester class schedule. 
+                            You will have to re-register for this class if you want to take the course.
+                        </p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form action="drop", method="POST" id="drop">
+                            <input type="hidden" name="stud_id" value="{{class['student_id']}}"> 
+                            <input type="hidden" name="cid" value="{{class['class_id']}}"> 
+                            <input type="hidden" name="csem" value="{{class['csem']}}">
+                            <input type="hidden" name="cyear" value="{{class['cyear']}}">
+                            <button type="submit"  class="btn btn-warning">Drop Class</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+
+    <div class="modal fade" id="registerModal" tabindex="-1" aria-labelledby="dropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="dropLabel"><strong>Finalize Registration</strong></h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <h6><strong>Ready to finalize your registration?</strong></h6>
+                    <p>Finalizing your registration will add all selected classes to your semester class schedule. 
+                        You can drop classes later if you change your mind.
+                    </p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <form action="checkout", method="POST" id="checkout">
+                        <button type="submit" class="btn btn-warning">Register</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <body class="mb-5">
 
+        <!-- Navbar -->
         <nav class="navbar navbar-expand-md bg-body p-3 shadow-sm" id="nav" style="z-index:1;">
             <!-- Edit this to inlclude logo link -->
             <a class="navbar-brand" href="/">Logo</a>
@@ -58,25 +114,20 @@
 
         <br>
 
-        <!-- Flash messages -->
-        <div class="container" style="z-index:1;">
+        <!-- Error Prompt -->
+        <div class="container">
             {% for category, message in get_flashed_messages(with_categories=true) %}
-            <div class="alert alert-warning">
-                {% if category == 'error'  %}
-                  <p class ="error"> {{ message }}</p>
-                {% elif category == 'success'  %}
-                  <p class ="success"> {{ message }}</p>
-                {%endif%}
-            </div>
+                <div class="alert alert-info alert-dismissible fade show mb-5" role="alert">
+                    {{message}}
+                    <button type="button" class="btn-close" aria-label="Close" data-dismiss="alert" data-bs-dismiss="alert"></button>
+                </div>
             {% endfor %}
         </div>
 
-        
-        
-          
-
 
         <div class="container" style="z-index:1;">
+
+            <!-- Calendar Schedule -->
             <div class="row mb-3">
                 <h2>{{semester[0]}} {{semester[1]}} Schedule</h2>
             </div>
@@ -153,17 +204,106 @@
                     </div>
                 </div>
             </div>
+
+
             <div class="row mb-3">
                 <div class="col">
-                    <h2>Current Registration</h2>
+                    <h2>Registration</h2>
                 </div>
             </div>
 
-            
+            <!-- Current Registration -->
+            <div class="row mb-3">
+                <div class="container p-3 border rounded-3 glass">
+                    <h4 class="px-3">Current Registration</h4>
+                    <div class="container d-flex flex-wrap overflow-y-auto" style="max-height:400px;">
+                        <ul class="list-group w-100">
+                            {% for class in schedule %}
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <h5><strong>{{class['course_name']}} ({{class['course_num']}})</strong></h5>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-4">
+                                            {% set days = {'M': 'Monday', 'T': 'Tuesday', 'W': 'Wednesday', 'R': 'Thursday', 'F': 'Friday'} %}
+                                            <p class="mb-0">Day: <strong>{{days[class['day_of_week']]}}</strong></p>
+                                            <p class="mb-0">Time: <strong>{{class['class_time']}}</strong></p>
+                                            <p class="mb-0">Credits: <strong>{{class['credit_hours']}}</strong></p>
+                                        </div>
+                                        <div class="col-4">
+                                           
+                                        </div>
+                                        <div class="col-4 d-flex flex-column">
+                                            <button type="button" class="btn btn-warning w-100 h-50 mb-2" data-bs-toggle="modal" data-bs-target="#{{class['class_id']}}Modal">Drop Class</button> 
+                                            <a class="btn btn-warning w-100 h-50" href='/catalog#{{class["dept_name"]}} {{class["course_num"]}}'>View Class</a>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+
+                    <br>
+                    {% if session['registration'] != [] %}
+                        <h4 class="mt-2 px-3">Added Classes</h4>
+                        <div class="container d-flex flex-wrap overflow-y-auto mt-3" style="max-height:400px;">
+                            <ul class="list-group w-100">
+                                {% for class in bulletin %}
+                                    {% for id in session['registration'] %}
+                                        {% if class['class_id']|string() == id|string() %}
+                                            <li class="list-group-item">
+                                                <div class="row">
+                                                    <h5><strong>{{class['course_name']}} ({{class['course_num']}})</strong></h5>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="col-4">
+                                                        {% set days = {'M': 'Monday', 'T': 'Tuesday', 'W': 'Wednesday', 'R': 'Thursday', 'F': 'Friday'} %}
+                                                        <p class="mb-0">Day: <strong>{{days[class['day_of_week']]}}</strong></p>
+                                                        <p class="mb-0">Time: <strong>{{class['class_time']}}</strong></p>
+                                                        <p class="mb-0">Credits: <strong>{{class['credit_hours']}}</strong></p>
+                                                    </div>
+                                                    <div class="col-4">
+                                                        
+                                                    </div>
+                                                    <div class="col-4 d-flex flex-column">
+                                                        <form action="remove" method="POST" id="dropForm{{class['class_id']}}">
+                                                            <input type="hidden" name="cid" value="{{class['class_id']}}"/>
+                                                        </form>
+                                                        <button type="submit" form="dropForm{{class['class_id']}}" class="btn btn-warning w-100 h-50 mb-2">Remove Class</button> 
+                                                        <a class="btn btn-warning w-100 h-50" href='/catalog#{{class["dept_name"]}} {{class["course_num"]}}'>View Class</a>
+                                                    </div>
+                                                </div>
+                                            </li>                                       
+                                        {% endif %}
+                                    {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="row px-3">
+                            <div class="col" >
+                                <button type="button" class="btn btn-warning mt-3" data-bs-toggle="modal" data-bs-target="#registerModal">Register</button>
+                            </div>
+                        </div>
+                    {% else %}
+
+                    {% endif %}
+
+
+                    
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col">
+                    <h2>Register</h2>
+                </div>
+            </div>
+
+            <!-- Search Bar and Class List -->
             <div class="row">
                 <div class="col-4">
-                    <div class="container p-2 border rounded-3 glass">
-                        <h2>Find Classes</h2>
+                    <div class="container p-3 border rounded-3 glass">
+                        <h3>Find Classes</h3>
                         <small>Search for specific classes offered at Horizon College</small>
                         <form action="register", method="POST" class="d-flex flex-column" id="register">
                             <input type="text" class="form-control my-2" placeholder="Department" name="dname"/>
@@ -186,27 +326,92 @@
                 </div>
 
                 <div class="col-8">
-                    <div class="container h-100 p-2 border rounded-3 glass">
-                        <h2>Classes</h2>
-                        <div class="container d-flex flex-wrap overflow-y-scroll" style="max-height: 480px; overflow-y: auto;">
-
-                            <div class="card m-2" style="width: 23rem;">
-                                <div class="card-body">
-                                    <h5 class="card-title">Card title</h5>
-                                    <h6 class="card-subtitle mb-2 text-body-secondary">Card subtitle</h6>
-                                    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                                    <a href="#" class="card-link">Card link</a>
-                                    <a href="#" class="card-link">Another link</a>
+                    <div class="container p-3 border rounded-3 glass h-100">
+                        <h3 id="search_result">Class Bulletin</h3>
+                        
+                        <div class="container d-flex flex-wrap overflow-y-auto" style="max-height:400px;">
+                            {% if classes == [] %}
+                                <div class="container d-flex flex-row align-items-center">
+                                    <div class="col-1">
+                                        <i class="fa-solid fa-face-frown fa-2xl" style="color:black;"></i>
+                                    </div>
+                                    <div class="col-7 pt-2">
+                                        <h2>No classes found...</h2>
+                                    </div>
                                 </div>
-                            </div>
+                                
+                            {% else %}
+                                
+                                <ul class="list-group w-100">
+                                    {% for class in classes %}
+                                        <li class="list-group-item">    
+                                            <div class="row">
+                                                    <h5><strong>{{class['course_name']}} ({{class['dept_name']}} {{class['course_num']}})</strong></h5>
+                                            </div>
+                                            <div class="row">
+                                                <div class="col-4">
+                                                    {% set days = {'M': 'Monday', 'T': 'Tuesday', 'W': 'Wednesday', 'R': 'Thursday', 'F': 'Friday'} %}
+                                                    <p class="mb-0">Day: <strong>{{days[class['day_of_week']]}}</strong></p>
+                                                    <p class="mb-0">Time: <strong>{{class['class_time']}}</strong></p>
+                                                    <p class="mb-0">Credits: <strong>{{class['credit_hours']}}</strong></p>
+                                                </div>
+                                                <div class="col-4">
+                                                    <p class="mb-0">Prerequisites</p>
+                                                    {% set found = namespace(bool=0) %}
+                                                    {% for pre in prereqs %}
+                                                        {% if pre['course_id'] == class['id'] %}
+                                                            
+                                                            <div class="container-fluid gx-3 d-flex flex-row align-items-center ">
+                                                                <div class="col-6">
+                                                                    <p class="mb-0"><strong>{{pre['dept_name']}} {{pre['course_num']}}</strong></p>
+                                                                </div>
 
-            
+                                                                <div class="col-auto">
+                                                                    {% set complete = namespace(bool=0) %}
+                                                                    {% for found in taken %}
+                                                                        {% if found['course_id'] == pre['prereq_id'] %}
+                                                                            {% set complete.bool = 1 %}
+                                                                        {% endif %}
+                                                                    {% endfor %}
+                                                                    
+                                                                    {% if complete.bool == 1 %}
+                                                                        <i class="fa-solid fa-square-check" style="color:green;"></i>
+                                                                    {% else %}
+                                                                        <i class="fa-solid fa-square-xmark" style="color:red;"></i>
+                                                                    {% endif %}
+                                                                </div>
+                                                            </div>
+                                                            
+                                                            {% set found.bool = 1 %}
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                    {% if found.bool == 0 %}
+                                                        <p class="mb-0"><strong>None</strong></p>
+                                                    {% endif %}
+                                                </div>
+                                                <div class="col-4 d-flex flex-column">
+                                                    <form id="addForm{{class['id']}}" action="add" method = "POST">
+                                                        <input type="hidden" id="course" name="course" value="{{class['id']}}">
+                                                        <input type="hidden" id="cid" name="cid" value="{{class['class_id']}}">
+                                                        <input type="hidden" id="class_time" name="class_time" value="{{class['class_time']}}">
+                                                        <input type="hidden" id="csem" name="csem" value="{{class['csem']}}">
+                                                        <input type="hidden" id="cyear" name="cyear" value="{{class['cyear']}}">
+                                                        <input type="hidden" id="day_of_week" name="day_of_week" value="{{class['day_of_week']}}">
+                                                    </form>
+                                                    <button class="btn btn-warning w-100 h-50 mb-2" type="submit" form="addForm{{class['id']}}">Add Class</button>
+                                                    <a class="btn btn-warning h-50" href='/catalog#{{class["dept_name"]}} {{class["course_num"]}}'>View Class</a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                                
+                            {% endif %}
                         </div>
                     </div>
                 </div>
             </div>
         </div>        
-
 
         <div class="background p-0 m-0" style="z-index:-1;">    
             <img class="img-fluid w-100" src="static/layered-waves-haikei.svg">         

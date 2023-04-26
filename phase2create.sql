@@ -1,7 +1,4 @@
-DROP DATABASE IF EXISTS integration;
-
-CREATE DATABASE integration;
-
+-- Active: 1682009432499@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
 use integration;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -406,11 +403,6 @@ insert into student_courses values(55555555, 32, 'A', 'Fall', '2022');
 insert into student_courses values(55555555, 31, 'A', 'Fall', '2022');
 insert into student_courses values(55555555, 33, 'A', 'Fall', '2022');
 insert into student_courses values(55555555, 34, 'A', 'Fall', '2022');
-insert into student_courses values(55555555, 35, 'B', 'Fall', '2022');
-insert into student_courses values(55555555, 37, 'B', 'Fall', '2022');
-insert into student_courses values(55555555, 41, 'B', 'Fall', '2022');
-insert into student_courses values(55555555, 42, 'B', 'Fall', '2022');
-insert into student_courses values(55555555, 36, 'B', 'Fall', '2022');
 
 insert into student_courses values(66666666, 47, 'C', 'Fall', '2022');
 insert into student_courses values(66666666, 30, 'B', 'Fall', '2022');
