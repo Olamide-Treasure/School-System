@@ -226,13 +226,18 @@
                                         </div>
                                         
                                         <div class="container mx-1 mb-4">
-                                            <h5>Credit Hours: {{row2['credit_hours']}}</h5>
+                                            <h5>Credit Hours: <strong>{{row2['credit_hours']}}</strong></h5>
                                             <h5>Prerequisites:
+                                                {% set found = namespace(bool=0) %}
                                                 {% for row3 in prereq %}
                                                     {% if row2['id'] == row3['course_id'] %}
+                                                        {% set found.bool = 1 %}
                                                         <a class="text-decoration-none" href='#{{row3["dept_name"] ~ " " ~ row3["course_num"]}}'>{{row3['dept_name'] ~ " " ~ row3['course_num']}}</a>
                                                     {% endif %}
                                                 {% endfor %}
+                                                {% if found.bool == 0 %}
+                                                    <strong>None</strong>
+                                                {% endif %}
                                             </h5>
                                         </div>
                 
