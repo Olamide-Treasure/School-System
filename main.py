@@ -166,23 +166,31 @@ def add():
 
       # Check if already enrolled previously
       cursor.execute('''SELECT * FROM student_courses s 
-      JOIN class_section c ON s.class_id = c.class_id
+      JOIN class_section c ON s.class_id = c.class_id AND s.csem = c.csem AND s.cyear = c.cyear
       JOIN course i ON c.course_id = i.id
-      WHERE i.id = %s AND s.student_id = %s''', (course, session['user_id']))
+      WHERE i.id = %s AND s.student_id = %s AND s.grade != "D" AND s.grade != "F" ''', (course, session['user_id']))
       data = cursor.fetchone()
+
       if data:
-          flash("You've already taken that class, or are currently registered for it", "error")
+          if data['csem'] == csem and data['cyear'] == cyear:
+            message = "You are currently enrolled in " + data['course_name'] + " for this semester"
+          else:
+            message = "You've already taken " + data['course_name'] +" in " + data['csem'] + " " + str(data['cyear'])
+          flash(message, "error")
           return redirect('/register') 
 
       # Check prereq  
       cursor.execute('''SELECT p.prereq_id FROM class_section c
       JOIN course i ON c.course_id = i.id
       JOIN prerequisite p ON i.id = p.course_id
-      WHERE i.id = %s''',(course, ))
+      WHERE i.id = %s''',(cid, ))
       ids = cursor.fetchall()
+      print(ids)
 
       cursor.execute("SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id JOIN course i ON c.course_id = i.id WHERE s.student_id = %s GROUP BY i.id", (session['user_id'],))
       taken = cursor.fetchall()
+      for row in taken:
+        print(row['id'])
       
       for id in ids:
         # Check if the id appears in taken 
@@ -352,18 +360,12 @@ def catalog():
 @app.route('/userloggedin', methods=['GET', 'POST'])
 def user():
   if 'username' in session: 
-    cur = db.cursor(dictionary = True)
-
     #check for the student logging in
-    cur.execute("SELECT student_id FROM students WHERE student_id = %s", (session['user_id'], ))
-    data = cur.fetchone()
-    if(data != None):
+    if(session['type'] == 5 or session['type'] == 4):
       return redirect('/studentlogging')
     
     #check for the alumni 
-    cur.execute("SELECT student_id FROM alumni WHERE student_id = %s", (session['user_id'], ))
-    data = cur.fetchone()
-    if(data != None):
+    if(session['type'] == 2):
       return redirect('/alumnilogging')
     
     #check for admin 
@@ -391,8 +393,6 @@ def user():
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     _reconnect()
-
-    print(session['registration'])
 
     # Connect to database
     cursor = db.cursor(dictionary=True)
@@ -487,9 +487,6 @@ def register():
     return render_template('registration.html', schedule=schedule, renderer=renderer, instructor_list=instructor_list,
                             classes=classes, prereqs=prereqs, session=session, semester=semester, times=times, 
                             intervals=intervals, week=week, taken=taken, bulletin=bulletin)
-
-
-
 
 
 
@@ -2045,12 +2042,17 @@ def gs_assign_advisor(student_id):
 
 @app.route('/welcome')
 def welcome():
-    cursor = db.cursor(dictionary = True, buffered = True)
+    cursor = db.cursor(dictionary = True)
+    
+    cursor.execute("SELECT fname FROM user WHERE user_id = %s", (session['user_id'],))
+    name = cursor.fetchall()
+    print(name)
+
     cursor.execute("SELECT fname, student_id, semester, s_year FROM applications INNER JOIN user ON applications.student_id = user.user_ID WHERE status = 'review'")
     apps = cursor.fetchall()
-    cursor.execute("SELECT fname FROM user WHERE user_id = %s", (session['user_id'],))
-    name = cursor.fetchone()["fname"]
-    return render_template("applicant.html", apps = apps, name = name)
+    print(apps)
+
+    return render_template("applicant.html", apps = apps, name = name['fname'])
 
 @app.route('/application', methods=['GET', 'POST'])
 def application():
