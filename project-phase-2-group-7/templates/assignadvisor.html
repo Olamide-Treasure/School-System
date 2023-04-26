@@ -1,0 +1,60 @@
+<html>
+  <head>
+    <title>Assign Advisor/Advisee</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="static/home.css">
+  </head>
+
+<body>
+
+ <center>
+    <h1 class = "sameen"> Welcome, {{session["fname"]}} {{session["lname"]}}! </h1>
+</center>
+
+<center>
+Select a Student and an Advisor to assign for the Advisor/Advisee
+</center>
+
+
+<form action = "/assigned" method = "POST">
+
+<label for= "student">Select a Student:</label>
+<select name= "student" id= "student" required>
+    {% for s in mstudents: %}
+  <option value="{{s['user_id']}}">{{s['fname']}} {{s['lname']}}</option>
+  {% endfor %}
+
+  {% for p in pstudents: %}
+  <option value="{{p['user_id']}}">{{p['fname']}} {{p['lname']}}</option>
+  {% endfor %}
+</select>
+<br><br>
+
+<label for= "advisor">Select a Advisor:</label>
+<select name= "advisor" id= "advisor" required>
+    {% for a in advisors: %}
+  <option value="{{a['user_id']}}">{{a['fname']}} {{a['lname']}}</option>
+  {% endfor %}
+</select>
+<br><br>
+ 
+<button type="submit">Assign</button>
+</form>
+
+
+
+<form action = "/"> 
+    <button type="submit">Home Page</button>
+   </form>
+
+
+</body>
+
+
+
+</html>
+
+
+
+
