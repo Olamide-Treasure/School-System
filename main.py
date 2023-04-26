@@ -133,15 +133,136 @@ def checkout():
         cursor = db.cursor(dictionary=True)
         semester = _get_curr_semester()
         for cid in session["registration"]:
-            cursor.execute("INSERT INTO Enrollment (stud_id, cid, csem, cyear) VALUES (%s, %s, %s, %s)", (id, cid, semester[0], semester[1]))
+            cursor.execute("INSERT INTO student_courses (student_id, class_id, grade, csem, cyear) VALUES (%s, %s, 'IP', %s, %s)", (session['user_id'], cid, semester[0], semester[1]))
             db.commit()
 
         session["registration"] = []
         session.modified = True
 
-        flash("You've successfully registered", "success")
+        flash("You've successfully registered!", "success")
 
-    return redirect("/register") 
+    return redirect('/register') 
+
+# Route to add a class
+@app.route('/add', methods=['GET', 'POST'])
+def add():
+  if request.method == 'POST':
+      _reconnect()
+
+      cursor = db.cursor(dictionary=True)
+
+      # Retrieve form data
+      cid = request.form["cid"]
+      csem = request.form["csem"]
+      cyear = request.form["cyear"]
+      course = request.form["course"]
+      day = request.form["day_of_week"]
+
+      # 1. Check if class already in currently registered class
+      if cid in session["registration"]:
+          flash("You've already added that class", "error")
+          return redirect('/register')
+
+
+      # Check if already enrolled previously
+      cursor.execute('''SELECT * FROM student_courses s 
+      JOIN class_section c ON s.class_id = c.class_id AND s.csem = c.csem AND s.cyear = c.cyear
+      JOIN course i ON c.course_id = i.id
+      WHERE i.id = %s AND s.student_id = %s AND s.grade != "D" AND s.grade != "F" ''', (course, session['user_id']))
+      data = cursor.fetchone()
+
+      if data:
+          if data['csem'] == csem and data['cyear'] == cyear:
+            message = "You are currently enrolled in " + data['course_name'] + " for this semester"
+          else:
+            message = "You've already taken " + data['course_name'] +" in " + data['csem'] + " " + str(data['cyear'])
+          flash(message, "error")
+          return redirect('/register') 
+
+      # Check prereq  
+      cursor.execute('''SELECT p.prereq_id FROM class_section c
+      JOIN course i ON c.course_id = i.id
+      JOIN prerequisite p ON i.id = p.course_id
+      WHERE i.id = %s''',(cid, ))
+      ids = cursor.fetchall()
+      print(ids)
+
+      cursor.execute("SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id JOIN course i ON c.course_id = i.id WHERE s.student_id = %s GROUP BY i.id", (session['user_id'],))
+      taken = cursor.fetchall()
+      for row in taken:
+        print(row['id'])
+      
+      for id in ids:
+        # Check if the id appears in taken 
+        if id['prereq_id'] not in taken:
+          flash("You do not fulfill the prerequisites for this class", "error")
+          return redirect('/register') 
+        
+
+      # Check schedule conflict
+      my_time = request.form["class_time"]
+      my_class_time = _process_time(my_time)
+      
+      print("time: ", my_class_time)
+
+      # Retrieve all class times for currently registering year and semester for each class and check
+      for class_id in session["registration"]:
+          cursor.execute("SELECT class_time FROM class_section WHERE class_id = %s AND csem = %s \
+                          AND cyear = %s", (class_id, csem, cyear))
+          other_time = cursor.fetchone()['class_time']
+          curr_class_time =  _process_time(other_time)
+
+          if (my_class_time[0] > curr_class_time[0] - 0.5 and my_class_time[0] < curr_class_time[1] + 0.5) or (my_class_time[1] > curr_class_time[0] - 0.5 and my_class_time[1] < curr_class_time[1] + 0.5):
+              flash("This class has a time conflict with a class you've already added", "error")
+              return redirect('/regsiter') 
+        
+
+      # Now we have to check for the classes that already got checked out but for current semester/year
+      cursor.execute('''SELECT class_time FROM class_section cs JOIN student_courses e ON cs.class_id = e.class_id AND cs.csem = e.csem AND cs.cyear = e.cyear \
+                      WHERE cs.csem = %s AND cs.cyear = %s AND cs.day_of_week = %s AND student_id = %s''', (csem, cyear, day ,session['user_id']))
+      time_list = cursor.fetchall()
+      for curr_class in time_list:
+          curr_class_time = _process_time(curr_class['class_time'])
+          print("test: ", curr_class_time)
+          if (my_class_time[0] > curr_class_time[0] - 0.5 and my_class_time[0] < curr_class_time[1] + 0.5) or (my_class_time[1] > curr_class_time[0] - 0.5 and my_class_time[1] < curr_class_time[1] + 0.5):
+            flash("This class has a time conflict with a class you've already registered for", "error")
+            return redirect('/register') 
+          
+
+      # If no issue, then add to registered class
+      session["registration"].append(cid)
+      session.modified = True
+      flash("Added class to cart", "success")
+
+  return redirect('/register')
+
+# Drop courses
+@app.route('/drop', methods=['GET', 'POST'])
+def drop():
+    if request.method == 'POST':
+        cursor = db.cursor(dictionary=True)
+        stud_id = request.form['stud_id']
+        cid = request.form["cid"]
+        csem = request.form["csem"]
+        cyear = request.form["cyear"]
+
+        cursor.execute("DELETE FROM student_courses WHERE student_id = %s AND class_id = %s AND csem = %s AND cyear = %s", (stud_id, cid, csem, cyear))
+        db.commit()
+
+        flash("Successfully dropped the class", "success")
+
+
+    return redirect('/register')
+
+# Remove from registration 
+@app.route('/remove', methods=['GET', 'POST'])
+def remove():
+    if request.method == 'POST':
+        session["registration"].remove(request.form["cid"])
+        session.modified = True
+
+    return redirect('/register')
+
 
 ####################################################
 #                    HOME PAGE                     #
@@ -192,6 +313,7 @@ def login():
         session['fname'] = data['fname']
         session['lname'] = data['lname']
         session['type'] = data['user_type']
+        session['registration'] = []
         return redirect('/userloggedin')
       else:
         flash("Incorrect username and password", "error")
@@ -238,18 +360,12 @@ def catalog():
 @app.route('/userloggedin', methods=['GET', 'POST'])
 def user():
   if 'username' in session: 
-    cur = db.cursor(dictionary = True)
-
     #check for the student logging in
-    cur.execute("SELECT student_id FROM students WHERE student_id = %s", (session['user_id'], ))
-    data = cur.fetchone()
-    if(data != None):
+    if(session['type'] == 5 or session['type'] == 4):
       return redirect('/studentlogging')
     
     #check for the alumni 
-    cur.execute("SELECT student_id FROM alumni WHERE student_id = %s", (session['user_id'], ))
-    data = cur.fetchone()
-    if(data != None):
+    if(session['type'] == 2):
       return redirect('/alumnilogging')
     
     #check for admin 
@@ -309,15 +425,20 @@ def register():
             query += " AND c.course_name LIKE %s"
             params.append(f"%{title}%")
        
+    query += " ORDER BY c.dept_name, c.course_num"
+
     cursor.execute(query, params)
     classes = cursor.fetchall()
+
+    cursor.execute("SELECT * FROM class_section c JOIN course i ON c.course_id = i.id WHERE c.csem = %s AND c.cyear = %s", (semester[0], semester[1]))
+    bulletin = cursor.fetchall()
 
     instructor_list = {}
     for each_class in classes:
         cursor.execute("SELECT fname, lname FROM user WHERE user_id = %s", (each_class['faculty_id'],))
         instructor_list[each_class['faculty_id']] = cursor.fetchone()
 
-    cursor.execute("SELECT * FROM prerequisite p JOIN course c ON p.prereq_id = c.id ORDER BY c.course_num")    
+    cursor.execute("SELECT * FROM prerequisite p JOIN course c ON p.prereq_id = c.id")    
     prereqs = cursor.fetchall()
 
     renderer = {
@@ -360,9 +481,13 @@ def register():
       time = _calendar_map(row['class_time'])
       times[row['class_id']] = [time[0], time[1], time[2], row['day_of_week']]
 
+    cursor.execute("SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id JOIN course i ON c.course_id = i.id WHERE s.student_id = %s GROUP BY i.id", (session['user_id'],))
+    taken = cursor.fetchall()
+
     return render_template('registration.html', schedule=schedule, renderer=renderer, instructor_list=instructor_list,
                             classes=classes, prereqs=prereqs, session=session, semester=semester, times=times, 
-                            intervals=intervals, week=week)
+                            intervals=intervals, week=week, taken=taken, bulletin=bulletin)
+
 
 
 ####################################################
@@ -1917,12 +2042,17 @@ def gs_assign_advisor(student_id):
 
 @app.route('/welcome')
 def welcome():
-    cursor = db.cursor(dictionary = True, buffered = True)
+    cursor = db.cursor(dictionary = True)
+    
+    cursor.execute("SELECT fname FROM user WHERE user_id = %s", (session['user_id'],))
+    name = cursor.fetchall()
+    print(name)
+
     cursor.execute("SELECT fname, student_id, semester, s_year FROM applications INNER JOIN user ON applications.student_id = user.user_ID WHERE status = 'review'")
     apps = cursor.fetchall()
-    cursor.execute("SELECT fname FROM user WHERE user_id = %s", (session['user_id'],))
-    name = cursor.fetchone()["fname"]
-    return render_template("applicant.html", apps = apps, name = name)
+    print(apps)
+
+    return render_template("applicant.html", apps = apps, name = name['fname'])
 
 @app.route('/application', methods=['GET', 'POST'])
 def application():
