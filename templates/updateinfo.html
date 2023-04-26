@@ -1,0 +1,29 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title> Update Personal Info </title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+    <script>
+      function onlyNumberKey(evt) {
+            
+          // Only ASCII character in that range allowed
+          var ASCIICode = (evt.which) ? evt.which : evt.keyCode
+          if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
+              return false;
+          return true;
+      }
+  </script>
+  </head>
+  <body class = "bcolor"> 
+    <form action = "{{ url_for('updateInfo') }}" method = "post">
+        First Name <input type = "text" name = "fname" value = "{{ info['fname'] }}"> <br>
+        Middle Initila<input type = "text" name = "minit" value = "{{ info['minit'] }}"> <br>
+        Last Name<input type = "text" name = "lname" value = "{{ info['lname'] }}"> <br>
+        Address <input type = "text" name = "address" value = "{{ info['address'] }}"> <br>
+        SSN<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "ssn" value = "{{ info['ssn'] }}"> <br>
+        Email <input type = "text" name = "email" value = "{{ info['email'] }}"><br>
+        Phone number<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "phone_no" value = "{{ info['phone_no'] }}"> <br>
+        <input type = "submit" class = "button">
+      </form>
+  </body>
+</html>

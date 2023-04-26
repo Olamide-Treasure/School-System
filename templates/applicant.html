@@ -1,0 +1,17 @@
+<html>
+  <head>
+    <title>  Apply </title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+    <script>
+    </script>
+  </head>
+  <body class = 'bcolor'>
+
+    <c class = welcome> <b> Welcome to your page {{ name }}! <br>
+        ID: {{ session['user_id'] }}</b> </c> <br>
+        <form action = '/application'> <input type = "submit" class = "button" name = "submit" Value = "Create new application here "> </form> 
+        <form action = '/view'> <input type = "submit" class = "button" name = "submit" Value = "View your application here"> </form>
+        <form action = '/infoViewer'> <input type = "submit" class = "button" name = "submit" Value = "Update personal info here "> </form>
+
+    </body>
+</html>
