@@ -1,0 +1,26 @@
+<html>
+  <head>
+    <title>  Apply </title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+    <script>
+    </script>
+  </head>
+  <body class = "bcolor">
+    <form action='/logout'>  <input type="submit" class = "logout button" name="logout" value="logout"> </b> </form>
+    <c class = just> <b> Your application(s) </b> </c> <br>
+    {% for items in content %}
+
+        <br>
+        <c class = labels> <b> {{items["semester"]}} {{items["s_year"]}} application</b> </c>
+        <br>
+        <c class = labels> <b> Status: {{items["status"]}} </b> </c>
+        <br>
+        {% if items["status"] == "incomplete" %}
+        <form action="/editApp/{{items['semester']}}/{{items['s_year']}}"> <input type="submit" class = "button" value="Edit App"> </b> </form>
+        <br>
+        {% endif %}
+        
+    {% endfor %}
+    <form action='/'>  <input type="submit" class = "button" value="Back"> </b> </form>
+  </body>
+</html>

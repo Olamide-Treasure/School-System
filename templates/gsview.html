@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+    <head>
+        <script>
+            function onlyOne(checkbox) {
+                var checkboxes = document.getElementsByName('decision')
+                checkboxes.forEach((item) => {
+                    if (item !== checkbox) item.checked = false
+                })
+            }
+            function showDropdown() {
+                var checkbox = document.getElementById("reject");
+                var dropdown = document.getElementById("rejectDropdown");
+                
+                if (checkbox.checked == true) {
+                    dropdown.style.display = "block";
+                } else {
+                    dropdown.style.display = "none";
+                }
+            }
+            function showDropdown2() {
+                var checkbox1 = document.getElementById("badmit");
+                var checkbox2 = document.getElementById("noaid");
+                var checkbox3 = document.getElementById("aid");
+
+                var aidDropdown = document.getElementById("aidDropdown");
+                if (checkbox1.checked || checkbox2.checked || checkbox3.checked) {
+                    aidDropdown.style.display = 'block';
+                } else {
+                    aidDropdown.style.display = 'none';
+                }
+            }
+        </script>
+    </head>
+    <body class = "bcolor">
+        <form action='/logout'>  <input type="submit" class = "logout button" name="logout" value="logout"> </b> </form>
+        
+        <h1>PERSONAL INFORMATION </h1>
+        Name: 
+            {% if appinfo[3] is not none %} 
+                {{ appinfo[3] }} 
+            {% endif %} 
+            {% if appinfo[2] is not none %} 
+                {{ appinfo[2] }} 
+            {% endif %} 
+          <br>
+          Address: {{ appinfo[6] }} <br>
+          phone_no: {{ appinfo[7] }} <br>
+          SSN: {{ appinfo[8] }} <br>
+          Email: {{ appinfo[9] }} <br>
+        </ul>
+       <br>
+        
+        <h1>PRIOR ACADEMIC INFORMATION </h1>
+          <c class = just> <b> <li> Prior degrees </li> </c> </b>
+          {% if  appinfo[5] == "BS/BA" %}
+             Bachelor's GPA: {{appinfo[6]}}  <br>
+             Bachelor's Major: {{appinfo[7]}}   <br>
+             Year: {{appinfo[8]}}   <br>
+             Bachelor's University: {{appinfo[9]}}  <br>
+          {% endif %}
+             Master's GPA: {{appinfo[20]}}  <br>
+             Master's Major: {{appinfo[21]}}   <br>
+             Year: {{appinfo[22]}}   <br>
+             Master's University: {{appinfo[23]}}  <br>
+             <br>
+             <c class = just>  <b> <li> GRE INFO </li> </b> </c> 
+            GRE Verbal: {{appinfo[10]}} <br>
+            GRE Quantitative: {{appinfo[12]}} <br>
+            Year: {{appinfo[10]}} <br>
+            GRE Advanced Score: {{appinfo[13]}} <br>
+            Subject: {{appinfo[14]}} <br>
+            <br>
+            <c class = just>  <b> <li> TOEFL INFO </li> </b> </c> <br>
+            TOEFL Score: {{appinfo[15]}} <br>
+            TOEFL Date: {{appinfo[16]}} <br>
+            <br>
+            <c class = just>  <b><li> Area of Interest: {{appinfo[17]}}</li> </b> </c> <br>
+            <c class = just>  <b><li> Experience: {{appinfo[18]}} </li> </b> </c> <br>
+            
+    </ul>
+        
+
+
+    </body>
+</html>

@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+        <h1>Current applicants needing review:</h1>
+        <ul>
+            {% for applicant in applicants %}
+
+            <li><a href="/reviews/{{ applicant[0] }}">{{ applicant[0] }}'s {{ applicant[1] }} {{ applicant[2] }} application</a></li>
+            {% endfor %}
+        </ul>
+{% endblock %}

@@ -5,7 +5,7 @@ from datetime import datetime
 
 app = Flask('app')
 app.secret_key = 'SECRET_KEY'
-
+letterID = 0
 db = connection.connect(
     host="phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com",
     user="admin",
@@ -75,6 +75,18 @@ def sessionStatus():
 def sessionType():
     return session['type']
 
+def checkComplete():
+  cursor = db.cursor(dictionary = True)
+  cursor.execute("SELECT * FROM applications WHERE status = 'incomplete'")
+  apps = cursor.fetchall()
+  for i in range(len(apps)):
+    app = apps[i]
+    if(app["student_id"]!=None and app["semester"]!=None and app["s_year"]!=None and app["degree_type"]!=None and app["interest"]!=None and app["experience"]!=None):
+      cursor.execute("UPDATE applications SET status = 'review' WHERE student_id = %s and semester = %s and s_year = %s", (app["student_id"], app["semester"], app["s_year"]))
+      db.commit()
+  global letterID
+  letterID += 1
+
 
 ####################################################
 #                WEBSITE FUNCTIONS                 #
@@ -83,21 +95,35 @@ def sessionType():
 # Reset the database
 @app.route('/reset', methods=['GET', 'POST'])
 def reset():
-  cur = db.cursor(dictionary=True)
-  with open('phase2create.sql', 'r') as f:
-    sql_scr = f.read()
-  sql_c = sql_scr.split(';')
-  for c in sql_c:
-    cur.execute(c)
-    db.commit()
-  session.pop('username', None)
-  session.pop('user_id', None)
-  session.pop('fname', None)
-  session.pop('lname', None)
-  session.pop('type', None)
-  session.clear()
+    cur = db.cursor(dictionary=True)
+    with open('phase2create.sql', 'r') as f:
+        sql_scr = f.read()
+    sql_c = sql_scr.split(';')
+    for c in sql_c:
+        try:
+            cur.execute(c)
+            db.commit()
+        except Exception as e:
+            print(f"Error executing SQL statement: {e}")
+    session.clear()
+    return redirect('/')
+# @app.route('/reset', methods=['GET', 'POST'])
+# def reset():
+#   cur = db.cursor(dictionary=True)
+#   with open('phase2create.sql', 'r') as f:
+#     sql_scr = f.read()
+#   sql_c = sql_scr.split(';')
+#   for c in sql_c:
+#     cur.execute(c)
+#     db.commit()
+#   session.pop('username', None)
+#   session.pop('user_id', None)
+#   session.pop('fname', None)
+#   session.pop('lname', None)
+#   session.pop('type', None)
+#   session.clear()
 
-  return redirect('/')
+#   return redirect('/')
 
 # Commits all the saved registered classes to the database
 @app.route('/checkout', methods=['GET', 'POST'])
@@ -159,6 +185,7 @@ def login():
     try:
       cur.execute("SELECT username, user_password, user_type, user_id, fname, lname FROM user WHERE username = %s and user_password = %s", (uname, passwrd))
       data = cur.fetchone()
+      print(data)
       if data:
         session['username'] = data['username']
         session['user_id'] = data['user_id']
@@ -228,6 +255,10 @@ def user():
     #check for admin 
     if(session['type'] == 0):
       return redirect('/admin')
+
+    #check for applicant 
+    if(session['type'] == 6):
+      return redirect('/welcome')
 
     #check for faculty advisor
     elif(session['type'] == 1):
@@ -433,8 +464,14 @@ def gs_student_names():
 
     cur.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s OR user_type = %s", (4, 5))
     students = cur.fetchall()
+
+    cur.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s", (6,))
+    applicants = cur.fetchall()
+
+    cur.execute("SELECT user_id, fname, lname, p_semester, p_year FROM review INNER JOIN user on user.user_id = review.review_id")
+    reviews = cur.fetchall()
     
-    return render_template("student_names.html", students=students)
+    return render_template("student_names.html", students=students, applicants = applicants, reviews = reviews)
   
   else:
     return redirect('/')
@@ -1873,5 +1910,203 @@ def gs_assign_advisor(student_id):
 
 
 #END OF Sameen's PART
+
+####################################################
+#                  APPLICATION                    #
+####################################################
+
+@app.route('/welcome')
+def welcome():
+    cursor = db.cursor(dictionary = True, buffered = True)
+    cursor.execute("SELECT fname, student_id, semester, s_year FROM applications INNER JOIN user ON applications.student_id = user.user_ID WHERE status = 'review'")
+    apps = cursor.fetchall()
+    cursor.execute("SELECT fname FROM user WHERE user_id = %s", (session['user_id'],))
+    name = cursor.fetchone()["fname"]
+    return render_template("applicant.html", apps = apps, name = name)
+
+@app.route('/application', methods=['GET', 'POST'])
+def application():
+   cursor = db.cursor(dictionary=True) 
+   cursor.execute("SELECT * FROM user WHERE user_id = %s", (session['user_id'],))
+   info = cursor.fetchone()
+   if request.method == 'POST':
+       cursor = db.cursor(dictionary=True)
+       prior_bac_deg_gpa = request.form["prior_bac_deg_gpa"]
+       prior_bac_deg_major = request.form["prior_bac_deg_major"]
+       prior_bac_deg_year = request.form["prior_bac_deg_year"]
+       prior_bac_deg_university = request.form["prior_bac_deg_university"]
+       prior_ms_deg_gpa = request.form["prior_ms_deg_gpa"]
+       prior_ms_deg_major = request.form["prior_ms_deg_major"]
+       prior_ms_deg_year = request.form["prior_ms_deg_year"]
+       prior_ms_deg_university = request.form["prior_ms_deg_university"]
+       gre_verbal = request.form["GRE_verbal"]
+       gre_year = request.form["GRE_year"]
+       gre_quantitative = request.form["GRE_quantitative"]
+       gre_advanced_score = request.form["GRE_advanced_score"]
+       gre_advanced_subject = request.form["GRE_advanced_subject"]
+       toefl_score = request.form["TOEFL_score"]
+       toefl_date = request.form["TOEFL_date"]
+       interest = request.form["interest"]
+       experience = request.form["experience"]
+       semester = request.form["semester"]
+       degree_type = request.form["degree_type"]
+       s_year = request.form["s_year"]
+       this = session["user_id"]
+       cursor.execute("INSERT INTO applications VALUES ('incomplete', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,'sent','not decided')", 
+                      (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
+                       gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))
+      
+      
+       uid = session["user_id"]
+       
+       rname = request.form["field_rName"]
+       affil = request.form["field_affil"]
+       email = request.form["field_email"]
+
+       rname1 = request.form["field_rName1"]
+       affil1 = request.form["field_affil1"]
+       email1 = request.form["field_email1"]
+
+       rname2 = request.form["field_rName2"]
+       affil2 = request.form["field_affil2"]
+       email2 = request.form["field_email2"]
+       
+       cursor.execute("INSERT INTO letter (user_id, letter_id, contents, recommenderName, recommenderAffil, recommenderEmail,  recommenderName1, recommenderAffil1, recommenderEmail1,  recommenderName2, recommenderAffil2, recommenderEmail2) VALUES (%s, %s, 'please', %s, %s, %s,%s,%s,%s,%s,%s,%s)", (uid, letterID, rname, affil, email,  rname1, affil1, email1,  rname2, affil2, email2,))
+      
+       db.commit()
+       checkComplete()
+       
+       return render_template("complete.html")
+   return render_template("application.html", info = info)
+
+
+@app.route('/infoViewer')
+def infoViewer():
+   cursor = db.cursor(dictionary = True)
+   cursor.execute("SELECT * FROM user WHERE user_id = %s", (session['user_id'],))
+   info = cursor.fetchone()
+   return render_template("updateinfo.html", info = info)
+
+@app.route('/view')
+def view():
+ cursor = db.cursor(dictionary=True)
+ this = session["user_id"]
+ cursor.execute("SELECT * FROM user INNER JOIN applications on user_id = student_id where user_id = %s;", (this,))
+ data = cursor.fetchall()
+ return render_template("view.html", content = data)
+
+@app.route('/incomplete',  methods = ["POST", "GET"])
+def incomplete():
+   cursor = db.cursor(dictionary=True) 
+   cursor.execute("SELECT * FROM user WHERE user_id = %s", (session['user_id'],))
+   info = cursor.fetchone()
+   if request.method == 'POST':
+       cursor = db.cursor(dictionary=True)
+       prior_bac_deg_gpa = request.form["prior_bac_deg_gpa"]
+       prior_bac_deg_major = request.form["prior_bac_deg_major"]
+       prior_bac_deg_year = request.form["prior_bac_deg_year"]
+       prior_bac_deg_university = request.form["prior_bac_deg_university"]
+       prior_ms_deg_gpa = request.form["prior_ms_deg_gpa"]
+       prior_ms_deg_major = request.form["prior_ms_deg_major"]
+       prior_ms_deg_year = request.form["prior_ms_deg_year"]
+       prior_ms_deg_university = request.form["prior_ms_deg_university"]
+       gre_verbal = request.form["GRE_verbal"]
+       gre_year = request.form["GRE_year"]
+       gre_quantitative = request.form["GRE_quantitative"]
+       gre_advanced_score = request.form["GRE_advanced_score"]
+       gre_advanced_subject = request.form["GRE_advanced_subject"]
+       toefl_score = request.form["TOEFL_score"]
+       toefl_date = request.form["TOEFL_date"]
+       interest = request.form["interest"]
+       experience = request.form["experience"]
+       semester = request.form["semester"]
+       degree_type = request.form["degree_type"]
+       s_year = request.form["s_year"]
+       this = session["user_id"]
+       cursor.execute("INSERT INTO applications VALUES ('incomplete', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,'sent','not decided')", 
+                      (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
+                       gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))
+      #  global letterID
+      #  letterID += 2
+      
+       uid = session["user_id"]
+       
+       rname = request.form["field_rName"]
+       affil = request.form["field_affil"]
+       email = request.form["field_email"]
+
+       rname1 = request.form["field_rName1"]
+       affil1 = request.form["field_affil1"]
+       email1 = request.form["field_email1"]
+
+       rname2 = request.form["field_rName2"]
+       affil2 = request.form["field_affil2"]
+       email2 = request.form["field_email2"]
+       
+       cursor.execute("INSERT INTO letter (user_id, letter_id, contents, recommenderName, recommenderAffil, recommenderEmail,  recommenderName1, recommenderAffil1, recommenderEmail1,  recommenderName2, recommenderAffil2, recommenderEmail2) VALUES (%s, %s, 'please', %s, %s, %s,%s,%s,%s,%s,%s,%s)", (uid, letterID, rname, affil, email,  rname1, affil1, email1,  rname2, affil2, email2,))
+       db.commit()
+       return redirect('/welcome')
+   return render_template("application.html", info = info)
+ 
+@app.route('/reviews')
+def reviews():
+   cursor = db.cursor(buffered = True)
+  #  cursor.execute("SELECT student_id, semester, s_year FROM applications WHERE student_id /NOT IN (SELECT review_id FROM review WHERE student_id = %s) AND status ='review'", (session['user_id'],))
+   cursor.execute("SELECT student_id, semester, s_year FROM applications WHERE status = 'review' ")
+   info = cursor.fetchall()
+   return render_template("review.html", applicants = info)
+
+@app.route('/reviews/<student_id>', methods=['GET','POST'])
+def review(student_id):
+    if request.method == 'POST':
+        cursor = db.cursor(dictionary = True, buffered = True)
+        decision = request.form.getlist('decision')
+        decision = decision[0]
+        print(decision)
+        deficiency_course = request.form["dcourse"]
+        reason_reject = request.form['reason']
+        GAS_comment = request.form['comment']
+        advisor = request.form['radvisor']
+        cursor.execute("SELECT semester, s_year FROM applications WHERE student_id = %s", (student_id,))
+        info = cursor.fetchone()
+        cursor.execute("INSERT INTO review (student_id, review_id, p_semester, p_year, rev_rating, deficiency_course, reason_reject, GAS_comment, decision, recom_advisor) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (session['user_id'],student_id,  info['semester'], info['s_year'], "1", deficiency_course, reason_reject, GAS_comment, decision, advisor))
+        db.commit()
+        return redirect('/')
+    cursor = db.cursor(buffered = True)
+    cursor.execute("SELECT * FROM applications WHERE student_id = %s", (student_id,))
+    appinfo = cursor.fetchall()
+    cursor.execute("SELECT fname, lname FROM user WHERE user_id = %s", (student_id,))
+    name = cursor.fetchone()
+    info = []
+    for data in appinfo:
+        info.extend(data)
+    info.extend(name)
+    print(appinfo)
+    print(info)
+    return render_template("appreview.html", appinfo = info, names = name)
+
+@app.route('/gsview')
+def gsview():
+   cursor = db.cursor(buffered = True)
+   cursor.execute("SELECT * from user INNER JOIN applications ON user_id = student_id WHERE user_type = 6")
+   appinfo = cursor.fetchone()
+   return render_template("gsview.html", appinfo = appinfo)
+
+@app.route('/finalDecision/<student_id>', methods = ["POST", "GET"])
+def finalDecision(student_id):
+  if request.method == "POST": 
+    print("this")
+    cursor = db.cursor(dictionary=True, buffered = True)
+    cursor.execute("SELECT semester, s_year FROM applications WHERE student_id = %s", (student_id,))
+    info = cursor.fetchone()
+
+    print(request.form["Decision"])
+    print(request.form["Transcript"])
+    print(request.form["Student"])
+    cursor.execute("UPDATE applications SET status = %s, transcript = %s, student = %s WHERE UID = %s", (request.form["Decision"], request.form["Transcript"], request.form["Student"], student_id))
+    db.commit()
+    return render_template("final.html")
+  return render_template("final.html")
+#make into a student if yes
 
 app.run(host='0.0.0.0', port=8080)
