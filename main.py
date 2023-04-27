@@ -2,6 +2,8 @@ import mysql.connector as connection
 from flask import Flask, session, render_template, redirect, url_for, request, flash
 import time, random
 from datetime import datetime
+import time, random
+from datetime import datetime
 
 app = Flask('app')
 app.secret_key = 'SECRET_KEY'
@@ -95,24 +97,35 @@ def checkComplete():
 # Reset the database
 @app.route('/reset', methods=['GET', 'POST'])
 def reset():
-  cur = db.cursor(dictionary=True)
-  with open('phase2create.sql', 'r') as f:
-    sql_scr = f.read()
-  sql_c = sql_scr.split(';')
-  for c in sql_c:
-    cur.execute(c)
-    db.commit()
-  session.pop('username', None)
-  session.pop('user_id', None)
-  session.pop('fname', None)
-  session.pop('lname', None)
-  session.pop('type', None)
-  session.clear()
+    cur = db.cursor(dictionary=True)
+    with open('phase2create.sql', 'r') as f:
+        sql_scr = f.read()
+    sql_c = sql_scr.split(';')
+    for c in sql_c:
+        try:
+            cur.execute(c)
+            db.commit()
+        except Exception as e:
+            print(f"Error executing SQL statement: {e}")
+    session.clear()
+    return redirect('/')
+# @app.route('/reset', methods=['GET', 'POST'])
+# def reset():
+#   cur = db.cursor(dictionary=True)
+#   with open('phase2create.sql', 'r') as f:
+#     sql_scr = f.read()
+#   sql_c = sql_scr.split(';')
+#   for c in sql_c:
+#     cur.execute(c)
+#     db.commit()
+#   session.pop('username', None)
+#   session.pop('user_id', None)
+#   session.pop('fname', None)
+#   session.pop('lname', None)
+#   session.pop('type', None)
+#   session.clear()
 
-  return redirect('/')
-
-
-
+#   return redirect('/')
 
 # Commits all the saved registered classes to the database
 @app.route('/checkout', methods=['GET', 'POST'])
@@ -485,7 +498,6 @@ def register():
 #                  FACULTY PAGE                    #
 ####################################################
 
-
 #faculty login 
 @app.route('/faculty', methods=['GET', 'POST'])
 def faculty():
@@ -581,8 +593,14 @@ def gs_student_names():
 
     cur.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s OR user_type = %s", (4, 5))
     students = cur.fetchall()
+
+    cur.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s", (6,))
+    applicants = cur.fetchall()
+
+    cur.execute("SELECT user_id, fname, lname, p_semester, p_year FROM review INNER JOIN user on user.user_id = review.review_id")
+    reviews = cur.fetchall()
     
-    return render_template("student_names.html", students=students)
+    return render_template("student_names.html", students=students, applicants = applicants, reviews = reviews)
   
   else:
     return redirect('/')
@@ -1948,6 +1966,10 @@ def gs_assign_advisor(student_id):
   else:
     return redirect('/')
 
+
+####################################################
+#                  APPLICATION                    #
+####################################################
 
 ####################################################
 #                  APPLICATION                    #
