@@ -2,6 +2,8 @@ import mysql.connector as connection
 from flask import Flask, session, render_template, redirect, url_for, request, flash
 import time, random
 from datetime import datetime
+import time, random
+from datetime import datetime
 
 app = Flask('app')
 app.secret_key = 'SECRET_KEY'
@@ -268,6 +270,8 @@ def remove():
 @app.route('/')
 def home_page():
   _reconnect()
+  if 'username' in session: 
+    return redirect('/userloggedin')
   
   return render_template("home.html", title = 'Home Page')
 
@@ -600,7 +604,6 @@ def gs_student_names():
 
 
 
-
 @app.route('/viewform1/<id>')
 def viewform1(id):
   if sessionType() == 0:
@@ -609,7 +612,7 @@ def viewform1(id):
     data = cur.fetchall()
     db.commit()
 
-    cur.execute("SELECT * from courses")
+    cur.execute("SELECT * from course")
     courses = cur.fetchall()
     db.commit()
 
@@ -669,7 +672,7 @@ def updategrade(studID, courID):
     if request.method == 'POST':
       #update grade
       if((request.form["grade"])):
-        cur.execute("UPDATE student_courses SET grade = %s WHERE student_id = %s and course_id = %s", ( str((request.form["grade"])), studID, courID))
+        cur.execute("UPDATE student_courses SET grade = %s WHERE student_id = %s and class_id = %s", ( str((request.form["grade"])), studID, courID))
         db.commit()
 
     return redirect('/')
@@ -696,35 +699,35 @@ def form():
         for checkbox in checkboxes:
           if(checkbox == "yes"):
             if (check == 0):
-              cur.execute("DELETE from student_courses WHERE grade = %s and student_id = %s", ('IP', session['user_id'] ))
-              db.commit()
+              #cur.execute("DELETE from student_courses WHERE grade = %s and student_id = %s", ('IP', session['user_id'] ))
+              #db.commit()
               cur.execute("DELETE from form1answer WHERE student_id = %s", (session['user_id'], ))
               db.commit()
               check +=1
 
-            cur.execute("SELECT grade FROM student_courses WHERE course_id = %s and student_id = %s", (i,session['user_id']))
-            grade = cur.fetchone()
+            #cur.execute("SELECT grade FROM student_courses WHERE class_id = %s and student_id = %s", (i,session['user_id']))
+            #grade = cur.fetchone()
             #print(grade)
-            db.commit()
+            
 
-            invalid_grades = ['D', 'F']
-            if grade != None:
-              if grade in invalid_grades:
-                  cur.execute("DELETE from student_courses WHERE course_id = %s", (i, ))
-                  db.commit()
-                  cur.execute("INSERT into student_courses (student_id, course_id, grade) VALUES (%s, %s, %s)", (session['user_id'], i, 'IP'))
-                  db.commit()
+            #invalid_grades = ['D', 'F']
+            #if grade != None:
+              #if grade in invalid_grades:
+                  #cur.execute("DELETE from student_courses WHERE class_id = %s", (i, ))
+                  #db.commit()
+                  #cur.execute("INSERT into student_courses (student_id, class_id, grade) VALUES (%s, %s, %s)", (session['user_id'], i, 'IP'))
+                  #db.commit()
 
-            else:
+            #else:
               #print("reaches the else")
-              cur.execute("INSERT into student_courses (student_id, course_id, grade) VALUES (%s, %s, %s)", (session['user_id'], i, 'IP'))
-              db.commit()
+              #cur.execute("INSERT into student_courses (student_id, class_id, grade) VALUES (%s, %s, %s)", (session['user_id'], i, 'IP'))
+              #db.commit()
 
             cur.execute("INSERT into form1answer (student_id, courseID) VALUES (%s, %s)", (session['user_id'], i))
             db.commit()
 
-            cur.execute("SELECT * from student_courses WHERE course_id = %s and student_id = %s", (i,session['user_id']))
-            data = cur.fetchall()
+            #cur.execute("SELECT * from student_courses WHERE class_id = %s and student_id = %s", (i,session['user_id']))
+            #data = cur.fetchall()
             
     return redirect('/')
 
@@ -738,7 +741,7 @@ def studentcourse():
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
 
-    cur.execute("SELECT course_id FROM student_courses WHERE student_id = %s", (session['user_id'], ))
+    cur.execute("SELECT class_id FROM student_courses WHERE student_id = %s", (session['user_id'], ))
     course_id = cur.fetchall()
     db.commit()
     return course_id
@@ -819,6 +822,7 @@ def alumnilist():
   else:
     return redirect('/')
 
+#beginning of sameen's part
 
 @app.route('/user/<id>/<type>')
 def userinfo(id, type):
@@ -1040,80 +1044,6 @@ def removeuser(id, type):
 
 
 
-@app.route('/signup', methods=['GET', 'POST'])
-def signup():
-  if request.method == "GET":
-    return render_template("signup.html")
-    
-  if request.method == "POST":
-    cur = db.cursor(dictionary = True)
-    unm = (request.form["username"])
-    passwrd = (request.form["password"])
-    fname = (request.form["fname"])
-    lname = (request.form["lname"])
-    ssn =  (request.form["ssn"])
-    email =  (request.form["email"])
-    address =  (request.form["address"])
-    phone =  (request.form["phone"])
-    type = (request.form["dates"])
-
-    if(type == "ms"):
-      x = 4
-      y = 20
-    if(type == "phd"):
-      x = 5
-      y = 21
-    
-    while True:
-      id = random.randint(10000000, 99999999)
-      cur.execute("SELECT user_id FROM user WHERE user_id = %s", (id,))
-      if not cur.fetchone():
-        break
-
-
-    cur.execute("SELECT username FROM user WHERE username = %s", (unm, ))
-    data = cur.fetchone()
-    if(data != None):
-      return render_template("userexists.html")
-
-    db.commit()
-
-    db.commit()
-    cur.execute("SELECT ssn FROM user WHERE ssn = %s", (ssn, ))
-    data = cur.fetchone()
-    if(data != None):
-      return render_template("userexists.html")
-
-    db.commit()
-    cur.execute("SELECT email FROM user WHERE email = %s", (email, ))
-    data = cur.fetchone()
-    if(data != None):
-      return render_template("userexists.html")
-      
-    cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, x, fname, lname, unm, passwrd, address, phone, ssn, email))
-    db.commit()
-    cur.execute("INSERT into students (student_id, degree_id) VALUES (%s, %s)", (id, y))
-    db.commit()
-    cur.execute("INSERT into need_advisor (student_id) VALUES (%s)", (id, ))
-    db.commit()
-    if(x == 5):
-      cur.execute("INSERT into phd_req (student_id, thesisapproved) VALUES (%s, %s)", (id, 'False'))
-      db.commit()
-
-
-    cur.execute("SELECT username, user_type, user_password, user_id, fname, lname FROM user WHERE username = %s and user_password = %s", (unm, passwrd))
-    data = cur.fetchone()
-    db.commit()
-  
-    if data != None :
-      session['username'] = data['username']
-      session['user_id'] = data['user_id']
-      session['fname'] = data['fname']
-      session['lname'] = data['lname']
-      session['type'] = data['user_type']
-      return redirect('/userloggedin')
-
-
 
 @app.route('/addthestudent', methods=['GET', 'POST'])
 def addthestudent():
@@ -1132,6 +1062,7 @@ def addthestudent():
       address =  (request.form["address"])
       phone =  (request.form["phone"])
       type = (request.form["dates"])
+      admit = (request.form["admityear"])
 
       if(type == "ms"):
         x = 4
@@ -1168,7 +1099,7 @@ def addthestudent():
       
       cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, x, fname, lname, unm, passwrd, address, phone, ssn, email))
       db.commit()
-      cur.execute("INSERT into students (student_id, degree_id) VALUES (%s, %s)", (id, y))
+      cur.execute("INSERT into students (student_id, degree_id, admit_year) VALUES (%s, %s, %s)", (id, y, admit))
       db.commit()
       cur.execute("INSERT into need_advisor (student_id) VALUES (%s)", (id, ))
       db.commit()
@@ -1213,23 +1144,32 @@ def coursehist(id):
   #connect to the database
     cur = db.cursor(dictionary = True)
     if request.method == "POST":
-      cur.execute("SELECT course_id, grade FROM student_courses WHERE student_id = %s", (id, ))
+      cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
       data = cur.fetchall()
       #print(data)
-      cur.execute("SELECT id, course_name, course_num, credit_hours from courses")
+      cur.execute("SELECT id, course_name, course_num, credit_hours from course")
       courses = cur.fetchall()
       db.commit()
 
+
+
       grade_points = 0
       num_courses = 0
-      credits = 0
-      cur.execute("SELECT course_id, grade FROM student_courses WHERE student_id = %s", (id, ))
+      #credits = 0
+      cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
       student_grades = cur.fetchall()
+      db.commit()
+
+      cur.execute("Select class_id, course_id from class_section")
+      data2 = cur.fetchall()
 
       for i in range(len(student_grades)):
-        cur.execute("SELECT credit_hours FROM courses WHERE id = %s", (student_grades[i]['course_id'], ))
-        course_hours = cur.fetchone()
-        credits += course_hours['credit_hours']
+        #cur.execute("SELECT credit_hours FROM course JOIN class_section ON course.id = class_section.course_id WHERE class_section.class_id = %s", (student_grades[i]['class_id'], ))
+        #course_hours = cur.fetchone()
+        #cur.execute("Select course_id from class_section where class_id = %s", (student_grades[i]['class_id'], ))
+        #cur.execute("SELECT credit_hours FROM course WHERE id = %s", (student_grades[i]['class_id'], ))
+        #course_hours = cur.fetchone()
+        #credits += course_hours['credit_hours']
         grade = student_grades[i]['grade'] 
         #num_courses = num_courses + 1
         if grade == 'A':
@@ -1263,7 +1203,7 @@ def coursehist(id):
         num_courses = 1
       gpa = grade_points / num_courses
       gpa = round(gpa, 2)
-      return render_template("coursehist.html", data = data, courses = courses, id = id, gpa = gpa)
+      return render_template("coursehist.html", data = data, courses = courses, id = id, gpa = gpa, data2 = data2)
   else:
     return redirect('/')
 
@@ -1430,6 +1370,7 @@ def addalumni():
 
 
 
+
 @app.route('/logout')
 def logout():
   session.pop('username', None)
@@ -1565,13 +1506,13 @@ def faculty_transcript(transcript_id):
 
           query = '''
         select user.user_id, user.user_type, user.fname, user.lname, user.email, student_advisors.studentID, student_advisors.advisorID, students.student_id, students.degree_id, 
-            user_type.id, user_type.name as degree_name, student_courses.student_id, student_courses.course_id, student_courses.grade, courses.id, courses.dept_name, courses.course_num, courses.course_name, courses.credit_hours
+            user_type.id, user_type.name as degree_name, student_courses.student_id, student_courses.class_id, student_courses.grade, course.id, course.dept_name, course.course_num, course.course_name, course.credit_hours
             from user 
             JOIN student_advisors ON  user.user_id = student_advisors.studentID
             JOIN students ON  student_advisors.studentID = students.student_id
             JOIN user_type ON user.user_type = user_type.id
             JOIN student_courses ON user.user_id = student_courses.student_id
-            JOIN courses ON courses.id = student_courses.course_id
+            JOIN course ON course.id = student_courses.class_id
             where user.user_id=%s 
         '''
        
@@ -1604,16 +1545,16 @@ def faculty_form(user_id):
               SELECT
               user.user_id,  
               user.fname, user.lname, user.email,
-              courses.id AS course_id,
-              courses.course_name,
-              courses.course_num, 
+              course.id AS class_id,
+              course.course_name,
+              course.course_num, 
               phd_req.student_id, phd_req.thesisapproved
             FROM
               user
               JOIN student_advisors ON user.user_id = student_advisors.studentID
               JOIN students ON student_advisors.studentID = students.student_id
               JOIN form1answer ON user.user_id = form1answer.student_id
-              JOIN courses ON courses.id = form1answer.courseID
+              JOIN course ON course.id = form1answer.courseID
               JOIN phd_req ON phd_req.student_id = students.student_id
 
             WHERE
@@ -1660,16 +1601,16 @@ def faculty_form(user_id):
               SELECT
               user.user_id,  
               user.fname, user.lname, user.email,
-              courses.id AS course_id,
-              courses.course_name,
-              courses.course_num, 
+              course.id AS class_id,
+              course.course_name,
+              course.course_num, 
               phd_req.student_id, phd_req.thesisapproved
             FROM
               user
               JOIN student_advisors ON user.user_id = student_advisors.studentID
               JOIN students ON student_advisors.studentID = students.student_id
               JOIN form1answer ON user.user_id = form1answer.student_id
-              JOIN courses ON courses.id = form1answer.courseID
+              JOIN course ON course.id = form1answer.courseID
               JOIN phd_req ON phd_req.student_id = students.student_id
 
             WHERE
@@ -1710,15 +1651,15 @@ def faculty_form_masters(user_id):
               SELECT
               user.user_id,  
               user.fname, user.lname, user.email,
-              courses.id AS course_id,
-              courses.course_name,
-              courses.course_num
+              course.id AS class_id,
+              course.course_name,
+              course.course_num
             FROM
               user
               JOIN student_advisors ON user.user_id = student_advisors.studentID
               JOIN students ON student_advisors.studentID = students.student_id
               JOIN form1answer ON user.user_id = form1answer.student_id
-              JOIN courses ON courses.id = form1answer.courseID
+              JOIN course ON course.id = form1answer.courseID
 
             WHERE
               user.user_id = %s; 
@@ -1793,21 +1734,11 @@ def gs_student_data(student_id):
     student_info.insert(2, degree[0])
 
     # get courses and grades
-    cur.execute("SELECT course_id, grade FROM student_courses WHERE student_id = %s", (student_id, ))
+    cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (student_id, ))
     student_grades = cur.fetchall()
     if not student_grades:
         student_grades = list()
     student_info.insert(3, student_grades)
-
-    # get gpa requirement for degree
-    gpa_req = 0
-    cur.execute("SELECT GPA_req FROM degree_requirements WHERE degree_type = %s", (student_info[2]['degree_id'], ))
-    gpa_req_dict = cur.fetchall()
-    # if there is so such degree_id, then the required gpa is 0
-    if not gpa_req_dict:
-        gpa_req = 0
-    else:
-        gpa_req = gpa_req_dict[0]['GPA_req']
 
     # get gpa and credit hours
     # counters for grades
@@ -1821,13 +1752,15 @@ def gs_student_data(student_id):
     cs_credit_hours = 0
 
     for i in range(len(student_grades)):
-        cur.execute("SELECT credit_hours FROM courses WHERE id = %s", (student_grades[i]['course_id'], ))
-        course_hours = cur.fetchall()
-        if student_grades[i]['course_id'] == 100 or 101 or 102:
+        cur.execute("SELECT credit_hours FROM course JOIN class_section ON course.id = class_section.course_id WHERE class_section.class_id = %s", (student_grades[i]['class_id'], ))
+        course_hours = cur.fetchone()
+        cur.execute("Select course_id from class_section where class_id = %s", (student_grades[i]['class_id'], ))
+        course_id = cur.fetchone()
+        if course_id == 100 or 101 or 102:
             req_courses_ctr = req_courses_ctr + 1
-        if student_grades[i]['course_id'] == 119 or 120 or 121:
+        if course_id == 119 or 120 or 121:
             outside_courses_ctr = outside_courses_ctr + 1
-        if student_grades[i]['course_id'] != 119 or 120 or 121:
+        if course_id != 119 or 120 or 121:
             cs_courses_ctr = cs_courses_ctr + 1
             cs_credit_hours = cs_credit_hours + course_hours[0]['credit_hours']
         total_credit_hours = total_credit_hours + course_hours[0]['credit_hours']
@@ -2031,7 +1964,9 @@ def gs_assign_advisor(student_id):
     return redirect('/')
 
 
-#END OF Sameen's PART
+####################################################
+#                  APPLICATION                    #
+####################################################
 
 ####################################################
 #                  APPLICATION                    #
