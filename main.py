@@ -2047,7 +2047,7 @@ def welcome():
     cursor = db.cursor(dictionary = True)
     
     cursor.execute("SELECT fname FROM user WHERE user_id = %s", (session['user_id'],))
-    name = cursor.fetchall()
+    name = cursor.fetchone()
     print(name)
 
     cursor.execute("SELECT fname, student_id, semester, s_year FROM applications INNER JOIN user ON applications.student_id = user.user_ID WHERE status = 'review'")
@@ -2182,8 +2182,8 @@ def incomplete():
 @app.route('/reviews')
 def reviews():
    cursor = db.cursor(buffered = True)
-  #  cursor.execute("SELECT student_id, semester, s_year FROM applications WHERE student_id /NOT IN (SELECT review_id FROM review WHERE student_id = %s) AND status ='review'", (session['user_id'],))
-   cursor.execute("SELECT student_id, semester, s_year FROM applications WHERE status = 'review' ")
+   cursor.execute("SELECT student_id, semester, s_year FROM applications WHERE student_id NOT IN (SELECT review_id FROM review WHERE student_id = %s) AND status ='review'", (session['user_id'],))
+  #  cursor.execute("SELECT student_id, semester, s_year FROM applications WHERE status = 'review' ")
    info = cursor.fetchall()
    return render_template("review.html", applicants = info)
 
@@ -2228,7 +2228,7 @@ def finalDecision(student_id):
   if request.method == "POST": 
     print("this")
     cursor = db.cursor(dictionary=True, buffered = True)
-    cursor.execute("SELECT semester, s_year FROM applications WHERE student_id = %s", (student_id,))
+    cursor.execute("SELECT semester, s_year, degree_type FROM applications WHERE student_id = %s", (student_id,))
     info = cursor.fetchone()
 
     print(request.form["Decision"])
@@ -2236,6 +2236,9 @@ def finalDecision(student_id):
     print(request.form["Student"])
     cursor.execute("UPDATE applications SET status = %s, transcript = %s, student = %s WHERE UID = %s", (request.form["Decision"], request.form["Transcript"], request.form["Student"], student_id))
     db.commit()
+    if request.form["student"] == "YES":
+      cursor.execute("INSERT INTO students (student_id, degree_id, year) VALUES (%s, %s, YEAR(CURDATE()) )", (student_id, info["degree_type"],))
+      db.commit()
     return render_template("final.html")
   return render_template("final.html")
 
@@ -2253,8 +2256,10 @@ def cac():
 @app.route('/cacview')
 def cacview():
    cursor = db.cursor(buffered = True)
-   cursor.execute("SELECT * from user INNER JOIN applications ON user_id = student_id WHERE user_type = 6")
-   appinfo = cursor.fetchone()
+   cursor.execute("SELECT user_id from user where user_type = 6")
+   info = cursor.fecthall()
+   cursor.execute("SELECT * from user INNER JOIN applications ON user_id = student_id WHERE user_id = %s", (info["user_id"],))
+   appinfo = cursor.fetchall()
    return render_template("cacview.html", appinfo = appinfo)
 
 app.run(host='0.0.0.0', port=8080)

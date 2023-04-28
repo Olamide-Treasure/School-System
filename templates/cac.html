@@ -1,17 +1,20 @@
-<!DOCTYPE html>
 <html>
-<body>
+  <head>
+    <link href="/static/style.css" rel="stylesheet" type="text/css"/>
+    <title>Student Data</title>
+  </head>
+  <body>
+    <h1 style="text-align:center;"> Welcome, CAC! </h1>
+        <h2> All Applicants </h2>
+        {% for applicant in applicants: %}
+        <p> {{applicant['fname']}} {{applicant['lname']}}</a>
+          &nbsp&nbsp&nbsp <form action="/cacview"> 
+            <button type="submit">View information</button>
+          </form>
+        </p>
+        {% endfor %}
 
-<h2> All Applicants </h2>
-{% for applicant in applicants: %}
-<p> {{applicant['fname']}} {{applicant['lname']}}</a>
-  &nbsp&nbsp&nbsp <form action="/cacview"> 
-    <button type="submit">View information</button>
-  </form>
-</p>
-{% endfor %}
-
-<hr color=#3F000F;>
+        <hr color=#3F000F;>
         <h2> Application needing review </h2>
         {% for review in reviews: %}
         <p> {{review['fname']}} {{review['lname']}} {{review['p_semester']}} {{review['p_year']}} application</a>
@@ -21,7 +24,9 @@
         </p>
         {% endfor %}
 
-
-
-</body>
+    
+    <form action="/logout"> 
+        <button type="submit">Log Out</button>
+    </form>
+  </body>
 </html>
