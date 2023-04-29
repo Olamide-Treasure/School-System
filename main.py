@@ -2,8 +2,6 @@ import mysql.connector as connection
 from flask import Flask, session, render_template, redirect, url_for, request, flash
 import time, random
 from datetime import datetime
-import time, random
-from datetime import datetime
 
 app = Flask('app')
 app.secret_key = 'SECRET_KEY'
@@ -97,35 +95,24 @@ def checkComplete():
 # Reset the database
 @app.route('/reset', methods=['GET', 'POST'])
 def reset():
-    cur = db.cursor(dictionary=True)
-    with open('phase2create.sql', 'r') as f:
-        sql_scr = f.read()
-    sql_c = sql_scr.split(';')
-    for c in sql_c:
-        try:
-            cur.execute(c)
-            db.commit()
-        except Exception as e:
-            print(f"Error executing SQL statement: {e}")
-    session.clear()
-    return redirect('/')
-# @app.route('/reset', methods=['GET', 'POST'])
-# def reset():
-#   cur = db.cursor(dictionary=True)
-#   with open('phase2create.sql', 'r') as f:
-#     sql_scr = f.read()
-#   sql_c = sql_scr.split(';')
-#   for c in sql_c:
-#     cur.execute(c)
-#     db.commit()
-#   session.pop('username', None)
-#   session.pop('user_id', None)
-#   session.pop('fname', None)
-#   session.pop('lname', None)
-#   session.pop('type', None)
-#   session.clear()
+  cur = db.cursor(dictionary=True)
+  with open('phase2create.sql', 'r') as f:
+    sql_scr = f.read()
+  sql_c = sql_scr.split(';')
+  for c in sql_c:
+    cur.execute(c)
+    db.commit()
+  session.pop('username', None)
+  session.pop('user_id', None)
+  session.pop('fname', None)
+  session.pop('lname', None)
+  session.pop('type', None)
+  session.clear()
 
-#   return redirect('/')
+  return redirect('/')
+
+
+
 
 # Commits all the saved registered classes to the database
 @app.route('/checkout', methods=['GET', 'POST'])
@@ -498,6 +485,7 @@ def register():
 #                  FACULTY PAGE                    #
 ####################################################
 
+
 #faculty login 
 @app.route('/faculty', methods=['GET', 'POST'])
 def faculty():
@@ -593,14 +581,8 @@ def gs_student_names():
 
     cur.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s OR user_type = %s", (4, 5))
     students = cur.fetchall()
-
-    cur.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s", (6,))
-    applicants = cur.fetchall()
-
-    cur.execute("SELECT user_id, fname, lname, p_semester, p_year FROM review INNER JOIN user on user.user_id = review.review_id")
-    reviews = cur.fetchall()
     
-    return render_template("student_names.html", students=students, applicants = applicants, reviews = reviews)
+    return render_template("student_names.html", students=students)
   
   else:
     return redirect('/')
@@ -1147,12 +1129,21 @@ def coursehist(id):
   #connect to the database
     cur = db.cursor(dictionary = True)
     if request.method == "POST":
-      cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
-      data = cur.fetchall()
+      #cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
+      #data = cur.fetchall()
+      #class_ids = [row['class_id'] for row in data]
       #print(data)
-      cur.execute("SELECT id, course_name, course_num, credit_hours from course")
+      #cur.execute("SELECT id, course_name, course_num, credit_hours from course")
+      #cour = cur.fetchall()
+      #db.commit()
+
+      #cur.execute("SELECT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE cs.class_id IN ({}) GROUP BY c.id".format(','.join(['%s']*len(class_ids))), class_ids)
+      #answer = cur.fetchall()
+
+      cur.execute("SELECT DISTINCT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours, sc.class_id, sc.grade FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE sc.student_id = %s", (id, ))
       courses = cur.fetchall()
-      db.commit()
+      for a in courses:
+        print(a)
 
 
 
@@ -1163,8 +1154,10 @@ def coursehist(id):
       student_grades = cur.fetchall()
       db.commit()
 
-      cur.execute("Select class_id, course_id from class_section")
-      data2 = cur.fetchall()
+      #cur.execute("SELECT class_section.class_id, course_id FROM class_section JOIN student_courses ON class_section.class_id = student_courses.class_id WHERE student_courses.student_id = %s", (id,))
+      #data2 = cur.fetchall()
+
+      
 
       for i in range(len(student_grades)):
         #cur.execute("SELECT credit_hours FROM course JOIN class_section ON course.id = class_section.course_id WHERE class_section.class_id = %s", (student_grades[i]['class_id'], ))
@@ -1206,7 +1199,7 @@ def coursehist(id):
         num_courses = 1
       gpa = grade_points / num_courses
       gpa = round(gpa, 2)
-      return render_template("coursehist.html", data = data, courses = courses, id = id, gpa = gpa, data2 = data2)
+      return render_template("coursehist.html", id = id, gpa = gpa, courses = courses)
   else:
     return redirect('/')
 
@@ -1966,10 +1959,6 @@ def gs_assign_advisor(student_id):
   else:
     return redirect('/')
 
-
-####################################################
-#                  APPLICATION                    #
-####################################################
 
 ####################################################
 #                  APPLICATION                    #
