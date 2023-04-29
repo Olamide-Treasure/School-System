@@ -1,5 +1,3 @@
--- Active: 1682009432499@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
-
 use integration;
 
 SET FOREIGN_KEY_CHECKS = 0;
