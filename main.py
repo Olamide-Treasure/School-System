@@ -581,8 +581,14 @@ def gs_student_names():
 
     cur.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s OR user_type = %s", (4, 5))
     students = cur.fetchall()
+
+    cur.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s", (6,))
+    applicants = cur.fetchall()
+
+    cur.execute("SELECT user_id, fname, lname, p_semester, p_year FROM review INNER JOIN user on user.user_id = review.review_id")
+    reviews = cur.fetchall()
     
-    return render_template("student_names.html", students=students)
+    return render_template("student_names.html", students=students, applicants = applicants, reviews = reviews)
   
   else:
     return redirect('/')
