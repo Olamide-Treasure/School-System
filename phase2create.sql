@@ -233,7 +233,6 @@ DROP TABLE IF EXISTS form1answer;
 CREATE TABLE form1answer (
   student_id int(8) NOT NULL,
   courseID int(6) NOT NULL,
-  Primary Key(student_id),
   Foreign Key (courseID) REFERENCES course(id)
 );
 
@@ -407,22 +406,22 @@ insert into class_section values(49, 'Spring', '2022', 'R', '16:00-18:30', 117, 
 
 -- STUDENT TRANSCRIPTS --
 
---SW Engineering--
+-- SW Engineering --
 insert into student_courses values(55555555, 39, 'B', 'Spring','2023'); 
---Graphics 1--
+-- Graphics 1 --
 insert into student_courses values(55555555, 41, 'F', 'Spring','2023'); 
---Multimedia--
+-- Multimedia --
 insert into student_courses values(55555555, 42, 'B', 'Spring','2023'); 
---Security 1--
+-- Security 1 --
 insert into student_courses values(55555555, 40, 'B', 'Spring','2023'); 
 
---SW Paradigms--
+-- SW Paradigms --
 insert into student_courses values(55555555, 30, 'A', 'Fall', '2022');
---Algorithms--
+-- Algorithms --
 insert into student_courses values(55555555, 32, 'A', 'Fall', '2022');
---Computer Architecture--
+-- Computer Architecture --
 insert into student_courses values(55555555, 31, 'A', 'Fall', '2022');
---Networks 1--
+-- Networks 1 --
 insert into student_courses values(55555555, 33, 'A', 'Fall', '2022'); 
 
 
