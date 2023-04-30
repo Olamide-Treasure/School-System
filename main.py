@@ -745,7 +745,7 @@ def signup():
       session['user_id'] = data['user_id']
       session['fname'] = data['fname']
       session['lname'] = data['lname']
-      return redirect('/application')
+      return redirect('/welcome')
 
 
 
