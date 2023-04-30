@@ -669,6 +669,80 @@ def updategrade(studID, courID):
 
 
 
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+  if request.method == "GET":
+    return render_template("signup.html")
+    
+  if request.method == "POST":
+    cur = db.cursor(dictionary = True)
+    unm = (request.form["username"])
+    passwrd = (request.form["password"])
+    fname = (request.form["fname"])
+    lname = (request.form["lname"])
+    ssn =  (request.form["ssn"])
+    email =  (request.form["email"])
+    address =  (request.form["address"])
+    phone =  (request.form["phone"])
+    type = (request.form["dates"])
+
+    if(type == "ms"):
+      x = 4
+      y = 20
+    if(type == "phd"):
+      x = 5
+      y = 21
+    
+    while True:
+      id = random.randint(10000000, 99999999)
+      cur.execute("SELECT user_id FROM user WHERE user_id = %s", (id,))
+      if not cur.fetchone():
+        break
+
+
+    cur.execute("SELECT username FROM user WHERE username = %s", (unm, ))
+    data = cur.fetchone()
+    if(data != None):
+      return render_template("userexists.html")
+
+    db.commit()
+
+    db.commit()
+    cur.execute("SELECT ssn FROM user WHERE ssn = %s", (ssn, ))
+    data = cur.fetchone()
+    if(data != None):
+      return render_template("userexists.html")
+
+    db.commit()
+    cur.execute("SELECT email FROM user WHERE email = %s", (email, ))
+    data = cur.fetchone()
+    if(data != None):
+      return render_template("userexists.html")
+      
+    cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, 6, fname, lname, unm, passwrd, address, phone, ssn, email))
+    db.commit()
+    #cur.execute("INSERT into students (student_id, degree_id) VALUES (%s, %s)", (id, y))
+    #db.commit()
+    #cur.execute("INSERT into need_advisor (student_id) VALUES (%s)", (id, ))
+    #db.commit()
+    #if(x == 5):
+      #cur.execute("INSERT into phd_req (student_id, thesisapproved) VALUES (%s, %s)", (id, 'False'))
+      #db.commit()
+
+
+    cur.execute("SELECT username, user_password, user_id, fname, lname FROM user WHERE username = %s and user_password = %s", (unm, passwrd))
+    data = cur.fetchone()
+    db.commit()
+  
+    if data != None :
+      session['username'] = data['username']
+      session['user_id'] = data['user_id']
+      session['fname'] = data['fname']
+      session['lname'] = data['lname']
+      return redirect('/application')
+
+
+
 @app.route('/form1', methods=['GET', 'POST'])
 def form():
   cur = db.cursor(dictionary = True)
