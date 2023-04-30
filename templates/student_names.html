@@ -10,7 +10,7 @@
     <h2> All Students </h2>
         {% for student in students: %}
         <p> {{student['fname']}} {{student['lname']}}</a>
-          &nbsp&nbsp&nbsp <form action="/student/{{student['user_id']}}"> 
+          &nbsp&nbsp&nbsp <form action="/student/{{student['user_id']}}" method = "POST"> 
             <button type="submit">View Profile</button>
           </form>
         </p>
