@@ -1,26 +1,63 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <div class="container">
-        <div class="jumbotron">
-            <h4>Masters students Portal</h4>
+
+<div class="container">
+  <div class="row">
+    <div class="col-8 mx-auto">
+      <div class="card">
+        <div class="card-body">
+            {% if form_one %}
+
+            <h2>Name: {{ form_one[0]['fname'] }} {{ form_one[0]['lname'] }}</h2>
+            <h4>Email: {{ form_one[0]['email'] }}</h4>
+
+           
+
+          <div class="row">
+            <h4>Form 1 </h4>
+
+            <table class="table table-hover table-dark">
+              <thead>
+                <tr>
+                  <th scope="col">Course </th>
+                  <th scope="col">Course Name</th>
+                  <th scope="col">Credit Hours</th>
+                </tr>
+              </thead>
+              <tbody>
+          
+            {% for c in form_one %}
+
+        <tr>
+            <td>{{ c.dept_name }} {{ c.course_num }}</td>
+            <td>{{ c.course_name }}</td>
+          <td>{{ c.credit_hours }}</td>
+
+        
+        </tr>
+      {% endfor %}
+
+      
+
+    </tbody>
+  </table>
+  
+
+          </div>
+
+          {% else %}
+          <h2>Student did not submit Form 1</h2>
+      {% endif %}
+
         </div>
-        {% if form_one %}
-            {% for entry in form_one %}
-                <h2>Name: {{ entry['fname'] }} {{ entry['lname'] }}</h2>
-                <h4>Email: {{ entry['email'] }}</h4>
-                <h4>Course ID: {{ entry['course_id'] }}</h4>
-                <h4>Course Name: {{ entry['course_name'] }}</h4>
-                <h4></h4>
-                <h4>Course Number: {{ entry['course_num'] }}</h4>
+        <div class="card-footer">
+        
 
-
-             
-            {% endfor %}
-        {% else %}
-            <h2>No information available for this student.</h2>
-        {% endif %}
+        </div>
+      </div>
     </div>
+  </div>
+</div>
 
-   
 {% endblock %}

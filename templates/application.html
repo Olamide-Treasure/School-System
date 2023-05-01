@@ -37,14 +37,13 @@
    <br>
    <form action = '/application', method="POST">
     <fieldset> 
-      <legend> Personal Information</legend> 
+       <legend> Personal Information</legend> 
       First Name <input type = "text" name = "fname" value = "{{ info['fname'] }}" readonly> 
-        Middle Initial<input type = "text" name = "minit" value = "{{ info['minit'] }}" readonly> 
         Last Name<input type = "text" name = "lname" value = "{{ info['lname'] }}" readonly> <br>
-        Address <input type = "text" name = "address" value = "{{ info['address'] }}" readonly> 
+        Address <input type = "text" name = "address" value = "{{ info['user_address'] }}" readonly> 
         SSN<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "ssn" value = "{{ info['ssn'] }}" readonly> 
         Email <input type = "text" name = "email" value = "{{ info['email'] }}" readonly>
-        Phone number<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "phone_no" value = "{{ info['phone_no'] }}" readonly> <br>
+        Phone number<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "phone_no" value = "{{ info['user_phoneNUM'] }}" readonly> <br>
      
     </fieldset>
    <fieldset>
