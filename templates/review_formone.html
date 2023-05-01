@@ -50,7 +50,7 @@
 
 
 
-                {% if entry['thesisapproved'] == "True"  %}
+                {% if form_one[0]['thesisapproved'] == "True"  %}
 
 
                 <h4 style="color:green; ">Thesis Status: Approved</h4>
@@ -59,13 +59,13 @@
 
                 {% else  %}
 
-                <h4 style="color:red; ">Thesis Status: Not  Approved</h4>
+                <h4 style="color:red; ">Thesis Status: Not Approved</h4>
 
                 {% endif   %}
 
 
                 <form action="" method="post">
-                    <input type="hidden" name="student_id" value="{{ entry['user_id'] }}"> <!-- Add this line -->
+                    <input type="hidden" name="student_id" value="{{form_one[0]['user_id']}}"> <!-- Add this line -->
                     <div class="form-group">
                         <label for="status">Select an option</label>
                         <select class="form-control" id="status" name="status">
