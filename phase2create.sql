@@ -292,7 +292,7 @@ insert into user values(33333333, 3, 'Emilia', 'Schmidt', 'semilia', 'jkoplkfd03
 insert into user values (11111111, 1, 'Bhagirath', 'Narahari', 'bhagi', 'jkjfd098', '2031 G St NW, Washington, DC 20052', '202-222-1000', '342-23-9233', 'bhagi@gwu.edu');
 insert into user values (22222222, 1, 'Gabriel', 'Parmer', 'gparmer', 'uofd0932', '2033 L St NW, Washington, DC 20052', '202-222-1000', '231-34-2343', 'gparmer@gwu.edu' );
 INSERT INTO user VALUES (12312312, 6, 'Lennon', 'John','ljohn', 'passes', '2003 H St NW, Washington, DC 20052', '443-888-9999', '111-19-111', 'ljohn@gwu.edu');
-insert into user values (65656565, 6, 'Rayra', 'Starr', 'raystarr', 'tplgik2890', '2005 H St NW, Washington, DC 20052', '202-955-1020', '202-91-1131', 'rstarr@gwu.edu');
+insert into user values (65656565, 6, 'Rayra', 'Starr', 'raystarr', 'tplgik2890', '2005 H St NW, Washington, DC 20052', '202-955-1020', '202-91-1131', 'raystarr@gwu.edu');
 insert into user values (10101010, 7, 'Chairman', 'Chair', 'cac', 'passed', '2005 F St NW, Washington, DC 20052', '202-443-1100', '222-72-1110', 'cac@gwu.edu');
 
 INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','');
