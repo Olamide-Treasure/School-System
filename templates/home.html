@@ -27,11 +27,17 @@
           <a class="nav-link" href="/reset">Reset</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="/userlogin">Login</a>
+          <a class="nav-link" href="/userlogin">Apply</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/signup">Apply</a>
-        </li>
+        {% if session['user_id'] != null %}
+          <li class="nav-item">
+            <a class="nav-link" href="/userloggedin">Account</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/userlogin">Login</a>
+          </li>
+        {% endif %}
       </ul>
     </div>
   </nav>

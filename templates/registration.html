@@ -83,6 +83,7 @@
 
             <!-- Collapsable navbar for buttons -->
             <div class="collapse navbar-collapse" id="main-navigation">
+
                 <ul class="navbar-nav">
 
                     <!-- All items on the navbar -->
@@ -95,14 +96,8 @@
                         <a class="nav-link" href="/catalog">Catalog</a>
                     </li>
 
-                    {% if session['type'] == "student" %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="/register">Register</a>
-                        </li>
-                    {% endif %}
-
                     <li class="nav-item">
-                        <a class="nav-link" href="/account">Account</a>
+                        <a class="nav-link" href="/userloggedin">Account</a>
                     </li>
 
                     <li class="nav-item">
