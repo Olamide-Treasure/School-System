@@ -1,4 +1,6 @@
--- Active: 1682009432499@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
+
+-- Active: 1682346338578@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
+
 
 use integration;
 
@@ -235,7 +237,6 @@ DROP TABLE IF EXISTS form1answer;
 CREATE TABLE form1answer (
   student_id int(8) NOT NULL,
   courseID int(6) NOT NULL,
-  Primary Key(student_id),
   Foreign Key (courseID) REFERENCES course(id)
 );
 
@@ -294,12 +295,12 @@ insert into user values (77777777, 2, 'Eric', 'Clapton', 'eclapton', 'jkjfd098',
 insert into user values(33333333, 3, 'Emilia', 'Schmidt', 'semilia', 'jkoplkfd03', '1290 U St NW, Washington, DC 20052', '202-222-1000', '124-86-9834', 'semilia@gwu.edu');
 insert into user values (11111111, 1, 'Bhagirath', 'Narahari', 'bhagi', 'jkjfd098', '2031 G St NW, Washington, DC 20052', '202-222-1000', '342-23-9233', 'bhagi@gwu.edu');
 insert into user values (22222222, 1, 'Gabriel', 'Parmer', 'gparmer', 'uofd0932', '2033 L St NW, Washington, DC 20052', '202-222-1000', '231-34-2343', 'gparmer@gwu.edu' );
-INSERT INTO user VALUES (12312312, 6, 'Lennon', 'John','ljohn', 'passes', '2003 H St NW, Washington, DC 20052', '443-888-9999', '111-111-111', 'ljohn@gwu.edu');
-insert into user values (65656565, 6, 'Rayra', 'Starr', 'rstarr', 'tplgik245', '2005 H St NW, Washington, DC 20052', '202-955-1000', '222-11-1111', 'rstarr@gwu.edu');
-insert into user values (10101010, 7, 'Chairman', 'Chair', 'cac', 'passed', '2005 F St NW, Washington, DC 20052', '202-443-1000', '222-22-1111', 'cac@gwu.edu');
+INSERT INTO user VALUES (12312312, 6, 'Lennon', 'John','ljohn', 'passes', '2003 H St NW, Washington, DC 20052', '443-888-9999', '111-19-111', 'ljohn@gwu.edu');
+insert into user values (65656565, 6, 'Rayra', 'Starr', 'raystarr', 'tplgik2890', '2005 H St NW, Washington, DC 20052', '202-955-1020', '202-91-1131', 'raystarr@gwu.edu');
+insert into user values (10101010, 7, 'Chairman', 'Chair', 'cac', 'passed', '2005 F St NW, Washington, DC 20052', '202-443-1100', '222-72-1110', 'cac@gwu.edu');
 
 INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','');
-INSERT INTO applications VALUES ('incomplete','66666666','Spring','2024','','','','','','','','','','','','','','','','','','','','','','');
+INSERT INTO applications VALUES ('incomplete','65656565','Spring','2024','','','','','','','','','','','','','','','','','','','','','','');
 
 insert into alumni values (77777777, 20, 2014);
 
@@ -409,22 +410,22 @@ insert into class_section values(49, 'Spring', '2022', 'R', '16:00-18:30', 117, 
 
 -- STUDENT TRANSCRIPTS --
 
---SW Engineering--
+-- SW Engineering --
 insert into student_courses values(55555555, 39, 'B', 'Spring','2023'); 
---Graphics 1--
+-- Graphics 1 --
 insert into student_courses values(55555555, 41, 'F', 'Spring','2023'); 
---Multimedia--
+-- Multimedia --
 insert into student_courses values(55555555, 42, 'B', 'Spring','2023'); 
---Security 1--
+-- Security 1 --
 insert into student_courses values(55555555, 40, 'B', 'Spring','2023'); 
 
---SW Paradigms--
+-- SW Paradigms --
 insert into student_courses values(55555555, 30, 'A', 'Fall', '2022');
---Algorithms--
+-- Algorithms --
 insert into student_courses values(55555555, 32, 'A', 'Fall', '2022');
---Computer Architecture--
+-- Computer Architecture --
 insert into student_courses values(55555555, 31, 'A', 'Fall', '2022');
---Networks 1--
+-- Networks 1 --
 insert into student_courses values(55555555, 33, 'A', 'Fall', '2022'); 
 
 

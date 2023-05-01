@@ -8,34 +8,34 @@
       <div class="card">
         <div class="card-body">
 
-          <h2>Name: {{transcript[0]['fname'] + ' ' + transcript[0]['lname']  }}</h2>
-          <h4>Email: {{transcript[0]['email']}} </h4>
+          <h2>Name: {{userdata['fname'] + ' ' + userdata['lname']  }}</h2>
+          <h4>Email: {{userdata['email']}} </h4>
 
 
           <div class="row">
-            <h4>Student Grades & Course Information </h4>
+            <h4>Transcript </h4>
 
             <table class="table table-hover table-dark">
               <thead>
+                <th scope="col">GPA: {{gpa}} </th>
                 <tr>
-                  <th scope="col">Course ID </th>
+                  <th scope="col">Course </th>
                   <th scope="col">Course Name</th>
-                  <th scope="col">Course Number</th>
+                  <th scope="col">Class Section</th>
                   <th scope="col">Credit Hours</th>
                   <th scope="col">Grades</th>
                 </tr>
               </thead>
               <tbody>
           
-            {% for grade in transcript %}
+            {% for c in transcript %}
 
-                  
         <tr>
-            <td>{{ grade.course_id }}</td>
-            <td>{{ grade.course_name }}</td>
-          <td>{{ grade.course_num }}</td>
-          <td>{{ grade.credit_hours }}</td>
-          <td>{{ grade.grade }}</td>
+            <td>{{ c.dept_name }} {{ c.course_num }}</td>
+            <td>{{ c.course_name }}</td>
+          <td>{{ c.class_id }}</td>
+          <td>{{ c.credit_hours }}</td>
+          <td>{{ c.grade }}</td>
 
 
 
@@ -44,6 +44,9 @@
         
         </tr>
       {% endfor %}
+
+      
+
     </tbody>
   </table>
   

@@ -28,6 +28,11 @@
                 {% endif %}
             </li>
           {% endif%}
+
+            <form action = "/coursehist/{{student_id}}" method = "POST"> 
+              <button type="submit">Transcript</button>
+              </form>
+       
     </li>
     <li> Advisor: {{student_info[6][0]['fname']}} {{student_info[6][0]['lname']}} 
         {% if student_info[6][0]['fname'] == 'N/A': %}
