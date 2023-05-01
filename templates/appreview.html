@@ -124,12 +124,7 @@
             <input type = "submit" formaction = '/finalDecision/{{["UID"]}}'>  </form>
         {% endif %}
 
-        {% if session['user_type'] == "CAC" %}
-        Transcript Received? 
-            <select name="Transcript" id="reasons">
-                <option value="YES">YES</option>
-                <option value="NO">NO</option>
-            </select><br>
+        {% if session['type'] == 7 %}
 
         Final Decision:
             <select name = "Decision">
@@ -137,7 +132,7 @@
             <option value = "Admit"> Admit </option>
             <option value = "Admit with aid"> Admit with aid </option> <br> 
             <br>
-            <input type = "submit" formaction = '/finalDecision/{{["UID"]}}'> </form>
+            <input type = "submit" formaction = '/cac'> </form>
         {% endif %}
 
 

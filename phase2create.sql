@@ -1,3 +1,7 @@
+
+-- Active: 1682346338578@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
+
+
 use integration;
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -296,7 +300,7 @@ insert into user values (65656565, 6, 'Rayra', 'Starr', 'raystarr', 'tplgik2890'
 insert into user values (10101010, 7, 'Chairman', 'Chair', 'cac', 'passed', '2005 F St NW, Washington, DC 20052', '202-443-1100', '222-72-1110', 'cac@gwu.edu');
 
 INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','');
-INSERT INTO applications VALUES ('incomplete','66666666','Spring','2024','','','','','','','','','','','','','','','','','','','','','','');
+INSERT INTO applications VALUES ('incomplete','65656565','Spring','2024','','','','','','','','','','','','','','','','','','','','','','');
 
 insert into alumni values (77777777, 20, 2014);
 
