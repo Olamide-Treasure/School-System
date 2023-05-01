@@ -356,15 +356,15 @@ def user():
       return redirect('/studentlogging')
     
     #check for the alumni 
-    if(session['type'] == 2):
+    elif(session['type'] == 2):
       return redirect('/alumnilogging')
     
     #check for admin 
-    if(session['type'] == 0):
+    elif(session['type'] == 0):
       return redirect('/admin')
 
     #check for applicant 
-    if(session['type'] == 6):
+    elif(session['type'] == 6):
       return redirect('/welcome')
 
     #check for faculty advisor
