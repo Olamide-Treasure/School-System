@@ -2190,10 +2190,15 @@ def application():
 
 @app.route('/infoViewer')
 def infoViewer():
-   cursor = db.cursor(dictionary = True)
-   cursor.execute("SELECT * FROM user WHERE user_id = %s", (session['user_id'],))
-   info = cursor.fetchone()
-   return render_template("updateinfo.html", info = info)
+  if(session['type'] == 6):
+    cur = db.cursor(dictionary = True)
+    cur.execute("SELECT email, user_address, user_id, user_phoneNUM FROM user WHERE username = %s", (session['username'],))
+    data = cur.fetchone()
+    return render_template("updateinfo.html", data = data)
+  else:
+    return redirect('/')
+
+
 
 @app.route('/view')
 def view():
