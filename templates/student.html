@@ -1,6 +1,6 @@
 <html>
 <head>
-  <title>Student Page</title>
+  <title>Student Page - {{data['fname']}} {{data['lname']}}</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet"
     integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"
@@ -29,6 +29,9 @@
       <li class="nav-item">
         <a class="nav-link" href="/userloggedin">Account</a>
       </li>
+      <li class="nav-item">
+        <a class="nav-link" href="/logout">Logout</a>
+      </li>
     </ul>
   </div>
 </nav>
@@ -38,7 +41,7 @@
 <!-- Error Prompt -->
 <div class="container">
   {% for category, message in get_flashed_messages(with_categories=true) %}
-  <div class="alert alert-info alert-dismissible fade show mb-5" role="alert">
+  <div class="alert alert-info alert-dismissible fade show mb-1" role="alert">
     {{message}}
     <button type="button" class="btn-close" aria-label="Close" data-dismiss="alert" data-bs-dismiss="alert"></button>
   </div>
@@ -59,6 +62,10 @@
           <div class="container" style="display: flex; align-items: center;">
             <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
             <a class="p-2 rounded text-decoration-none" href="#account_info">Account Information</a>
+          </div>
+          <div class="container" style="display: flex; align-items: center;">
+            <i class="fa-solid fa-graduation-cap" style="color:rgb(255,115,115);"></i>
+            <a class="p-2 rounded text-decoration-none" href="#transcript">Transcript</a>
           </div>
           <div class="container" style="display: flex; align-items: center;">
             <i class="fa-solid fa-calendar-days" style="color:rgb(255,115,115);"></i>
@@ -104,11 +111,28 @@
                     <div class="col-7">
                       <div class="row">
                         <script>
-                          submitForms = function () {
-                            document.getElementById("fname_form").submit();
-                            document.getElementById("lname_form").submit();
-                            document.getElementById("email_form").submit();
-                            document.getElementById("number_form").submit();
+                          function submitForms() {
+                            const formData = new FormData();
+
+                            const fname = document.getElementById('fname').value;
+                            const lname = document.getElementById('lname').value;
+                            const email = document.getElementById('email').value;
+                            const number = document.getElementById('number').value;
+                            const user_id = document.getElementById('user_id').value;
+
+                            formData.append('fname', fname);
+                            formData.append('lname', lname);
+                            formData.append('email', email);
+                            formData.append('number', number);
+                            formData.append('user_id', user_id);
+
+                            const xhr = new XMLHttpRequest();
+                            xhr.open('POST', '/update_info');
+                            xhr.send(formData);
+                            xhr.addEventListener('load', () => {
+                              // handle successful form submission
+                              window.location.href = '/userloggedin'; // redirect to desired URL
+                            });
                           }
                         </script>
 
@@ -121,7 +145,7 @@
                               </div>
                               <input class="form-control" type="text" name="fname" id="fname"
                                 placeholder="{{data['fname']}}" />
-                              <input type="hidden" name="info" id="info" value="fname" />
+                              <input type="hidden" name="info" id="info" value="fname" /> 
                               <input type="hidden" name="user_id" id="user_id" value="{{data['user_id']}}" />
                             </form>
                           </div>
@@ -132,16 +156,16 @@
                                 <i class="fa-solid fa-user-tag"></i>
                                 <label for="lname" class="form-label mx-2 mb-0">Last Name</label>
                               </div>
-                              <input class="form-control" type="text" name="lanme" id="lname"
+                              <input class="form-control" type="text" name="lname" id="lname"
                                 placeholder="{{data['lname']}}" />
-                              <input type="hidden" name="info" id="info" value="lname" />
+                              <input type="hidden" name="info" id="info" value="lname" /> 
                               <input type="hidden" name="user_id" id="user_id" value="{{data['user_id']}}" />
                             </form>
                           </div>
                         </div>
                       </div>
                       <div class="row">
-                        <div class="container" class="mb-1">
+                        <div class="container mb-1">
                           <form class="mb-0" action="/update_info" id="email_form" method="POST">
                             <div class="d-flex align-items-center">
                               <i class="fa-solid fa-envelope"></i>
@@ -149,14 +173,14 @@
                             </div>
                             <input class="form-control" type="email" name="email" id="email"
                               placeholder="{{data['email']}}" />
-                            <input type="hidden" name="info" id="info" value="email" />
+                            <input type="hidden" name="info" id="info" value="email" /> 
                             <input type="hidden" name="user_id" id="user_id" value="{{data['user_id']}}" />
                           </form>
                           <p class="fw-lighter" style="font-size: 12.5;">Format: username@domain.com</p>
                         </div>
                       </div>
                       <div class="row">
-                        <div class="container" class="mb-1">
+                        <div class="container mb-1">
                           <form class="mb-0" action="/update_info" id="number_form" method="POST">
                             <div class="d-flex align-items-center">
                               <i class="fa-solid fa-phone"></i>
@@ -164,7 +188,7 @@
                             </div>
                             <input class="form-control" type="text" name="number" id="number"
                               placeholder="{{data['user_phoneNUM']}}" />
-                            <input type="hidden" name="info" id="info" value="number" />
+                            <input type="hidden" name="info" id="info" value="number" /> 
                             <input type="hidden" name="user_id" id="user_id" value="{{data['user_id']}}" />
                           </form>
                           <p class="fw-lighter" style="font-size: 12.5;">Format: 123-456-7890</p>
@@ -207,27 +231,25 @@
                       <div class="row">
                         <div class="container-fluid px-0 d-flex flex-row">
                           <div class="container">
-                            <form action="/update_info" id="id_fomr" method="POST">
+                            <form action="/update_id" id="id_fomr" method="POST">
                               <div class="d-flex align-items-center">
                                 <i class="fa-solid fa-id-card"></i>
                                 <label for="fname" class="form-label mx-2 mb-0">University ID</label>
                               </div>
                               <input disabled class="form-control" type="text" name="id" id="id"
                                 placeholder="{{data['user_id']}}" />
-                              <input type="hidden" name="info" id="info" value="id" />
                               <input type="hidden" name="user_id" id="user_id" value="{{data['user_id']}}" />
                             </form>
                           </div>
 
                           <div class="container">
-                            <form action="/update_info" id="degree_form" method="POST">
+                            <form action="/update_degree" id="degree_form" method="POST">
                               <div class="d-flex align-items-center">
                                 <i class="fa-solid fa-graduation-cap"></i>
                                 <label for="degree" class="form-label mx-2 mb-0">Degree</label>
                               </div>
                               <input disabled class="form-control" type="text" name="degree" id="degree"
                                 placeholder="{{data['degree_name']}}" />
-                              <input type="hidden" name="info" id="info" value="degree" />
                               <input type="hidden" name="user_id" id="user_id" value="{{data['user_id']}}" />
                             </form>
                           </div>
@@ -237,14 +259,13 @@
                       <div class="row">
                         <div class="col-4 px-0">
                           <div class="container" class="mb-1">
-                            <form class="mb-0" action="/update_info" id="year_form" method="POST">
+                            <form class="mb-0" action="/update_year" id="year_form" method="POST">
                               <div class="d-flex align-items-center">
                                 <i class="fa-regular fa-calendar-check"></i>
                                 <label for="year" class="form-label mx-2 mb-0">Admitted Year</label>
                               </div>
                               <input disabled class="form-control" type="text" name="year" id="year"
                                 placeholder="{{data['admit_year']}}" />
-                              <input type="hidden" name="info" id="info" value="number" />
                               <input type="hidden" name="user_id" id="user_id" value="{{data['user_id']}}" />
                             </form>
                           </div>
@@ -258,7 +279,36 @@
 
             </div>
             <br>
-            <div class="item-2">
+
+            <div class="item-2 mb-3">
+              <div class="row">
+                <div class="col">
+                  <div class="row mb-2" id="transcript">
+                    <h2>Transcript</h2>
+                  </div>
+
+                  <div class="row">
+                    <div class="col-7">
+                      <div class="container mb-3 border-bottom p-0">
+                        <p class="fw-light">The view transcript feature allows alumni to access 
+                          and review their academic records from their time at the university. 
+                          This feature provides alumni with a convenient way to check their grades, 
+                          GPA, and course history for personal or professional purposes. With just 
+                          a few clicks, alumni can retrieve an official copy of their transcript or 
+                          view an unofficial transcript online. </p>
+                      </div>
+                      <form action = "/coursehist/{{data['user_id']}}"> 
+                        <button class="btn btn-warning" type="submit">View Transcript</button>
+                      </form>
+                    </div>
+                  </div>
+                  
+                </div>
+              </div>
+            </div>
+
+            <br>
+            <div class="item-3">
 
               <div class="row">
                 <div class="col">
@@ -269,7 +319,7 @@
               </div>
 
               <div class="row">
-                <div class="col-5">
+                <div class="col-7">
                   <p class="fw-light border-bottom pb-3">
                     The Registration section is an essential tool for students to keep 
                     track of their course registrations. With this feature, students can 
@@ -283,7 +333,7 @@
               <div class="row">
                 <div class="dropdown">
                   
-                  <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     <bold>{{cur_sem[0]}} {{cur_sem[1]}}</bold>
                   </button>
                   <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
@@ -304,8 +354,10 @@
                           <h4>{{sem['csem']}} {{sem['cyear']}} Registration</h4>
                         </div>  
                         <ul class="list-group">
+                          {% set reg = namespace(bool=0) %}
                           {% for class in registration %}
                             {% if class['csem'] == sem['csem'] and class['cyear']|string() == sem['cyear']|string() %}
+                              {% set reg.bool = 1 %}
                               <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <div class="container d-flex flex-row">
                                   <div class="ms-2 me-auto">
@@ -333,6 +385,9 @@
                               </li>
                             {% endif %}
                           {% endfor %}
+                          {% if reg.bool == 0 %}
+                              <h5 class="fw-light">No Registered Courses for this Semester</h5>
+                          {% endif %}
                         </ul>
                       </div>
                     {% else %}
@@ -341,8 +396,10 @@
                           <h4>{{sem['csem']}} {{sem['cyear']}} Registration</h4>
                         </div>  
                         <ul class="list-group">
+                          {% set reg = namespace(bool=0) %}
                           {% for class in registration %}
                             {% if class['csem'] == sem['csem'] and class['cyear']|string() == sem['cyear']|string() %}
+                              {% set reg.bool = 1 %}
                               <li class="list-group-item d-flex justify-content-between align-items-start">
                                 <div class="container d-flex flex-row">
                                   <div class="ms-2 me-auto">
@@ -370,6 +427,9 @@
                               </li>
                             {% endif %}
                           {% endfor %}
+                          {% if reg.bool == 0 %}
+                              <h5 class="fw-light">No Registered Courses for this Semester</h5>
+                          {% endif %}
                         </ul>
                       </div>
                     {% endif %}
@@ -398,7 +458,7 @@
 
             </div>
             <br>
-            <div class="item-3">
+            <div class="item-4">
               <div class="row">
                 <div class="col">
                   <div class="row mb-2" id="forms">

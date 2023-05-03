@@ -266,76 +266,63 @@ def remove():
 
     return redirect('/register')
 
+@app.route("/update_info", methods=['POST'])
+def update_all():
+  cursor = db.cursor(dictionary=True)
+  user_id = request.form.get('user_id')
 
+  # Check if user exists
+  cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id, ))
+  data = cursor.fetchone()
 
-@app.route("/update_info", methods=['GET', 'POST'])
-def update_info():
-  if request.method == 'POST':
-    cursor = db.cursor(dictionary=True)
-    user_id = request.form.get('user_id')
-    info = request.form.get('info')
+  # Update first name
+  fname = request.form['fname']
+  if fname != "":
+    fname = fname.title()
 
-    # Check if user exists and if the info is different
-    cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id, ))
-    data = cursor.fetchone()
+  # Update last name
+  lname = request.form['lname']
+  if lname != "":
+    lname = lname.title()
 
-    # Check what info to update
-    if info == "fname":
-      # Update first name
-      fname = request.form['fname']
-      if fname != "":
-        fname = fname.title()
+  # Update email
+  email = request.form['email']
+  if email != "":
+    if validate_email(email) == False:
+      flash("Invalid email. Please use the format: username@domain.com", "error")
+      return redirect('/userloggedin')
 
-        if data['fname'] != fname:
-          cursor.execute("UPDATE user SET fname = %s WHERE user_id = %s", (fname, user_id))
-          db.commit()
-          flash("Successfully updated first name", "success")
+  # Update phone number
+  number = request.form['number']
+  if number != "":
+    if re.match(r'^\d{3}-\d{3}-\d{4}$', number) == None:
+      flash("Invalid phone number. Please use the format: 123-456-7890", "error")
+      return redirect('/userloggedin')
+
+  # Update database
+  if fname != "" and data['fname'] != fname:
+    flash("Successfully updated first name", "success")
+    cursor.execute("UPDATE user SET fname = %s WHERE user_id = %s", (fname, user_id))
+    db.commit()
+
+  if lname != "" and data['lname'] != lname:
+    flash("Successfully updated last name", "success")
+    cursor.execute("UPDATE user SET lname = %s WHERE user_id = %s", (lname, user_id))
+    db.commit()
+
+  if email != "" and data['email'] != email:
+    flash("Successfully updated email", "success")
+    cursor.execute("UPDATE user SET email = %s WHERE user_id = %s", (email, user_id))
+    db.commit()
     
-    if info == "lname":
-      # Update last name
-      lname = request.form['lname']
 
-      if lname != "":
-        lname = lname.title()
-        
-        if data['lname'] != lname:
-          cursor.execute("UPDATE user SET lname = %s WHERE user_id = %s", (lname, user_id))
-          db.commit()
-          flash("Successfully updated last name", "success")
+  if number != "" and data['user_phoneNUM'] != number:
+    flash("Successfully updated phone number", "success")
+    cursor.execute("UPDATE user SET user_phoneNUM = %s WHERE user_id = %s", (number, user_id))
+    db.commit()
+    
+  return redirect('/userloggedin', message=message)
 
-    if info == "number":
-      # Update phone number
-      number = request.form['number']
-      if number != "":
-
-        if re.match(r'^\d{3}-\d{3}-\d{4}$', number) == None:
-          flash("Invalid phone number. Please use the format: 123-456-7890", "error")
-          return redirect('/userloggedin')
-
-        if data['user_phoneNUM'] != number:
-          cursor.execute("UPDATE user SET user_phoneNUM = %s WHERE user_id = %s", (number, user_id))
-          db.commit()
-          flash("Successfully updated phone number", "success")
-
-    if info == "email":
-      # Update email
-      email = request.form['email']
-
-      if email != "":
-        if validate_email(email) == False:
-          flash("Invalid email. Please use the format: username@domain.com", "error")
-          return redirect('/userloggedin')
-        
-        if data['email'] != email:
-          cursor.execute("UPDATE user SET email = %s WHERE user_id = %s", (email, user_id))
-          db.commit()
-          flash("Successfully updated email", "success")
-
-
-    return redirect('/userloggedin')
-  
-  flash("Fatal Error. Please try again", "error")
-  return redirect('/userloggedin')
 
 ####################################################
 #                    HOME PAGE                     #
@@ -428,7 +415,12 @@ def catalog():
   if 'user_id' in session:
     logged = True
 
-  return render_template('catalog.html', dept=dept, course=course, prereq=prereq, logged=logged)
+  user = None
+  if logged:
+    cursor.execute("SELECT * FROM user WHERE user_id = %s", (session['user_id'],))
+    user = cursor.fetchone()
+
+  return render_template('catalog.html', dept=dept, course=course, prereq=prereq, logged=logged, user=user)
 
 ####################################################
 #                  LOGIN REDIRECT                  #
@@ -576,23 +568,65 @@ def register():
 @app.route('/faculty', methods=['GET', 'POST'])
 def faculty():
   if sessionType() == 1:
-    if request.method == "GET":
-      return render_template('dashboard.html')
-      
-    if request.method == "POST": 
-        user = get_session['user']
-        return render_template('dashboard.html',  user=user)
+    _reconnect()
+
+    cur = db.cursor(dictionary = True)
+    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN faculty f ON u.user_id = f.faculty_id WHERE u.username = %s", (session['username'],))
+    data = cur.fetchone()
+
+    cur_sem = _get_curr_semester()
+    next_sem = _get_next_semester()
+
+    cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
+    semesters = cur.fetchall()
+
+    new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
+    semesters.append(new_semester)  
+
+    semesters = sorted(semesters, key=lambda x: (-int(x['cyear']), x['csem']))
+
+    cur.execute('''SELECT * FROM class_section c JOIN course i ON c.course_id = i.id 
+    JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s''', (session['user_id'],))
+    registration = cur.fetchall()
+
+    cur.execute('''SELECT * FROM student_courses s 
+    JOIN class_section c ON s.class_id = c.class_id 
+    AND s.csem = c.csem AND s.cyear = c.cyear WHERE c.faculty_id = %s''', (session['user_id'],))
+    classes = cur.fetchall()
+
+    return render_template('dashboard.html', data=data, cur_sem=cur_sem, next_sem=next_sem, semesters=semesters, 
+                           registration=registration, classes=classes)
 
   else:
     return redirect('/')
 
+@app.route('/class/<class_id>/<csem>/<cyear>', methods=['GET', 'POST'])
+def class_page(class_id, csem, cyear):
+  _reconnect()
+
+  cur = db.cursor(dictionary = True)
+  cur.execute('''SELECT * FROM class_section c JOIN course i ON c.course_id = i.id 
+  JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s AND c.class_id = %s AND c.csem = %s AND c.cyear = %s''', 
+              (session['user_id'], class_id, csem, cyear))
+  registration = cur.fetchall()
+
+  print(registration)
+
+  cur.execute('''SELECT * FROM student_courses s 
+  JOIN class_section c ON s.class_id = c.class_id 
+  AND s.csem = c.csem AND s.cyear = c.cyear WHERE c.class_id = %s AND c.csem = %s AND c.cyear = %s''', (class_id, csem, cyear))
+  classes = cur.fetchall()
+
+
+  return render_template('class.html', registration=registration, classes=classes,
+                          class_id=class_id, csem=csem, cyear=cyear)
 
 #alumni log in
 @app.route('/alumnilogging')
 def alumnilogging():
     if sessionType() == 2:
       cur = db.cursor(dictionary = True)
-      cur.execute("SELECT email, user_address, user_id, user_phoneNUM FROM user WHERE username = %s", (session['username'],))
+      cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN alumni a ON u.user_id = a.student_id JOIN degrees d ON a.degree_id = d.degree_id WHERE u.username = %s", (session['username'],))
       data = cur.fetchone()
       db.commit()
       return render_template("alumni.html", title = 'Alumni Logged In', data = data)
@@ -609,12 +643,17 @@ def studentlogging():
     cur = db.cursor(dictionary = True)
     cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN students s ON u.user_id = s.student_id JOIN degrees d ON s.degree_id = d.degree_id WHERE u.username = %s", (session['username'],))
     data = cur.fetchone()
-    db.commit()
-
-    cur.execute("SELECT DISTINCT csem, cyear FROM student_courses WHERE student_id = %s ORDER BY cyear DESC, csem", (session['user_id'],))
-    semesters = cur.fetchall()
 
     cur_sem = _get_curr_semester()
+    next_sem = _get_next_semester()
+
+    cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
+    semesters = cur.fetchall()
+
+    new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
+    semesters.append(new_semester)  
+
+    semesters = sorted(semesters, key=lambda x: (-int(x['cyear']), x['csem']))
 
     cur.execute('''SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id 
     AND s.csem = c.csem AND s.cyear = c.cyear JOIN course i ON c.course_id = i.id JOIN user u ON c.faculty_id = u.user_id 
@@ -1332,77 +1371,89 @@ def applygrad():
 def coursehist(id):
   if sessionType() == 0 or sessionType() == 4 or sessionType() == 5 or sessionType() == 2 or sessionType() == 3:
   #connect to the database
+    _reconnect()
+
     cur = db.cursor(dictionary = True)
-    if request.method == "POST":
-      #cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
-      #data = cur.fetchall()
-      #class_ids = [row['class_id'] for row in data]
-      #print(data)
-      #cur.execute("SELECT id, course_name, course_num, credit_hours from course")
-      #cour = cur.fetchall()
-      #db.commit()
+    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN students s ON u.user_id = s.student_id JOIN degrees d ON s.degree_id = d.degree_id WHERE u.username = %s", (session['username'],))
+    data = cur.fetchone()
 
-      #cur.execute("SELECT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE cs.class_id IN ({}) GROUP BY c.id".format(','.join(['%s']*len(class_ids))), class_ids)
-      #answer = cur.fetchall()
+  
+    #cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
+    #data = cur.fetchall()
+    #class_ids = [row['class_id'] for row in data]
+    #print(data)
+    #cur.execute("SELECT id, course_name, course_num, credit_hours from course")
+    #cour = cur.fetchall()
+    #db.commit()
 
-      cur.execute("SELECT DISTINCT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours, sc.class_id, sc.grade FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE sc.student_id = %s", (id, ))
-      courses = cur.fetchall()
+    #cur.execute("SELECT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE cs.class_id IN ({}) GROUP BY c.id".format(','.join(['%s']*len(class_ids))), class_ids)
+    #answer = cur.fetchall()
 
+    cur.execute("SELECT * FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (id, ))
+    courses = cur.fetchall()
 
+    grade_points = 0
+    num_courses = 0
+    #credits = 0
+    cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
+    student_grades = cur.fetchall()
+    db.commit()
 
-      grade_points = 0
-      num_courses = 0
-      #credits = 0
-      cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
-      student_grades = cur.fetchall()
-      db.commit()
+    #cur.execute("SELECT class_section.class_id, course_id FROM class_section JOIN student_courses ON class_section.class_id = student_courses.class_id WHERE student_courses.student_id = %s", (id,))
+    #data2 = cur.fetchall()
+    cur_sem = _get_curr_semester()
+    next_sem = _get_next_semester()
 
-      #cur.execute("SELECT class_section.class_id, course_id FROM class_section JOIN student_courses ON class_section.class_id = student_courses.class_id WHERE student_courses.student_id = %s", (id,))
-      #data2 = cur.fetchall()
+    cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
+    semesters = cur.fetchall()
 
-      
+    # new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
+    # semesters.append(new_semester)  
 
-      for i in range(len(student_grades)):
-        #cur.execute("SELECT credit_hours FROM course JOIN class_section ON course.id = class_section.course_id WHERE class_section.class_id = %s", (student_grades[i]['class_id'], ))
-        #course_hours = cur.fetchone()
-        #cur.execute("Select course_id from class_section where class_id = %s", (student_grades[i]['class_id'], ))
-        #cur.execute("SELECT credit_hours FROM course WHERE id = %s", (student_grades[i]['class_id'], ))
-        #course_hours = cur.fetchone()
-        #credits += course_hours['credit_hours']
-        grade = student_grades[i]['grade'] 
-        #num_courses = num_courses + 1
-        if grade == 'A':
-            grade_points = grade_points + 4
-            num_courses = num_courses + 1
-        if grade == 'A-':
-            grade_points = grade_points + 3.7
-            num_courses = num_courses + 1
-        if grade == 'B+':
-            grade_points = grade_points + 3.3
-            num_courses = num_courses + 1
-        if grade == 'B':
-            grade_points = grade_points + 3
-            num_courses = num_courses + 1
-        if grade == 'B-':
-            grade_points = grade_points + 2.7
-            num_courses = num_courses + 1
-        if grade == 'C+':
-            grade_points = grade_points + 2.3
-            num_courses = num_courses + 1
-        if grade == 'C':
-            grade_points = grade_points + 2
-            num_courses = num_courses + 1
-        if grade == 'C-':
-            grade_points = grade_points + 1.7
-            num_courses = num_courses + 1
-        if grade == 'F':
-            grade_points = grade_points + 0
-            num_courses = num_courses + 1
-      if num_courses == 0:
-        num_courses = 1
-      gpa = grade_points / num_courses
-      gpa = round(gpa, 2)
-      return render_template("coursehist.html", id = id, gpa = gpa, courses = courses)
+    # semesters = sorted(semesters, key=lambda x: (-int(x['cyear']), x['csem']))
+
+    for i in range(len(student_grades)):
+      #cur.execute("SELECT credit_hours FROM course JOIN class_section ON course.id = class_section.course_id WHERE class_section.class_id = %s", (student_grades[i]['class_id'], ))
+      #course_hours = cur.fetchone()
+      #cur.execute("Select course_id from class_section where class_id = %s", (student_grades[i]['class_id'], ))
+      #cur.execute("SELECT credit_hours FROM course WHERE id = %s", (student_grades[i]['class_id'], ))
+      #course_hours = cur.fetchone()
+      #credits += course_hours['credit_hours']
+      grade = student_grades[i]['grade'] 
+      #num_courses = num_courses + 1
+      if grade == 'A':
+          grade_points = grade_points + 4
+          num_courses = num_courses + 1
+      if grade == 'A-':
+          grade_points = grade_points + 3.7
+          num_courses = num_courses + 1
+      if grade == 'B+':
+          grade_points = grade_points + 3.3
+          num_courses = num_courses + 1
+      if grade == 'B':
+          grade_points = grade_points + 3
+          num_courses = num_courses + 1
+      if grade == 'B-':
+          grade_points = grade_points + 2.7
+          num_courses = num_courses + 1
+      if grade == 'C+':
+          grade_points = grade_points + 2.3
+          num_courses = num_courses + 1
+      if grade == 'C':
+          grade_points = grade_points + 2
+          num_courses = num_courses + 1
+      if grade == 'C-':
+          grade_points = grade_points + 1.7
+          num_courses = num_courses + 1
+      if grade == 'F':
+          grade_points = grade_points + 0
+          num_courses = num_courses + 1
+    if num_courses == 0:
+      num_courses = 1
+    gpa = grade_points / num_courses
+    gpa = round(gpa, 2)
+    return render_template("coursehist.html", id = id, gpa = gpa, courses = courses, data = data,
+                            semesters = semesters, cur_sem = cur_sem, next_sem = next_sem, session=session)
   else:
     return redirect('/')
 
