@@ -1,7 +1,8 @@
 import mysql.connector as connection
 from flask import Flask, session, render_template, redirect, url_for, request, flash
 import time, random
-from datetime import datetime
+from datetime import datetime, date
+import re
 
 app = Flask('app')
 app.secret_key = 'SECRET_KEY'
@@ -44,6 +45,20 @@ def _process_time(class_time):
 # uses the current time to determine the current semester
 def _get_curr_semester():
     seasons = {
+            'Fall': ['August','September', 'October', 'November', 'December'],
+            'Spring': ['January', 'February', 'March', 'April', 'May', 'June']
+            }
+    
+    current_time = datetime.now()
+    current_month = current_time.strftime('%B')
+    current_year = int(current_time.strftime('%Y'))
+    for season in seasons:
+      if current_month in seasons[season]:
+        return season, current_year
+    return 'Invalid input month'
+
+def _get_next_semester():
+    seasons = {
             'Spring': ['August','September', 'October', 'November', 'December'],
             'Fall': ['January', 'February', 'March', 'April', 'May', 'June']
             }
@@ -84,8 +99,10 @@ def checkComplete():
     if(app["student_id"]!=None and app["semester"]!=None and app["s_year"]!=None and app["degree_type"]!=None and app["interest"]!=None and app["experience"]!=None):
       cursor.execute("UPDATE applications SET status = 'review' WHERE student_id = %s and semester = %s and s_year = %s", (app["student_id"], app["semester"], app["s_year"]))
       db.commit()
-  global letterID
-  letterID += 1
+      
+def validate_email(email):
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
 
 
 ####################################################
@@ -120,7 +137,7 @@ def checkout():
     # Commit data to enrollment table
     if request.method == 'POST':
         cursor = db.cursor(dictionary=True)
-        semester = _get_curr_semester()
+        semester = _get_next_semester()
         for cid in session["registration"]:
             cursor.execute("INSERT INTO student_courses (student_id, class_id, grade, csem, cyear) VALUES (%s, %s, 'IP', %s, %s)", (session['user_id'], cid, semester[0], semester[1]))
             db.commit()
@@ -172,14 +189,11 @@ def add():
       cursor.execute('''SELECT p.prereq_id FROM class_section c
       JOIN course i ON c.course_id = i.id
       JOIN prerequisite p ON i.id = p.course_id
-      WHERE i.id = %s''',(cid, ))
+      WHERE c.class_id = %s''',(course, ))
       ids = cursor.fetchall()
-      print(ids)
 
       cursor.execute("SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id JOIN course i ON c.course_id = i.id WHERE s.student_id = %s GROUP BY i.id", (session['user_id'],))
       taken = cursor.fetchall()
-      for row in taken:
-        print(row['id'])
       
       for id in ids:
         # Check if the id appears in taken 
@@ -253,6 +267,76 @@ def remove():
     return redirect('/register')
 
 
+
+@app.route("/update_info", methods=['GET', 'POST'])
+def update_info():
+  if request.method == 'POST':
+    cursor = db.cursor(dictionary=True)
+    user_id = request.form.get('user_id')
+    info = request.form.get('info')
+
+    # Check if user exists and if the info is different
+    cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id, ))
+    data = cursor.fetchone()
+
+    # Check what info to update
+    if info == "fname":
+      # Update first name
+      fname = request.form['fname']
+      if fname != "":
+        fname = fname.title()
+
+        if data['fname'] != fname:
+          cursor.execute("UPDATE user SET fname = %s WHERE user_id = %s", (fname, user_id))
+          db.commit()
+          flash("Successfully updated first name", "success")
+    
+    if info == "lname":
+      # Update last name
+      lname = request.form['lname']
+
+      if lname != "":
+        lname = lname.title()
+        
+        if data['lname'] != lname:
+          cursor.execute("UPDATE user SET lname = %s WHERE user_id = %s", (lname, user_id))
+          db.commit()
+          flash("Successfully updated last name", "success")
+
+    if info == "number":
+      # Update phone number
+      number = request.form['number']
+      if number != "":
+
+        if re.match(r'^\d{3}-\d{3}-\d{4}$', number) == None:
+          flash("Invalid phone number. Please use the format: 123-456-7890", "error")
+          return redirect('/userloggedin')
+
+        if data['user_phoneNUM'] != number:
+          cursor.execute("UPDATE user SET user_phoneNUM = %s WHERE user_id = %s", (number, user_id))
+          db.commit()
+          flash("Successfully updated phone number", "success")
+
+    if info == "email":
+      # Update email
+      email = request.form['email']
+
+      if email != "":
+        if validate_email(email) == False:
+          flash("Invalid email. Please use the format: username@domain.com", "error")
+          return redirect('/userloggedin')
+        
+        if data['email'] != email:
+          cursor.execute("UPDATE user SET email = %s WHERE user_id = %s", (email, user_id))
+          db.commit()
+          flash("Successfully updated email", "success")
+
+
+    return redirect('/userloggedin')
+  
+  flash("Fatal Error. Please try again", "error")
+  return redirect('/userloggedin')
+
 ####################################################
 #                    HOME PAGE                     #
 ####################################################
@@ -260,10 +344,8 @@ def remove():
 @app.route('/')
 def home_page():
   _reconnect()
-  if 'username' in session: 
-    return redirect('/userloggedin')
   
-  return render_template("home.html", title = 'Home Page')
+  return render_template("home.html", title = 'Home Page', session = session)
 
 ####################################################
 #                    LOGIN PAGE                    #
@@ -387,7 +469,7 @@ def register():
 
     # Connect to database
     cursor = db.cursor(dictionary=True)
-    semester = _get_curr_semester()
+    semester = _get_next_semester()
     query = "SELECT * FROM class_section cs \
             JOIN course c ON cs.course_id = c.id WHERE \
             cs.csem = %s AND cs.cyear = %s"
@@ -517,12 +599,50 @@ def alumnilogging():
 #student log in 
 @app.route('/studentlogging')
 def studentlogging():
+  _reconnect()
+
   if sessionType() == 4 or sessionType() == 5:
     cur = db.cursor(dictionary = True)
-    cur.execute("SELECT email, user_address, user_id, user_phoneNUM FROM user WHERE username = %s", (session['username'],))
+    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN students s ON u.user_id = s.student_id JOIN degrees d ON s.degree_id = d.degree_id WHERE u.username = %s", (session['username'],))
     data = cur.fetchone()
     db.commit()
 
+    cur.execute("SELECT DISTINCT csem, cyear FROM student_courses WHERE student_id = %s ORDER BY cyear DESC, csem", (session['user_id'],))
+    semesters = cur.fetchall()
+
+    cur_sem = _get_curr_semester()
+
+    cur.execute('''SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id 
+    AND s.csem = c.csem AND s.cyear = c.cyear JOIN course i ON c.course_id = i.id JOIN user u ON c.faculty_id = u.user_id 
+    WHERE student_id = %s''', (session['user_id'],))
+    registration = cur.fetchall()
+
+    # intervals = [("1:00", 1.0),("1:30", 1.5),
+    #               ("2:00", 2.0),("2:30", 2.5),
+    #               ("3:00", 3.0),("3:30", 3.5),
+    #               ("4:00", 4.0),("4:30", 4.5),
+    #               ("5:00", 5.0),("5:30", 5.5),
+    #               ("6:00", 6.0),("6:30", 6.5),
+    #               ("7:00", 7.0),("7:30", 7.5),
+    #               ("8:00", 8.0),("8:30", 8.5),
+    #               ("9:00", 9.0),("9:30", 9.5),]
+    # week = ['M', 'T', 'W', 'R', 'F']
+    # semester = _get_curr_semester()
+    # cur.execute('''SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id 
+    #   AND s.csem = c.csem AND s.cyear = c.cyear JOIN course i ON c.course_id = i.id 
+    #   WHERE s.student_id = %s AND s.cyear = %s AND s.csem = %s ORDER BY c.class_time, CASE c.day_of_week 
+    #   WHEN 'M' THEN 1 
+    #   WHEN 'T' THEN 2 
+    #   WHEN 'W' THEN 3 
+    #   WHEN 'R' THEN 4
+    #   ELSE 5 
+    #   END''', (session['user_id'], semester[1], semester[0]))   
+    # schedule = cur.fetchall()
+    
+    # times = {}
+    # for row in schedule:
+    #   time = _calendar_map(row['class_time'])
+    #   times[row['class_id']] = [time[0], time[1], time[2], row['day_of_week']]
 
     #cur.execute("SELECT status FROM student_status WHERE student_id = %s", (session['user_id'],))
     #checksuspended = cur.fetchone()
@@ -551,7 +671,8 @@ def studentlogging():
     suspended = cur.fetchone()
     db.commit()
 
-    return render_template("student.html", title = 'Student Logged In', data = data, suspended = suspended)
+    return render_template("student.html", title = 'Student Logged In', data = data, suspended = suspended, 
+                           registration = registration, semesters = semesters, cur_sem = cur_sem)
   
   else:
     return redirect('/')
