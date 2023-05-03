@@ -919,7 +919,13 @@ def form():
   if sessionType() == 4 or sessionType() == 5:
 
     if request.method == "GET":
-      return render_template("form1.html")
+      studentid = session['user_id']
+      cur.execute("SELECT c.id FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (studentid, ))
+      courses = cur.fetchall()
+      c = 0
+      for i in courses:
+        c += 1
+      return render_template("form1.html", courses = courses, c = c)
 
     if request.method == 'POST':
       check = 0
@@ -951,6 +957,17 @@ def form():
               #print("reaches the else")
               #cur.execute("INSERT into student_courses (student_id, class_id, grade) VALUES (%s, %s, %s)", (session['user_id'], i, 'IP'))
               #db.commit()
+              cur.execute("SELECT c.id FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (studentid, ))
+              courses = cur.fetchall()
+              c = 0
+              d = 0
+              for y in courses:
+                d += 1
+                if(y == i):
+                  c += 1
+              if(d == c):
+                return redirect('/form1')
+              
 
             cur.execute("INSERT into form1answer (student_id, courseID) VALUES (%s, %s)", (session['user_id'], i))
             db.commit()
