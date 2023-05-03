@@ -9,6 +9,7 @@ DROP TABLE IF EXISTS students;
 CREATE TABLE students (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
+	  semester varchar(4) NOT NULL,
   admit_year   INT(4) NOT NULL,
   PRIMARY KEY (student_id),
   FOREIGN KEY (student_id) REFERENCES user(user_id)
@@ -165,6 +166,7 @@ DROP TABLE IF EXISTS alumni;
 CREATE TABLE alumni (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
+	  semester varchar(4) NOT NULL,
 	grad_year int(4) NOT NULL,
   PRIMARY KEY (student_id)
 );
@@ -301,11 +303,14 @@ insert into user values (10101010, 7, 'Chairman', 'Chair', 'cac', 'passed', '200
 INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','');
 INSERT INTO applications VALUES ('incomplete','65656565','Spring','2024','','','','','','','','','','','','','','','','','','','','','','');
 
-insert into alumni values (77777777, 20, 2014);
 
-insert into students values (55555555, 20, 2021);
-insert into students values (66666666, 20, 2021);
-insert into students values (99999999, 21, 2021);
+insert into alumni values (77777777, 20, 'Spring', 2014);
+
+insert into students values (55555555, 20, 'Spring', 2021);
+insert into students values (66666666, 20, 'Fall' , 2021);
+insert into students values (99999999, 21, 'Fall',  2021);
+
+
 
 insert into phd_req values(99999999, 'False');
 
