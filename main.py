@@ -919,18 +919,31 @@ def form():
   if sessionType() == 4 or sessionType() == 5:
 
     if request.method == "GET":
-      studentid = session['user_id']
-      cur.execute("SELECT c.id FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (studentid, ))
-      courses = cur.fetchall()
-      c = 0
-      for i in courses:
-        c += 1
-      return render_template("form1.html", courses = courses, c = c)
+      return render_template("form1.html")
 
     if request.method == 'POST':
+      courseselected = 0
+      totalcourse = 0
+      for i in range(100, 122):
+        checkboxes = request.form.getlist(str(i))
+        for e in checkboxes:
+          if(e == "yes"):
+            studentid = session['user_id']
+            cur.execute("SELECT c.id FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (studentid, ))
+            courses = cur.fetchall()
+            for courseid in courses:
+              totalcourse += 1
+              if(courseid['id'] == i):
+                courseselected += 1
+         
+      if(totalcourse != courseselected):
+          return render_template("form1.html")
+
+
       check = 0
       for i in range(100, 122):
         checkboxes = request.form.getlist(str(i))
+
         for checkbox in checkboxes:
           if(checkbox == "yes"):
             if (check == 0):
@@ -957,16 +970,7 @@ def form():
               #print("reaches the else")
               #cur.execute("INSERT into student_courses (student_id, class_id, grade) VALUES (%s, %s, %s)", (session['user_id'], i, 'IP'))
               #db.commit()
-              cur.execute("SELECT c.id FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (studentid, ))
-              courses = cur.fetchall()
-              c = 0
-              d = 0
-              for y in courses:
-                d += 1
-                if(y == i):
-                  c += 1
-              if(d == c):
-                return redirect('/form1')
+
               
 
             cur.execute("INSERT into form1answer (student_id, courseID) VALUES (%s, %s)", (session['user_id'], i))
