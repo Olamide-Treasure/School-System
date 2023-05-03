@@ -341,11 +341,15 @@ def update_info():
 #                    HOME PAGE                     #
 ####################################################
 
+
 @app.route('/')
 def home_page():
   _reconnect()
+  if 'username' in session: 
+    return redirect('/userloggedin')
   
   return render_template("home.html", title = 'Home Page', session = session)
+
 
 ####################################################
 #                    LOGIN PAGE                    #
