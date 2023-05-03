@@ -7,7 +7,6 @@
       integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe"
       crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/f16edda68d.js" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="static/student.css">
   </head>
 
   <!-- Nav Bar -->
@@ -60,24 +59,24 @@
           <div class="flex-shrink-0 pt-2 py-3 sticky-top">
             <div class="container" style="display: flex; align-items: center;">
               <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
-              <a class="p-2 rounded text-decoration-none" href="#account_info">Account Information</a>
+              <a class="p-2 rounded text-decoration-none" href="#account_info">Account Info</a>
             </div>
             {% if data['instructor'] == True %}
               <div class="container" style="display: flex; align-items: center;">
-                <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
-                <a class="p-2 rounded text-decoration-none" href="#instructor_info">Instructor Information</a>
+                <i class="fa-solid fa-chalkboard-user" style="color:rgb(255,115,115);"></i>
+                <a class="p-2 rounded text-decoration-none" href="#instructor_info">Instructor Info</a>
               </div>
             {% endif %}
             {% if data['advisor'] == True %}
               <div class="container" style="display: flex; align-items: center;">
-                <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
-                <a class="p-2 rounded text-decoration-none" href="#advisor_info">Advisor Information</a>
+                <i class="fa-solid fa-user-tie" style="color:rgb(255,115,115);"></i>
+                <a class="p-2 rounded text-decoration-none" href="#advisor_info">Advisor Info</a>
               </div>
             {% endif %}
-            {% if data['reviewer'] == True %}
+            {% if data['reviewr'] == True %}
               <div class="container" style="display: flex; align-items: center;">
-                <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
-                <a class="p-2 rounded text-decoration-none" href="#reviewer_info">Reviewer Information</a>
+                <i class="fa-solid fa-magnifying-glass" style="color:rgb(255,115,115);"></i>
+                <a class="p-2 rounded text-decoration-none" href="#reviewer_info">Reviewer Info</a>
               </div>
             {% endif %}
           </div>
@@ -264,12 +263,206 @@
                 </div>
               </div>
 
-              <div class="item-2 mb-3">
+              {% if data['instructor'] == True %}
+                <br>
+                <div class="item-2 mb-3">
 
-              </div>   
+                  <div class="row">
+                    <div class="col">
+                      <div class="row mb-2" id="instructor_info">
+                        <h2>Instructor Info</h2>
+                      </div>
+                    </div>
+                  </div>
+
+
+                  <div class="row">
+                    <div class="col-7">
+                      <p class="fw-light border-bottom pb-3">
+                        The Registration section is an essential tool for students to keep 
+                        track of their course registrations. With this feature, students can 
+                        easily access and view their current and past course registrations, 
+                        including course names, instructors, schedules, grades, and credits earned. 
+                        This information can be used to plan for future semesters, 
+                        ensure degree requirements are met, and monitor academic progress.</p>
+                    </div>
+                  </div>
+
+                  <div class="row">
+                    <div class="dropdown">
+                  
+                      <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <bold>{{cur_sem[0]}} {{cur_sem[1]}}</bold>
+                      </button>
+                      <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        {% for sem in semesters %}
+                          {% if sem['csem'] == cur_sem[0] and sem['cyear']|string() == cur_sem[1]|string() %}
+                            <button class="dropdown-item" data-bs-toggle="tab" data-bs-target="#{{sem['csem']}}_{{sem['cyear']}}">{{sem['csem']}} {{sem['cyear']}}</button>
+                          {% else %}
+                            <button class="dropdown-item" data-bs-toggle="tab" data-bs-target="#{{sem['csem']}}_{{sem['cyear']}}">{{sem['csem']}} {{sem['cyear']}}</button>
+                          {% endif %}
+                        {% endfor %}
+                      </div>
+                    </div>
+                    <div class="tab-content" id="myTabContent">
+                      {% for sem in semesters %}
+                        {% if sem['csem'] == cur_sem[0] and sem['cyear']|string() == cur_sem[1]|string() %}
+                          <div class="tab-pane fade show active py-3" id="{{sem['csem']}}_{{sem['cyear']}}" role="tabpanel" aria-labelledby="{{sem['csem']}}_{{sem['cyear']}}-tab" tabindex="0">
+                            <div class="container px-0 mb-2">
+                              <h4>{{sem['csem']}} {{sem['cyear']}} Schedule</h4>
+                            </div>  
+                            <ul class="list-group">
+                              {% set reg = namespace(bool=0) %}
+                              {% for class in registration %}
+                                {% if class['csem'] == sem['csem'] and class['cyear']|string() == sem['cyear']|string() %}
+                                  {% set reg.bool = 1 %}
+                                  <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="container d-flex flex-row">
+                                      <div class="ms-2 me-auto col-4">
+                                        <div class="fw-bold">{{class['course_name']}}</div>
+                                        {% set days = {'M': 'Monday', 'T': 'Tuesday', 'W': 'Wednesday', 'R': 'Thursday', 'F': 'Friday'} %}
+                                        <p class="mb-0">Day: <strong>{{days[class['day_of_week']]}}</strong></p>
+                                        <p class="mb-0">Time: <strong>{{class['class_time']}}</strong></p>
+                                        <p class="mb-0">Credits: <strong>{{class['credit_hours']}}</strong></p>
+                                      </div>
+                                      <div class="ms-2 me-auto mx-0">
+                                        <form method="GET" action="/class/{{class['class_id']}}/{{class['csem']}}/{{class['cyear']}}">
+                                          <button type="submit" class="btn btn-warning" onclick="window.location.href=''">View Students</button>
+                                        </form>
+                                      </div>
+                                    </div>
+                                    {% set grade=namespace(bool=0) %}
+                                    {% for row in classes %}
+                                      {% if row['grade'] == "IP" %}
+                                        {set grade.bool = 1 %}
+                                      {% endif %}
+                                    {% endfor %}
+                                    {% if grade.bool == 1 %}
+                                      <span class="badge bg-warning rounded-pill">Needs Grade Submissions</span>
+                                    {% else %}
+                                      <span class="badge bg-success rounded-pill">Submitted Grades</span>
+                                    {% endif %}
+                                  </li>
+                                {% endif %}
+                              {% endfor %}
+                              {% if reg.bool == 0 %}
+                                  <h5 class="fw-light">No Taught Courses for this Semester</h5>
+                              {% endif %}
+                            </ul>
+                          </div>
+                        {% elif sem['csem'] == next_sem[0] and sem['cyear']|string() == next_sem[1]|string() %}
+                          <div class="tab-pane fade py-3" id="{{sem['csem']}}_{{sem['cyear']}}" role="tabpanel" aria-labelledby="{{sem['csem']}}_{{sem['cyear']}}-tab" tabindex="0">
+                            <div class="container px-0 mb-2">
+                              <h4>{{sem['csem']}} {{sem['cyear']}} Schedule</h4>
+                            </div>  
+                            <ul class="list-group">
+                              {% set reg = namespace(bool=0) %}
+                              {% for class in registration %}
+                                {% if class['csem'] == sem['csem'] and class['cyear']|string() == sem['cyear']|string() %}
+                                  {% set reg.bool = 1 %}
+                                  <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="container d-flex flex-row">
+                                      <div class="ms-2 me-auto col-4">
+                                        <div class="fw-bold">{{class['course_name']}}</div>
+                                        {% set days = {'M': 'Monday', 'T': 'Tuesday', 'W': 'Wednesday', 'R': 'Thursday', 'F': 'Friday'} %}
+                                        <p class="mb-0">Day: <strong>{{days[class['day_of_week']]}}</strong></p>
+                                        <p class="mb-0">Time: <strong>{{class['class_time']}}</strong></p>
+                                        <p class="mb-0">Credits: <strong>{{class['credit_hours']}}</strong></p>
+                                      </div>
+                                      <div class="ms-2 me-auto mx-0">
+                                        <form method="GET" action="/class/{{class['class_id']}}/{{class['csem']}}/{{class['cyear']}}">
+                                          <button type="submit" class="btn btn-warning" onclick="window.location.href=''">View Students</button>
+                                        </form>
+                                      </div>
+                                    </div>
+                                    <span class="badge bg-info rounded-pill">Scheduled to Start</span>
+                                  </li>
+                                {% endif %}
+                              {% endfor %}
+                              {% if reg.bool == 0 %}
+                                  <h5 class="fw-light">No Taught Courses for this Semester</h5>
+                              {% endif %}
+                            </ul>
+                          </div>
+                        {% else %}
+                          <div class="tab-pane fade py-3" id="{{sem['csem']}}_{{sem['cyear']}}" role="tabpanel" aria-labelledby="{{sem['csem']}}_{{sem['cyear']}}-tab" tabindex="0">
+                            <div class="container px-0 mb-2">
+                              <h4>{{sem['csem']}} {{sem['cyear']}} Schedule</h4>
+                            </div>  
+                            <ul class="list-group">
+                              {% set reg = namespace(bool=0) %}
+                              {% for class in registration %}
+                                {% if class['csem'] == sem['csem'] and class['cyear']|string() == sem['cyear']|string() %}
+                                  {% set reg.bool = 1 %}
+                                  <li class="list-group-item d-flex justify-content-between align-items-start">
+                                    <div class="container d-flex flex-row">
+                                      <div class="ms-2 me-auto col-4">
+                                        <div class="fw-bold">{{class['course_name']}}</div>
+                                        {% set days = {'M': 'Monday', 'T': 'Tuesday', 'W': 'Wednesday', 'R': 'Thursday', 'F': 'Friday'} %}
+                                        <p class="mb-0">Day: <strong>{{days[class['day_of_week']]}}</strong></p>
+                                        <p class="mb-0">Time: <strong>{{class['class_time']}}</strong></p>
+                                        <p class="mb-0">Credits: <strong>{{class['credit_hours']}}</strong></p>
+                                      </div>
+                                      <div class="ms-2 me-auto mx-0">
+                                        <form method="GET" action="/class/{{class['class_id']}}/{{class['csem']}}/{{class['cyear']}}">
+                                          <button type="submit" class="btn btn-warning" onclick="window.location.href=''">View Students</button>
+                                        </form>
+                                      </div>
+                                    </div>
+                                    {% set grade=namespace(bool=0) %}
+                                    {% for row in classes %}
+                                      {% if row['grade'] == "IP" %}
+                                        {set grade.bool = 1 %}
+                                      {% endif %}
+                                    {% endfor %}
+                                    {% if grade.bool == 1 %}
+                                      <span class="badge bg-warning rounded-pill">Needs Grade Submissions</span>
+                                    {% else %}
+                                      <span class="badge bg-success rounded-pill">Submitted Grades</span>
+                                    {% endif %}
+                                  </li>
+                                {% endif %}
+                              {% endfor %}
+                              {% if reg.bool == 0 %}
+                                  <h5 class="fw-light">No Taught Courses for this Semester</h5>
+                              {% endif %}
+                            </ul>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+
+                    <script>
+                      // Add event listener to dropdown items
+                      const dropdownItems = document.querySelectorAll('.dropdown-item');
+                      dropdownItems.forEach(item => {
+                        item.addEventListener('click', () => {
+                          // Get the text of the clicked item and set it as the dropdown button text
+                          const dropdownButton = document.querySelector('.dropdown-toggle');
+                          dropdownButton.textContent = item.textContent;
+                          // Switch to the corresponding tab
+                          const target = item.getAttribute('data-bs-target');
+                          const tab = document.querySelector(target);
+                          const tabs = document.querySelectorAll('.tab-pane');
+                          tabs.forEach(t => t.classList.remove('active', 'show'));
+                          tab.classList.add('active', 'show');
+                        });
+                      });
+                    </script>
+                  </div>
+
+                </div>   
+              {% endif %}
             </div>
           </div>
         </div>
+      </div>
+    </div>
+
+
+    <div class="container mb-5">
+      <div class="row">
+        <a href="#" class="text-decoration-none">Back To Top</a>
       </div>
     </div>
   </body>

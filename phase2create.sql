@@ -1,5 +1,4 @@
-
--- Active: 1682346338578@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
+-- Active: 1682009432499@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
 
 
 use integration;
@@ -385,26 +384,26 @@ insert into class_section values(48, 'Fall', '2022', 'W', '18:00-20:30', 121, 11
 insert into class_section values(49, 'Fall', '2022', 'R', '16:00-18:30', 117, 11111111);
 
 -- SPRING 2022 --
-insert into class_section values(30, 'Spring', '2022', 'M', '15:00-17:30', 100, 11111111);
-insert into class_section values(31, 'Spring', '2022', 'T', '15:00-17:30', 101, 11111111);
-insert into class_section values(32, 'Spring', '2022', 'W', '15:00-17:30', 102, 11111111);
-insert into class_section values(33, 'Spring', '2022', 'M', '18:00-20:30', 104, 11111111);
-insert into class_section values(34, 'Spring', '2022', 'T', '18:00-20:30', 105, 11111111);
-insert into class_section values(35, 'Spring', '2022', 'W', '18:00-20:30', 106, 11111111);
-insert into class_section values(36, 'Spring', '2022', 'R', '18:00-20:30', 107, 11111111);
-insert into class_section values(37, 'Spring', '2022', 'T', '15:00-17:30', 108, 11111111);
-insert into class_section values(38, 'Spring', '2022', 'M', '18:00-20:30', 110, 11111111);
-insert into class_section values(39, 'Spring', '2022', 'M', '15:30-18:00', 111, 11111111);
-insert into class_section values(40, 'Spring', '2022', 'R', '18:00-20:30', 109, 11111111);
-insert into class_section values(41, 'Spring', '2022', 'W', '18:00-20:30', 112, 11111111);
-insert into class_section values(42, 'Spring', '2022', 'T', '18:00-20:30', 113, 11111111);
-insert into class_section values(43, 'Spring', '2022', 'M', '18:00-20:30', 114, 11111111);
-insert into class_section values(44, 'Spring', '2022', 'W', '18:00-20:30', 115, 11111111);
-insert into class_section values(45, 'Spring', '2022', 'W', '15:00-17:30', 118, 11111111);
-insert into class_section values(46, 'Spring', '2022', 'M', '18:00-20:30', 119, 11111111);
-insert into class_section values(47, 'Spring', '2022', 'T', '18:00-20:30', 120, 11111111);
-insert into class_section values(48, 'Spring', '2022', 'W', '18:00-20:30', 121, 11111111);
-insert into class_section values(49, 'Spring', '2022', 'R', '16:00-18:30', 117, 11111111);
+-- insert into class_section values(30, 'Spring', '2022', 'M', '15:00-17:30', 100, 11111111);
+-- insert into class_section values(31, 'Spring', '2022', 'T', '15:00-17:30', 101, 11111111);
+-- insert into class_section values(32, 'Spring', '2022', 'W', '15:00-17:30', 102, 11111111);
+-- insert into class_section values(33, 'Spring', '2022', 'M', '18:00-20:30', 104, 11111111);
+-- insert into class_section values(34, 'Spring', '2022', 'T', '18:00-20:30', 105, 11111111);
+-- insert into class_section values(35, 'Spring', '2022', 'W', '18:00-20:30', 106, 11111111);
+-- insert into class_section values(36, 'Spring', '2022', 'R', '18:00-20:30', 107, 11111111);
+-- insert into class_section values(37, 'Spring', '2022', 'T', '15:00-17:30', 108, 11111111);
+-- insert into class_section values(38, 'Spring', '2022', 'M', '18:00-20:30', 110, 11111111);
+-- insert into class_section values(39, 'Spring', '2022', 'M', '15:30-18:00', 111, 11111111);
+-- insert into class_section values(40, 'Spring', '2022', 'R', '18:00-20:30', 109, 11111111);
+-- insert into class_section values(41, 'Spring', '2022', 'W', '18:00-20:30', 112, 11111111);
+-- insert into class_section values(42, 'Spring', '2022', 'T', '18:00-20:30', 113, 11111111);
+-- insert into class_section values(43, 'Spring', '2022', 'M', '18:00-20:30', 114, 11111111);
+-- insert into class_section values(44, 'Spring', '2022', 'W', '18:00-20:30', 115, 11111111);
+-- insert into class_section values(45, 'Spring', '2022', 'W', '15:00-17:30', 118, 11111111);
+-- insert into class_section values(46, 'Spring', '2022', 'M', '18:00-20:30', 119, 11111111);
+-- insert into class_section values(47, 'Spring', '2022', 'T', '18:00-20:30', 120, 11111111);
+-- insert into class_section values(48, 'Spring', '2022', 'W', '18:00-20:30', 121, 11111111);
+-- insert into class_section values(49, 'Spring', '2022', 'R', '16:00-18:30', 117, 11111111);
 
 
 
