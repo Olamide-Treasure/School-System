@@ -69,7 +69,7 @@ CREATE TABLE faculty (
   department      VARCHAR(50) NOT NULL,
   instructor      BOOLEAN,
   advisor         BOOLEAN,
-  reviewr         BOOLEAN,
+  reviewer        BOOLEAN,
   PRIMARY KEY (faculty_id),
   FOREIGN KEY (faculty_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
