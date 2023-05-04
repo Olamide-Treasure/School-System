@@ -898,13 +898,13 @@ def signup():
       
     cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, 6, fname, lname, unm, passwrd, address, phone, ssn, email))
     db.commit()
-    cur.execute("INSERT into students (student_id, degree_id) VALUES (%s, %s)", (id, y))
-    db.commit()
-    cur.execute("INSERT into need_advisor (student_id) VALUES (%s)", (id, ))
-    db.commit()
-    if(x == 5):
-      cur.execute("INSERT into phd_req (student_id, thesisapproved) VALUES (%s, %s)", (id, 'False'))
-      db.commit()
+    #cur.execute("INSERT into students (student_id, degree_id) VALUES (%s, %s)", (id, y))
+    #db.commit()
+    #cur.execute("INSERT into need_advisor (student_id) VALUES (%s)", (id, ))
+    #db.commit()
+    #if(x == 5):
+      #cur.execute("INSERT into phd_req (student_id, thesisapproved) VALUES (%s, %s)", (id, 'False'))
+      #db.commit()
 
 
     cur.execute("SELECT username, user_password, user_id, fname, lname FROM user WHERE username = %s and user_password = %s", (unm, passwrd))
@@ -920,31 +920,219 @@ def signup():
 
 
 
+
 @app.route('/form1', methods=['GET', 'POST'])
 def form():
   cur = db.cursor(dictionary = True)
   if sessionType() == 4 or sessionType() == 5:
+    _reconnect()
 
     if request.method == "GET":
+      _reconnect()
       return render_template("form1.html")
 
     if request.method == 'POST':
+      _reconnect()
       courseselected = 0
       totalcourse = 0
+      grade_points = 0
+      total_credit_hours = 0
+      num_courses = 0
+      bad_grade_ctr = 0
+      req_courses_ctr = 0
+      outside_courses_ctr = 0
+      cs_courses_ctr = 0
+      cs_credit_hours = 0
+      studentid = session['user_id']
       for i in range(100, 122):
         checkboxes = request.form.getlist(str(i))
         for e in checkboxes:
           if(e == "yes"):
-            studentid = session['user_id']
-            cur.execute("SELECT c.id FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (studentid, ))
-            courses = cur.fetchall()
-            for courseid in courses:
-              totalcourse += 1
-              if(courseid['id'] == i):
-                courseselected += 1
+            if i == 100 or 101 or 102:
+              req_courses_ctr = req_courses_ctr + 1
+            if i == 119 or 120 or 121:
+              outside_courses_ctr = outside_courses_ctr + 1
+            if i != 119 or 120 or 121:
+              cs_courses_ctr = cs_courses_ctr + 1
+              cs_credit_hours = cs_credit_hours + 3
+            total_credit_hours = total_credit_hours + 3
+            
+
+        
+      degree = list()
+      cur.execute("SELECT fname, lname, user_id, user_address, user_phoneNUM, email FROM user WHERE user_id = %s", (studentid, ))
+      student_name = cur.fetchall()
+      student_info.insert(0, student_name)
+      eligible = {'eligible': 'True', 'reason': []}
+      student_info.insert(1, eligible)
+
+    # get degree_id
+      cur.execute("SELECT degree_id FROM students WHERE student_id = %s", (studentid, ))
+      degree = cur.fetchall()
+      if not degree:
+        degree = 0
+      student_info.insert(2, degree[0])
+
+    # get courses and grades
+      cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (studentid, ))
+      student_grades = cur.fetchall()
+      if not student_grades:
+        student_grades = list()
+      student_info.insert(3, student_grades)
+
+      #db.commit()
+    # get gpa and credit hours
+    # counters for grades
+
+      for i in range(len(student_grades)):
+        #cur.execute("SELECT DISTINCT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours, sc.class_id, sc.grade FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE sc.student_id = %s", (id, ))
+        #courses = cur.fetchall()
+        cur.execute("SELECT DISTINCT credit_hours FROM course JOIN class_section ON course.id = class_section.course_id WHERE class_section.class_id = %s", (student_grades[i]['class_id'], ))
+        course_hours = cur.fetchone()
+ 
+        
+        #db.commit()
+        cur.execute("SELECT DISTINCT course_id FROM class_section AS cs WHERE cs.class_id = %s", (student_grades[i]['class_id'], ))
+        course_id = cur.fetchone()
+        #course_id = c['course_id']
+
+
+
+        db.commit()
+        if course_id == 100 or 101 or 102:
+          req_courses_ctr = req_courses_ctr + 1
+        if course_id == 119 or 120 or 121:
+          outside_courses_ctr = outside_courses_ctr + 1
+        if course_id != 119 or 120 or 121:
+          cs_courses_ctr = cs_courses_ctr + 1
+          cs_credit_hours = cs_credit_hours + course_hours['credit_hours']
+        total_credit_hours = total_credit_hours + course_hours['credit_hours']
+        grade = student_grades[i]['grade'] 
+        
+        if grade == 'A':
+          grade_points = grade_points + 4
+          num_courses = num_courses + 1
+        if grade == 'A-':
+          grade_points = grade_points + 3.7
+          num_courses = num_courses + 1
+        if grade == 'B+':
+          grade_points = grade_points + 3.3
+          num_courses = num_courses + 1
+        if grade == 'B':
+          grade_points = grade_points + 3
+          num_courses = num_courses + 1
+        if grade == 'B-':
+          grade_points = grade_points + 2.7
+          bad_grade_ctr = bad_grade_ctr + 1
+          num_courses = num_courses + 1
+        if grade == 'C+':
+          grade_points = grade_points + 2.3
+          bad_grade_ctr = bad_grade_ctr + 1
+          num_courses = num_courses + 1
+        if grade == 'C':
+          grade_points = grade_points + 2
+          bad_grade_ctr = bad_grade_ctr + 1
+          num_courses = num_courses + 1
+        if grade == 'C-':
+          grade_points = grade_points + 1.7
+          bad_grade_ctr = bad_grade_ctr + 1
+          num_courses = num_courses + 1
+        if grade == 'F':
+          grade_points = grade_points + 0
+          bad_grade_ctr = bad_grade_ctr + 1
+          num_courses = num_courses + 1
+      if num_courses == 0:
+        num_courses = 1
+      gpa = grade_points / num_courses
+      gpa = round(gpa, 2)
+      gpa_dict = {'gpa': gpa}
+      total_credit_hours_dict = {'total_credit_hours': total_credit_hours}
+      student_info.insert(4, gpa_dict)
+      student_info.insert(5, total_credit_hours_dict)
+
+
+    # requirements for master's students
+      if student_info[2]['degree_id'] == 20:
+        # check gpa
+        if student_info[4]['gpa'] < 3.0:
+            student_info[1]['eligible'] = 'False'
+            student_info[1]['reason'].append('Has not met GPA requirement')
+            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            return redirect('/userloggedin')
+          
+        # check credit hours
+        if student_info[5]['total_credit_hours'] < 30:
+            student_info[1]['eligible'] = 'False'
+            student_info[1]['reason'].append('Has not met credit hour requirement')
+            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            return redirect('/userloggedin')
+        
+        # check for grades below a B
+        if bad_grade_ctr > 2:
+            student_info[1]['eligible'] = 'False'
+            student_info[1]['reason'].append('Has 2+ grades below a B')
+            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            return redirect('/userloggedin')
+          
+        # check for required courses
+        if req_courses_ctr < 3:
+            student_info[1]['eligible'] = 'False'
+            student_info[1]['reason'].append('Has not taken required courses')
+            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            return redirect('/userloggedin')
+           
+        # check for outside courses
+        if outside_courses_ctr < 2:
+            student_info[1]['eligible'] = 'False'
+            student_info[1]['reason'].append('Has not taken enough classes outside of CS')
+            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            return redirect('/userloggedin')
+            
+
+    # requirements for phd students
+      if student_info[2]['degree_id'] == 21:
+        # check gpa
+        if student_info[4]['gpa'] < 3.5:
+            student_info[1]['eligible'] = 'False'
+            student_info[1]['reason'].append('Has not met GPA requirement')
+            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            return redirect('/userloggedin')
          
-      if(totalcourse != courseselected):
-          return render_template("form1.html")
+        # check credit hours
+        if student_info[5]['total_credit_hours'] < 36:
+            student_info[1]['eligible'] = 'False'
+            student_info[1]['reason'].append('Has not met credit hour requirement')
+            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            return redirect('/userloggedin')
+           
+        # check for grades below a B
+        if bad_grade_ctr > 1:
+            student_info[1]['eligible'] = 'False'
+            student_info[1]['reason'].append('Has 1+ grades below a B')
+            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            return redirect('/userloggedin')
+       
+        # check for 30 credits of CS courses
+        if cs_credit_hours < 30:
+            student_info[1]['eligible'] = 'False'
+            student_info[1]['reason'].append('Has not met CS course credit requirement')
+            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            return redirect('/userloggedin')
+     
+
+    # check if thesis is approved for phd 
+      if student_info[2]['degree_id'] == 21:
+        cur.execute("SELECT thesisapproved FROM phd_req WHERE student_id = %s", (studentid, ))
+        approved = cur.fetchall()
+        student_info.append(approved)
+        if approved[0]['thesisapproved'] == 'False':
+          student_info[1]['eligible'] = 'False'
+          student_info[1]['reason'].append('Thesis has not been approved')
+          flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+          return redirect('/userloggedin')
+      
+
+  
 
 
       check = 0
@@ -1691,6 +1879,7 @@ def logout():
 #For phD students they have to approve (pass) the phd thesis
 #they can view their advisees' transcript but cannot update transcript.
 
+
 @app.route('/faculty/login', methods=['GET', 'POST'])
 def faculty_login():
     print(f'method is: ', request.method)
@@ -1790,6 +1979,9 @@ def phd_students():
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
 
+      
+      cursor.close()
+
       return render_template('phd_students.html', students=result)
 
   else:
@@ -1876,6 +2068,7 @@ def faculty_transcript(transcript_id):
         gpa = grade_points / num_courses
         gpa = round(gpa, 2)
 
+        cursor.close()
 
     return render_template('student_transcript.html', transcript=result, userdata = userdata, gpa = gpa)
 
@@ -1914,6 +2107,7 @@ def faculty_form(user_id):
               JOIN form1answer ON user.user_id = form1answer.student_id
               JOIN course ON course.id = form1answer.courseID
               JOIN phd_req ON phd_req.student_id = students.student_id
+
             WHERE
               user.user_id = %s; 
           '''
@@ -1923,10 +2117,28 @@ def faculty_form(user_id):
 
             cursor.execute(query,(user_id,) )
             result =cursor.fetchall()
+
+            q = '''
+              SELECT
+              user.user_id,  
+              phd_req.thesisapproved
+            FROM
+              user
+              JOIN student_advisors ON user.user_id = student_advisors.studentID
+              JOIN students ON student_advisors.studentID = students.student_id
+              JOIN phd_req ON phd_req.student_id = students.student_id
+
+            WHERE
+              user.user_id = %s; 
+          '''
+            cursor.execute(q,(user_id,) )
+            phdapp =cursor.fetchall()
+
             for r in result:
               print(r)
+            cursor.close()
 
-            return render_template('review_formone.html', form_one=result)
+            return render_template('review_formone.html', form_one=result, phdapp = phdapp)
     
 
       elif request.method == "POST":
@@ -1972,6 +2184,7 @@ def faculty_form(user_id):
               JOIN form1answer ON user.user_id = form1answer.student_id
               JOIN course ON course.id = form1answer.courseID
               JOIN phd_req ON phd_req.student_id = students.student_id
+
             WHERE
               user.user_id = %s; 
           '''
@@ -1982,12 +2195,29 @@ def faculty_form(user_id):
 
           cursor.execute(query,(user_id,) )
           result =cursor.fetchall()
+
+          q = '''
+              SELECT
+              user.user_id,  
+              phd_req.thesisapproved
+            FROM
+              user
+              JOIN student_advisors ON user.user_id = student_advisors.studentID
+              JOIN students ON student_advisors.studentID = students.student_id
+              JOIN phd_req ON phd_req.student_id = students.student_id
+
+            WHERE
+              user.user_id = %s; 
+          '''
+          cursor.execute(q,(user_id,) )
+          phdapp =cursor.fetchall()
           for r in result:
             print(r)
+          cursor.close()
           db.commit()
           flash(f'Student Thesis has been approved!', category="success")
 
-          return render_template('review_formone.html', form_one=result)
+          return render_template('review_formone.html', form_one=result, phdapp = phdapp)
   else:
     return redirect('/')
 
@@ -2022,6 +2252,7 @@ def faculty_form_masters(user_id):
               JOIN students ON student_advisors.studentID = students.student_id
               JOIN form1answer ON user.user_id = form1answer.student_id
               JOIN course ON course.id = form1answer.courseID
+
             WHERE
               user.user_id = %s; 
           '''
@@ -2033,6 +2264,7 @@ def faculty_form_masters(user_id):
             result =cursor.fetchall()
             for r in result:
               print(r)
+            cursor.close()
 
             return render_template('review_formone_masters.html', form_one=result)
   else:
@@ -2065,6 +2297,7 @@ def master_students():
 
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
+      cursor.close()
 
       return render_template('master_students.html', students=result)
   else:
@@ -2184,6 +2417,7 @@ def gs_student_data(student_id):
         gs_all_suspended()
 
     # check if they've applied for graduation
+      gradcheck = 0
       cur.execute("SELECT * FROM applied_grad WHERE student_id = %s", (student_id, ))
       applied = cur.fetchall()
       if not applied:
@@ -2196,22 +2430,27 @@ def gs_student_data(student_id):
         if student_info[4]['gpa'] < 3.0:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has not met GPA requirement')
+            gradcheck = 1
         # check credit hours
         if student_info[5]['total_credit_hours'] < 30:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has not met credit hour requirement')
+            gradcheck = 1
         # check for grades below a B
         if bad_grade_ctr > 2:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has 2+ grades below a B')
+            gradcheck = 1
         # check for required courses
         if req_courses_ctr < 3:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has not taken required courses')
+            gradcheck = 1
         # check for outside courses
         if outside_courses_ctr < 2:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has not taken enough classes outside of CS')
+            gradcheck = 1
 
     # requirements for phd students
       if student_info[2]['degree_id'] == 21:
@@ -2219,18 +2458,22 @@ def gs_student_data(student_id):
         if student_info[4]['gpa'] < 3.5:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has not met GPA requirement')
+            gradcheck = 1
         # check credit hours
         if student_info[5]['total_credit_hours'] < 36:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has not met credit hour requirement')
+            gradcheck = 1
         # check for grades below a B
         if bad_grade_ctr > 1:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has 1+ grades below a B')
+            gradcheck = 1
         # check for 30 credits of CS courses
         if cs_credit_hours < 30:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has not met CS course credit requirement')
+            gradcheck = 1
 
     # check if thesis is approved for phd 
       if student_info[2]['degree_id'] == 21:
@@ -2240,6 +2483,11 @@ def gs_student_data(student_id):
         if approved[0]['thesisapproved'] == 'False':
           student_info[1]['eligible'] = 'False'
           student_info[1]['reason'].append('Thesis has not been approved')
+          gradcheck = 1
+
+
+      if gradcheck == 1:
+        cur.execute("DELETE FROM applied_grad WHERE student_id", (student_id, ))
 
     # get advisor
       cur.execute("SELECT advisorID FROM student_advisors WHERE studentID = %s", (student_id, ))
@@ -2283,7 +2531,7 @@ def gs_graduate(student_id):
     today = datetime.date.today()
     year = today.year
 
-    cur.execute("INSERT INTO alumni (student_id, degree_id, grad_year) VALUES (%s, %s, %s)", (student_id, data[1][0]['degree_id'], year))
+    cur.execute("INSERT INTO alumni (student_id, degree_id, semester, grad_year) VALUES (%s, %s, %s, %s)", (student_id, data[1][0]['degree_id'], 'Spring', year))
     cur.execute("DELETE FROM students WHERE student_id = %s", (student_id, ))
     cur.execute("UPDATE user SET user_type = %s WHERE user_id = %s", (2, student_id))
 
