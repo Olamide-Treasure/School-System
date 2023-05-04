@@ -107,6 +107,18 @@ CREATE TABLE review (
 );
 
 
+DROP TABLE IF EXISTS transcript;
+CREATE TABLE transcript (
+  t_id int(8),
+  t_semester varchar(10),
+  t_year year,
+  school varchar(20),
+  email varchar(20),
+  contents varchar(600),
+  primary key(t_id,t_semester,t_year),
+  foreign key(t_id) references user(user_id) ON DELETE CASCADE
+);
+
 DROP TABLE IF EXISTS letter;
 CREATE TABLE letter (
   user_id int(8),
