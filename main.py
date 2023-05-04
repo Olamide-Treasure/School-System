@@ -2490,6 +2490,7 @@ def incomplete():
        degree_type = request.form["degree_type"]
        s_year = request.form["s_year"]
        this = session["user_id"]
+       transcript = request.form["transcript"]
        cursor.execute("INSERT INTO applications VALUES ('incomplete', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,CURDATE(),'sent','not decided')", 
                       (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))      
@@ -2560,6 +2561,7 @@ def updateapplication():
        degree_type = request.form["degree_type"]
        s_year = request.form["s_year"]
        this = session["user_id"]
+       transcript = request.form["transcript"]
        cursor.execute("UPDATE applications SET status = 'review', student_id = %s, semester = %s, s_year = %s, degree_type = %s, prior_bac_deg_name = '', prior_bac_deg_gpa = %s, prior_bac_deg_major = %s, prior_bac_deg_year = %s, prior_bac_deg_university = %s, GRE_verbal = %s, GRE_year = %s, GRE_quatitative = %s, GRE_advanced_score = %s, GRE_advanced_subject = %s, TOEFL_score = %s, TOEFL_date = %s, interest = %s, experience = %s, prior_ms_deg_name = '', prior_ms_deg_gpa = %s, prior_ms_deg_major = %s, prior_ms_deg_year = %s, prior__deg_university = %s, transcript= 'sent', student = 'not decided' WHERE student_id = %s AND semester = %s AND s_year = %s", 
                     (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                     gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university,this,semester, s_year))
@@ -2628,6 +2630,7 @@ def updateincomplete():
        degree_type = request.form["degree_type"]
        s_year = request.form["s_year"]
        this = session["user_id"]
+       transcript = request.form["transcript"]
        cursor.execute("SELECT semester, s_year FROM applications WHERE student_id = %s AND status = 'incomplete'", (this,))
        just = cursor.fetchall()
        justs = []
@@ -2734,9 +2737,12 @@ def review(student_id,semester,s_year):
     letter = cursor.fetchall()
     if request.method == 'POST':
         cursor = db.cursor(dictionary = True, buffered = True)
-        fdecision = request.form.getlist('fdecision')
-        fdecision = fdecision[0]
-        print(fdecision)
+        if session["type"] == 7:
+          fdecision = request.form.getlist('fdecision')
+          fdecision = fdecision[0]
+          print(fdecision)
+          cursor.execute("UPDATE applications SET status = %s WHERE student_id = %s AND semester = %s AND s_year = %s", (fdecision, student_id,semester,s_year))
+          db.commit()
         decision = request.form.getlist('decision')
         decision = decision[0]
         print(decision)
@@ -2746,7 +2752,7 @@ def review(student_id,semester,s_year):
         advisor = request.form['radvisor']
         cursor.execute("INSERT INTO review (student_id, review_id, p_semester, p_year, rev_rating, deficiency_course, reason_reject, GAS_comment, decision, recom_advisor) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (student_id, session['user_id'], semester,s_year, "1", deficiency_course, reason_reject, GAS_comment, decision, advisor))
         db.commit()
-        cursor.execute("UPDATE applications SET status = %s WHERE student_id = %s AND semester = %s AND s_year = %s", (fdecision, student_id,semester,s_year))
+        # cursor.execute("UPDATE applications SET status = %s WHERE student_id = %s AND semester = %s AND s_year = %s", (fdecision, student_id,semester,s_year))
         return redirect('/')
     cursor = db.cursor(buffered = True)
     cursor.execute("SELECT * FROM applications WHERE student_id = %s AND semester = %s AND s_year = %s", (student_id,semester,s_year))
@@ -2782,7 +2788,7 @@ def finalDecision(student_id,semester,s_year):
     decision = request.form.getlist('Decision')
     decision = decision[0]
     print(decision)
-    Transcript = request.form.getlist('transcript')
+    Transcript = request.form.getlist('Transcript')
     Transcript = Transcript[0]
     print(Transcript)
     cursor.execute("UPDATE applications SET status = %s, transcript = %s WHERE student_id = %s AND semester = %s AND s_year = %s", (decision, Transcript, student_id,semester,s_year))

@@ -119,7 +119,11 @@
             <option value = "Admit"> Admit </option>
             <option value = "Admit with aid"> Admit with aid </option> <br> 
             <br>
-            <input type = "submit" method = 'POST'> </form>
+            <input type = "submit"> </form>
+        </form>
+        {% endif %}
+        {% if session['type'] == 1 %}
+        <input type = "submit"> </form>
         </form>
         {% endif %}
 
