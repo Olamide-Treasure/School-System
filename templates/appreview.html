@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+    <head>
+        <script>
+            function onlyOne(checkbox) {
+                var checkboxes = document.getElementsByName('decision')
+                checkboxes.forEach((item) => {
+                    if (item !== checkbox) item.checked = false
+                })
+            }
+            function showDropdown() {
+                var checkbox = document.getElementById("reject");
+                var dropdown = document.getElementById("rejectDropdown");
+                
+                if (checkbox.checked == true) {
+                    dropdown.style.display = "block";
+                } else {
+                    dropdown.style.display = "none";
+                }
+            }
+            function showDropdown2() {
+                var checkbox1 = document.getElementById("badmit");
+                var checkbox2 = document.getElementById("noaid");
+                var checkbox3 = document.getElementById("aid");
+
+                var aidDropdown = document.getElementById("aidDropdown");
+                if (checkbox1.checked || checkbox2.checked || checkbox3.checked) {
+                    aidDropdown.style.display = 'block';
+                } else {
+                    aidDropdown.style.display = 'none';
+                }
+            }
+        </script>
+    </head>
+    <body class = "bcolor">
+        <form action='/logout'>  <input type="submit" class = "logout button" name="logout" value="logout"> </b> </form>
+        
+        <h1>Name: 
+            {% if names[1] is not none %} 
+                {{ names[1] }} 
+            {% endif %} 
+            {% if names[0] is not none %} 
+                {{ names[0] }} 
+            {% endif %} 
+            </h1>
+        <c class = just>  <b> Student Number:  </b> </c>  <d class = "just"> {{ appinfo[1] }} </d> <br>
+       
+            <c class = just> <b> Semester and Year of Application:  </b></c> <d class = "just"> {{ appinfo[2] }} {{appinfo[3]}}</d>  <br>
+            <c class = just> <b> Applying for Degree:  </b> </c> <d class = "just"> {{ appinfo[4] }} </d>
+        </ul>
+        <h1>Summary of Credentials: </h1>
+          <c class = just> <b> <li> Prior degrees </li> </c> </b>
+          {% if  appinfo[5] == "BS/BA" %}
+             Bachelor's GPA: {{appinfo[6]}}  <br>
+             Bachelor's Major: {{appinfo[7]}}   <br>
+             Year: {{appinfo[8]}}   <br>
+             Bachelor's University: {{appinfo[9]}}  <br>
+          {% endif %}
+             Master's GPA: {{appinfo[20]}}  <br>
+             Master's Major: {{appinfo[21]}}   <br>
+             Year: {{appinfo[22]}}   <br>
+             Master's University: {{appinfo[23]}}  <br>
+             <br>
+             <c class = just>  <b> <li> GRE INFO </li> </b> </c> 
+            GRE Verbal: {{appinfo[10]}} <br>
+            GRE Quantitative: {{appinfo[12]}} <br>
+            Year: {{appinfo[10]}} <br>
+            GRE Advanced Score: {{appinfo[13]}} <br>
+            Subject: {{appinfo[14]}} <br>
+            <br>
+            <c class = just>  <b> <li> TOEFL INFO </li> </b> </c> <br>
+            TOEFL Score: {{appinfo[15]}} <br>
+            TOEFL Date: {{appinfo[16]}} <br>
+            <br>
+            <c class = just>  <b><li> Area of Interest: {{appinfo[17]}}</li> </b> </c> <br>
+            <c class = just>  <b><li> Experience: {{appinfo[18]}} </li> </b> </c> <br>
+            
+        </ul>
+
+        <form action ="/reviews/{{appinfo[1]}}" method="POST">
+            <textarea id="comment" name="comment" rows="6" cols="30" placeholder="Comments for applicant" maxlength="150" textarea style="resize: none"></textarea><br>
+            <input type="checkbox" id="reject" name="decision" value="reject" onclick="onlyOne(this);showDropdown()">
+            <label for="reject">Reject</label><br>
+            <div id="rejectDropdown" style="display: none">
+                <select name="reason" id="reasons">
+                    <option value="A">A: Incomplete Record</option>
+                    <option value="B">B: Does not meet minimum requirements</option>
+                    <option value="B">C: Bad letters</option>
+                    <option value="B">D: Not competitive</option>
+                    <option value="B">E: Other</option>
+                </select><br>
+            </div>
+            <input type="checkbox" id="badmit" name="decision" value="badmit" onclick="onlyOne(this);showDropdown2()">
+            <label for="borderlineadmit">Borderline Admit</label><br>
+            <input type="checkbox" id="noaid" name="decision" value="noaid" onclick="onlyOne(this);showDropdown2()">
+            <label for="noaid">Admit with no aid</label><br>
+            <input type="checkbox" id="aid" name="decision" value="aid" onclick="onlyOne(this);showDropdown2()">
+            <label for="aid">Admit with aid</label><br>
+            <div id="aidDropdown" style="display: none">
+                <label for="radvsior">Recommended Advisor</label><br>
+                <input type="text" id="radvisor" name="radvisor"><br>
+                <label for="dcourse">Deficiency course if any</label><br>
+                <input type="text" name="dcourse" placeholder=""><br>
+            </div>
+            {% if session['type'] == 1 %}
+            <button id="submit" class = "button" type ="submit"> Submit Review </button>  </form>
+        {% endif %}
+    <br>
+
+        {% if session['type'] == 3 %}
+        Transcript Received? 
+            <select name="Transcript" id="reasons">
+                <option value="YES">YES</option>
+                <option value="NO">NO</option>
+            </select><br>
+
+        Final Decision:
+            <select name = "Decision">
+            <option value = "Reject"> Reject </option>
+            <option value = "Admit"> Admit </option>
+            <option value = "Admit with aid"> Admit with aid </option> <br> 
+            <br>
+            <input type = "submit" formaction = '/finalDecision/{{["UID"]}}'>  </form>
+        {% endif %}
+
+        {% if session['type'] == 7 %}
+
+        Final Decision:
+            <select name = "Decision">
+            <option value = "Reject"> Reject </option>
+            <option value = "Admit"> Admit </option>
+            <option value = "Admit with aid"> Admit with aid </option> <br> 
+            <br>
+            <input type = "submit" formaction = '/cac'> </form>
+        {% endif %}
+
+
+
+    </body>
+</html>

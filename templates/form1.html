@@ -1,0 +1,140 @@
+<html>
+  <head>
+    <title>Form 1</title>
+  
+  </head>
+
+  <body>
+    <center>
+    <h1 class = "sameen"> Form 1 </h1>
+    </center>
+
+
+    <form action = "/form1"  method = "POST" id = "form">
+         <h3> Select with yes or no with courses you have taken </h3>
+        <h3>You can select at most 12 courses and make sure that you meet the degree requirements</h3>
+        <p> CSCI 6221: SW Paradigms (one of the three core required course for MS)</p>
+        
+        <input type="radio" name = "100" value="yes"> Yes </br>
+        <input type="radio" name = "100" value="no" checked> No </br>
+
+        <p> CSCI 6461: Computer Architecture (one of the three core required course for MS)</p>
+        <input type="radio" name = "101" value="yes"> Yes </br>
+        <input type="radio" name = "101" value="no" checked> No </br>
+  
+        <p> CSCI 6212: Algorithms (one of the three core required course for MS)</p>
+        <input type="radio" name = "102" value="yes"> Yes </br>
+        <input type="radio" name = "102" value="no" checked> No </br>
+
+        <p>CSCI 6220: Machine Learning</p>
+        <input type="radio" name = "103" value="yes"> Yes </br>
+        <input type="radio" name = "103" value="no" checked> No </br>
+
+        <p> CSCI 6232: Networks 1</p>
+        <input type="radio" name = "104" value="yes"> Yes </br>
+        <input type="radio" name = "104" value="no" checked> No </br>
+
+        <p> CSCI 6233: Networks 2</p>
+        <input type="radio" name = "105" value="yes"> Yes </br>
+        <input type="radio" name = "105" value="no" checked> No </br>
+
+        <p> CSCI 6241: Databases 1</p>
+        <input type="radio" name = "106" value="yes"> Yes </br>
+        <input type="radio" name = "106" value="no" checked> No </br>
+
+        <p> CSCI 6242: Databases 2</p>
+        <input type="radio" name = "107" value="yes"> Yes </br>
+        <input type="radio" name = "107" value="no" checked> No </br>
+
+        <p> CSCI 6246: Compilers</p>
+        <input type="radio" name = "108" value="yes"> Yes </br>
+        <input type="radio" name = "108" value="no" checked> No </br>
+
+        <p> CSCI 6260: Multimedia</p>
+        <input type="radio" name = "109" value="yes"> Yes </br>
+        <input type="radio" name = "109" value="no" checked> No </br>
+
+        <p> CSCI 6251: Cloud Computing</p>
+        <input type="radio" name = "110" value="yes"> Yes </br>
+        <input type="radio" name = "110" value="no" checked> No </br>
+
+        <p> CSCI 6254: SW Engineering</p>
+        <input type="radio" name = "111" value="yes"> Yes </br>
+        <input type="radio" name = "111" value="no" checked> No </br>
+
+        <p> CSCI 6262: Graphics 1</p>
+        <input type="radio" name = "112" value="yes"> Yes </br>
+        <input type="radio" name = "112" value="no" checked> No </br>
+
+        <p> CSCI 6283: Security 1</p>
+        <input type="radio" name = "113" value="yes"> Yes </br>
+        <input type="radio" name = "113" value="no" checked> No </br>
+
+        <p> CSCI 6284: Cryptography</p>
+        <input type="radio" name = "114" value="yes"> Yes </br>
+        <input type="radio" name = "114" value="no" checked> No </br>
+
+        <p> CSCI 6286: Network Security</p>
+        <input type="radio" name = "115" value="yes"> Yes </br>
+        <input type="radio" name = "115" value="no" checked> No </br>
+
+        <p> CSCI 6325: Algorithms 2</p>
+        <input type="radio" name = "116" value="yes"> Yes </br>
+        <input type="radio" name = "116" value="no" checked> No </br>
+
+        <p> CSCI 6339: Embedded Systems</p>
+        <input type="radio" name = "117" value="yes"> Yes </br>
+        <input type="radio" name = "117" value="no" checked> No </br>
+
+        <p> CSCI 6384: Cryptography 2</p>
+        <input type="radio" name = "118" value="yes"> Yes </br>
+        <input type="radio" name = "118" value="no" checked> No </br>
+
+        <p> ECE 6241: Communication Theory</p>
+        <input type="radio" name = "119" value="yes"> Yes </br>
+        <input type="radio" name = "119" value="no" checked> No </br>
+
+        <p> ECE 6242: Information Theory</p>
+        <input type="radio" name = "120" value="yes"> Yes </br>
+        <input type="radio" name = "120" value="no" checked> No </br>
+       
+        <p> MATH 6210: Logic</p>
+        <input type="radio" name = "121" value="yes"> Yes </br>
+        <input type="radio" name = "121" value="no" checked> No </br>
+
+        <div id="error-message"></div>
+
+        <button type="submit">Submit</button>
+
+    </form>
+
+
+
+    <script>
+      const form = document.getElementById("form");
+      const checkboxes = form.querySelectorAll("input[type='radio']");
+      const errorMessage = document.getElementById("error-message");
+    
+      form.addEventListener("submit", function(event) {
+        let count = 0;
+        checkboxes.forEach(function(checkbox) {
+          if (checkbox.checked && checkbox.value == "yes") {
+            count++;
+          }
+        });
+    
+        if (count > 12) {
+          event.preventDefault();
+          errorMessage.innerHTML = "You can select at most 12 courses!";
+        }
+      });
+    </script>
+
+
+<form action = "/"> 
+  <button type="submit">Home Page</button>
+  </form>
+
+  </body>
+
+  </html>

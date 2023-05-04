@@ -1,0 +1,49 @@
+<html>
+
+  <body>
+    <h1 style="text-align:center;"> Welcome, Graduate Secretary! </h1>
+    <h2> All Students </h2>
+        {% for student in students: %}
+        <p> {{student['fname']}} {{student['lname']}}</a>
+          &nbsp&nbsp&nbsp <form action="/student/{{student['user_id']}}" method = "POST"> 
+            <button type="submit">View Profile</button>
+          </form>
+          
+
+        </p>
+        {% endfor %}
+        <hr color=#3F000F;>
+        <h2> All Applicants </h2>
+        {% for applicant in applicants: %}
+        <p> {{applicant['fname']}} {{applicant['lname']}}</a>
+          &nbsp&nbsp&nbsp <form action="/gsview"> 
+            <button type="submit">View information</button>
+          </form>
+        </p>
+        {% endfor %}
+
+        <hr color=#3F000F;>
+        <h2> Application needing review </h2>
+        {% for review in reviews: %}
+        <p> {{review['fname']}} {{review['lname']}} {{review['p_semester']}} {{review['p_year']}} application</a>
+          &nbsp&nbsp&nbsp <form action="/finalDecision/{{review['user_id']}}">
+            <button type="submit">Make Final decision</button>
+          </form>
+        </p>
+        {% endfor %}
+
+    <hr color=#3F000F;>
+
+    <form action="/all_suspended"> 
+      <button type="submit">Suspended Students</button>
+    </form>
+
+    <form action = "/assignadvsior"> 
+      <button type="submit">Change Advisor</button>
+      </form>
+
+    <form action="/logout"> 
+        <button type="submit">Log Out</button>
+    </form>
+  </body>
+</html>

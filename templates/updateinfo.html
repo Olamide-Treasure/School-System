@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <title> Update Personal Info </title>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+    <div class="buttons">
+
+      <form action = "/updateinfo" method = "POST"> 
+        <h3>University ID: {{ '{:08d}'.format(session['user_id']) }}</h3>
+        <h4>Last Name: 
+          <input type="text" placeholder= "{{session['lname']}}" name = "lname">
+        </h4>
+  
+        <h4> First Name: 
+         <input type="text" placeholder= "{{session['fname']}}" name = "fname">
+        </h4>
+  
+      <h4>Email Address: 
+      <input type="text" placeholder="{{data['email']}}" name= "email">
+      </h4>
+  
+      <h4>Address: 
+      <input type="text" placeholder="{{data['user_address']}}" name= "address">
+      </h4>
+  
+      <h4>Phone Number: 
+      <input type="text" placeholder="{{data['user_phoneNUM']}}" name= "phonenum">
+      </h4>
+  
+      <button type="submit">Submit</button>
+      </form>
+  
+      </div>
+  </body>
+</html>
