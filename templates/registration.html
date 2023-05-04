@@ -113,6 +113,8 @@
 
         <br>
 
+        {% if suspended == [] %}
+
         <!-- Error Prompt -->
         <div class="container">
             {% for category, message in get_flashed_messages(with_categories=true) %}
@@ -421,6 +423,18 @@
         </div>
 
         <div class="container my-3"></div>
+
+    {% else %}
+
+        <div class="container">
+            <h2 class="fw-bold">You Are suspended</h2>
+            <h3 class="fw-light">Suspended students cannot register for classes</h3>
+            <h3>Please talk to a faculty member about removing this hold on your account</h3>
+        </div>
+
+    {% endif %}
+
+    
     </body>
 
     

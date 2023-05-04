@@ -478,8 +478,14 @@ def user():
 def register():
     _reconnect()
 
+
+
     # Connect to database
     cursor = db.cursor(dictionary=True)
+
+    cursor.execute("SELECT * FROM user u JOIN student_status s u.user_id = s.student_id WHERE user_id = %s", (session['user_id'],))
+    suspended = cursor.fetchone()
+
     semester = _get_next_semester()
     query = "SELECT * FROM class_section cs \
             JOIN course c ON cs.course_id = c.id WHERE \
@@ -570,7 +576,7 @@ def register():
 
     return render_template('registration.html', schedule=schedule, renderer=renderer, instructor_list=instructor_list,
                             classes=classes, prereqs=prereqs, session=session, semester=semester, times=times, 
-                            intervals=intervals, week=week, taken=taken, bulletin=bulletin)
+                            intervals=intervals, week=week, taken=taken, bulletin=bulletin, suspended=suspended)
 
 
 
