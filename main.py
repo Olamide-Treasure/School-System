@@ -572,6 +572,7 @@ def faculty():
   if sessionType() == 1:
     _reconnect()
 
+    print(session['username'])
     cur = db.cursor(dictionary = True)
     cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN faculty f ON u.user_id = f.faculty_id WHERE u.username = %s", (session['username'],))
     data = cur.fetchone()
@@ -581,6 +582,8 @@ def faculty():
 
     cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
     semesters = cur.fetchall()
+
+    print(semesters)
 
     new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
     semesters.append(new_semester)  
@@ -604,24 +607,27 @@ def faculty():
 
 @app.route('/class/<class_id>/<csem>/<cyear>', methods=['GET', 'POST'])
 def class_page(class_id, csem, cyear):
+  print(class_id)
+  print(csem)
+  print(cyear)
+  cyear = str(cyear)
   _reconnect()
 
   cur = db.cursor(dictionary = True)
   cur.execute('''SELECT * FROM class_section c JOIN course i ON c.course_id = i.id 
   JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s AND c.class_id = %s AND c.csem = %s AND c.cyear = %s''', 
               (session['user_id'], class_id, csem, cyear))
-  registration = cur.fetchall()
+  print(cur.fetchone())
+  course = cur.fetchone()
 
-  print(registration)
 
   cur.execute('''SELECT * FROM student_courses s 
   JOIN class_section c ON s.class_id = c.class_id 
-  AND s.csem = c.csem AND s.cyear = c.cyear WHERE c.class_id = %s AND c.csem = %s AND c.cyear = %s''', (class_id, csem, cyear))
+  AND s.csem = c.csem AND s.cyear = c.cyear
+  JOIN user u ON s.student_id = u.user_id WHERE c.class_id = %s AND c.csem = %s AND c.cyear = %s''', (class_id, csem, cyear))
   classes = cur.fetchall()
 
-
-  return render_template('class.html', registration=registration, classes=classes,
-                          class_id=class_id, csem=csem, cyear=cyear)
+  return render_template('class.html', course=course, classes=classes, session=session)
 
 #alumni log in
 @app.route('/alumnilogging')
@@ -1787,7 +1793,6 @@ def phd_students():
 
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
-      cursor.close()
 
       return render_template('phd_students.html', students=result)
 
@@ -1875,7 +1880,6 @@ def faculty_transcript(transcript_id):
         gpa = grade_points / num_courses
         gpa = round(gpa, 2)
 
-        cursor.close()
 
     return render_template('student_transcript.html', transcript=result, userdata = userdata, gpa = gpa)
 
@@ -1925,7 +1929,6 @@ def faculty_form(user_id):
             result =cursor.fetchall()
             for r in result:
               print(r)
-            cursor.close()
 
             return render_template('review_formone.html', form_one=result)
     
@@ -1985,7 +1988,6 @@ def faculty_form(user_id):
           result =cursor.fetchall()
           for r in result:
             print(r)
-          cursor.close()
           db.commit()
           flash(f'Student Thesis has been approved!', category="success")
 
@@ -2035,7 +2037,6 @@ def faculty_form_masters(user_id):
             result =cursor.fetchall()
             for r in result:
               print(r)
-            cursor.close()
 
             return render_template('review_formone_masters.html', form_one=result)
   else:
@@ -2068,7 +2069,6 @@ def master_students():
 
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
-      cursor.close()
 
       return render_template('master_students.html', students=result)
   else:
@@ -2493,6 +2493,7 @@ def incomplete():
        cursor.execute("INSERT INTO applications VALUES ('incomplete', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,CURDATE(),'sent','not decided')", 
                       (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))      
+        db.commit()
 
        cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
        those = cursor.fetchone()
