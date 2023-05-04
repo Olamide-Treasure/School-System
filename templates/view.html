@@ -16,10 +16,48 @@
         <c class = labels> <b> Status: {{items["status"]}} </b> </c>
         <br>
         {% if items["status"] == "incomplete" %}
+        111 {{items['semester']}}
+        111 {{items['s_year']}}
         <form action="/editApp/{{items['semester']}}/{{items['s_year']}}"> <input type="submit" class = "button" value="Edit App"> </b> </form>
         <br>
         {% endif %}
         
+        {% if items["status"] == "Admit" %}
+        EMAIL<br>
+        SUBJECT: ***ACTION NEEDED*** <br>
+         Congratulations, you have been accepted to Horizon Graduate School. Please kindly accept your decison and pay the matriculation fee. THANK YOU
+        <form action = "/view" method="post"> 
+        Accept decision?
+        <select name = "student">
+          <option value = "Accept"> ACCEPT</option>
+          <option value = "Reject"> REJECT</option> 
+        </select>
+        <br>
+        Pay Matriculation fee
+        <select name = "fee">
+          <option value = "Pay"> $800 </option>
+          <option value = "Later"> Pay later </option>
+        </select>
+        <br>
+        <input type="submit" class = "button" value="Submit Decision">  </form>
+        {% endif %}
+
+        {% if items["status"] == "Admit with aid" %}
+        ***ACTION NEEDED*** <br>
+        Accept decision?
+        <select name = "Decision">
+          <option value = "Accept"> ACCEPT ACCEPTANCE </option>
+          <option value = "Reject"> REJECT ACCEPTANCE </option> 
+        </select>
+        <br>
+        Pay Matriculation fee
+        <select name = "Payment">
+          <option value = "Pay"> $800 </option>
+          <option value = "Later"> Pay later </option>
+        </select>
+        <br>
+        {% endif %}
+
     {% endfor %}
     <form action='/'>  <input type="submit" class = "button" value="Back"> </b> </form>
   </body>
