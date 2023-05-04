@@ -740,6 +740,7 @@ def studentlogging():
 #admin log in 
 @app.route('/admin')
 def admin():
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
     cur.execute("SELECT email, user_address, user_id, user_phoneNUM FROM user WHERE username = %s", (session['username'],))
@@ -754,6 +755,7 @@ def admin():
 student_info = list()
 @app.route('/gradsec', methods=['GET', 'POST'])
 def gs_student_names():
+  _reconnect()
   if sessionType() == 3:
 
     cur = db.cursor(dictionary = True, buffered = True)
@@ -780,6 +782,7 @@ def gs_student_names():
 
 @app.route('/viewform1/<id>')
 def viewform1(id):
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
     cur.execute("SELECT courseID FROM form1answer WHERE student_id = %s", (id,))
@@ -799,6 +802,7 @@ def viewform1(id):
 
 @app.route('/updateinfo', methods=['GET', 'POST'])
 def updateinfo():
+  _reconnect()
   #connect to the database
   cur = db.cursor(dictionary = True)
 
@@ -838,6 +842,7 @@ def updateinfo():
 
 @app.route('/updategrade/<studID>/<courID>', methods=['GET', 'POST'])
 def updategrade(studID, courID):
+  _reconnect()
   #connect to the database
   cur = db.cursor(dictionary = True)
 
@@ -860,6 +865,7 @@ def updategrade(studID, courID):
 
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
+  _reconnect()
   if request.method == "GET":
     return render_template("signup.html")
     
@@ -935,6 +941,7 @@ def signup():
 
 @app.route('/form1', methods=['GET', 'POST'])
 def form():
+  _reconnect()
   cur = db.cursor(dictionary = True)
   if sessionType() == 4 or sessionType() == 5:
     _reconnect()
@@ -1195,6 +1202,7 @@ def form():
 
 @app.route('/student_courseslist')
 def studentcourse():
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
 
@@ -1209,6 +1217,7 @@ def studentcourse():
 
 @app.route('/facultylist')
 def facultylist():
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
 
@@ -1223,6 +1232,7 @@ def facultylist():
 
 @app.route('/gradlist')
 def gradlist():
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
 
@@ -1244,6 +1254,7 @@ def gradlist():
 
 @app.route('/approvethesis/<id>')
 def approvethesis(id):
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
     cur.execute("UPDATE phd_req SET thesisapproved = %s WHERE student_id = %s", ('True', id))
@@ -1256,6 +1267,7 @@ def approvethesis(id):
 
 @app.route('/gradseclist')
 def gradseclist():
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
 
@@ -1269,6 +1281,7 @@ def gradseclist():
 
 @app.route('/alumnilist')
 def alumnilist():
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
 
@@ -1283,6 +1296,7 @@ def alumnilist():
 
 @app.route('/user/<id>/<type>')
 def userinfo(id, type):
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
 
@@ -1340,6 +1354,7 @@ def userinfo(id, type):
 
 @app.route('/updateuserinfo/<id>', methods=['GET', 'POST'])
 def updateuserinfo(id):
+  _reconnect()
   #connect to the database
   cur = db.cursor(dictionary = True)
 
@@ -1372,6 +1387,7 @@ def updateuserinfo(id):
 
 @app.route('/assigned', methods=['GET', 'POST'])
 def assigned():
+  _reconnect()
   if sessionType() == 0:
     if request.method == "POST":
       cur = db.cursor(dictionary = True)
@@ -1390,6 +1406,7 @@ def assigned():
 
 @app.route('/assignadvsior')
 def assignadvisor():
+  _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
 
@@ -1414,6 +1431,7 @@ def assignadvisor():
 
 @app.route('/graduatethestudent/<id>/<type>', methods=['GET', 'POST'])
 def graduatethestudent(id, type):
+  _reconnect()
   if sessionType() == 0: 
     if request.method == "POST":
       cur = db.cursor(dictionary = True)
@@ -1438,6 +1456,7 @@ def graduatethestudent(id, type):
 
 @app.route('/remove/<id>/<type>', methods=['GET', 'POST'])
 def removeuser(id, type):
+  _reconnect()
   if sessionType() == 0:
     if request.method == "POST":
       cur = db.cursor(dictionary = True)
@@ -1506,6 +1525,7 @@ def removeuser(id, type):
 
 @app.route('/addthestudent', methods=['GET', 'POST'])
 def addthestudent():
+  _reconnect()
   if sessionType() == 0:
     if request.method == "GET":
       return render_template("addstudent.html")
@@ -1576,6 +1596,7 @@ def addthestudent():
 
 @app.route('/applygrad', methods=['GET', 'POST'])
 def applygrad():
+  _reconnect()
   if sessionType() == 4 or sessionType() == 5:
   #connect to the database
     cur = db.cursor(dictionary = True)
@@ -1600,6 +1621,7 @@ def applygrad():
 
 @app.route('/coursehist/<id>', methods=['GET', 'POST'])
 def coursehist(id):
+  _reconnect()
   if sessionType() == 0 or sessionType() == 4 or sessionType() == 5 or sessionType() == 2 or sessionType() == 3:
   #connect to the database
     _reconnect()
@@ -1692,6 +1714,7 @@ def coursehist(id):
 
 @app.route('/addfaculty' , methods=['GET', 'POST'])
 def addfaculty():
+  _reconnect()
   if sessionType() == 0:
     if request.method == "GET":
       return render_template("addfaculty.html")
@@ -1765,6 +1788,7 @@ def addfaculty():
 
 @app.route('/addgradsec' , methods=['GET', 'POST'])
 def addgradsec():
+  _reconnect()
   if sessionType() == 0:
     if request.method == "GET":
       return render_template("addgradsec.html")
@@ -1817,6 +1841,7 @@ def addgradsec():
 
 @app.route('/addalumni' , methods=['GET', 'POST'])
 def addalumni():
+  _reconnect()
   if sessionType() == 0:
     if request.method == "GET":
       return render_template("addalumni.html")
@@ -1876,6 +1901,7 @@ def addalumni():
 
 @app.route('/logout')
 def logout():
+  _reconnect()
   session.pop('username', None)
   session.pop('user_id', None)
   session.pop('fname', None)
@@ -1894,6 +1920,7 @@ def logout():
 
 @app.route('/faculty/login', methods=['GET', 'POST'])
 def faculty_login():
+    _reconnect()
     print(f'method is: ', request.method)
 
 
@@ -1938,6 +1965,7 @@ def faculty_login():
 
 @app.route('/faculty/dashboard', methods=['GET', 'POST'])
 def faculty_dashboard():
+  _reconnect()
   if sessionType() == 1:
     if request.method == "GET":
       return render_template('dashboard.html')
@@ -1954,6 +1982,7 @@ def faculty_dashboard():
 
 @app.route('/faculty/advisees/')
 def faculty_advisees():
+  _reconnect()
   if sessionType() == 1:
     if session.get('user_id') == None:
       return redirect(url_for('login'))
@@ -1968,6 +1997,7 @@ def faculty_advisees():
 
 @app.route('/faculty/advisees/phd')
 def phd_students():
+  _reconnect()
   if sessionType() == 1:
     if session.get('user_id') == None:
       return redirect(url_for('login'))
@@ -2000,6 +2030,7 @@ def phd_students():
 
 @app.route('/faculty/advisees/<transcript_id>')
 def faculty_transcript(transcript_id): 
+  _reconnect()
   if sessionType() == 1:
     if session.get('user_id') == None:
       return redirect(url_for('login'))
@@ -2087,7 +2118,6 @@ def faculty_transcript(transcript_id):
 
 @app.route('/faculty/advisees/formone/<user_id>', methods=['GET', 'POST'])
 def faculty_form(user_id): 
-    
   if sessionType() == 1:
     if session.get('user_id') == None:
       return redirect(url_for('login'))
