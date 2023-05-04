@@ -53,7 +53,7 @@
 
     {% if alumnicourses %}
 
-    <form action = "/coursehist/{{data['user_id']}}"  method = "POST"> 
+    <form action = "/coursehist/{{data['user_id']}}" > 
     <button type="submit">View Transcript</button>
     </form>
 
@@ -61,7 +61,7 @@
     
     <div class="buttons">
 
-    <form action = "/coursehist/{{data['user_id']}}"  method = "POST"> 
+    <form action = "/coursehist/{{data['user_id']}}" > 
     <button type="submit">View Transcript</button>
     </form>
 
@@ -79,7 +79,7 @@
     {% endfor %}
 
 
-    <form action = "/viewform1/{{data['user_id']}}"  method = "POST"> 
+    <form action = "/viewform1/{{data['user_id']}}"> 
     <button type="submit">View Form 1</button>
     </form>
 
