@@ -15,12 +15,12 @@
   <div class="container-fluid vw-100 vh-100 position-absolute top-50 start-50 translate-middle z-n1 bkgnd"></div>
 
   <!-- Error Prompt -->
-  <div class="container mt-5 w-50">
+  <div class="container">
     {% for category, message in get_flashed_messages(with_categories=true) %}
-        <div class="alert alert-info alert-dismissible fade show mb-5" role="alert">
-            {{message}}
-            <button type="button" class="btn-close" aria-label="Close" data-dismiss="alert" data-bs-dismiss="alert"></button>
-        </div>
+    <div class="alert alert-info alert-dismissible fade show mb-1" role="alert">
+      {{message}}
+      <button type="button" class="btn-close" aria-label="Close" data-dismiss="alert" data-bs-dismiss="alert"></button>
+    </div>
     {% endfor %}
   </div>
 
@@ -35,7 +35,7 @@
           </div>
           
           <div class="mb-3">
-              <input type="text" class="form-control" placeholder="Password" name="password">
+              <input type="password" class="form-control" placeholder="Password" name="password">
           </div>
 
           <div class="d-grid">

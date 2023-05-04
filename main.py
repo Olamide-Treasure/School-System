@@ -1,10 +1,12 @@
 import mysql.connector as connection
 from flask import Flask, session, render_template, redirect, url_for, request, flash
 import time, random
-from datetime import datetime
+from datetime import datetime, date
+import re
 
 app = Flask('app')
 app.secret_key = 'SECRET_KEY'
+letterID = 0
 db = connection.connect(
     host="phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com",
     user="admin",
@@ -42,6 +44,20 @@ def _process_time(class_time):
 
 # uses the current time to determine the current semester
 def _get_curr_semester():
+    seasons = {
+            'Fall': ['August','September', 'October', 'November', 'December'],
+            'Spring': ['January', 'February', 'March', 'April', 'May', 'June']
+            }
+    
+    current_time = datetime.now()
+    current_month = current_time.strftime('%B')
+    current_year = int(current_time.strftime('%Y'))
+    for season in seasons:
+      if current_month in seasons[season]:
+        return season, current_year
+    return 'Invalid input month'
+
+def _get_next_semester():
     seasons = {
             'Spring': ['August','September', 'October', 'November', 'December'],
             'Fall': ['January', 'February', 'March', 'April', 'May', 'June']
@@ -83,7 +99,10 @@ def checkComplete():
     if(app["student_id"]!=None and app["semester"]!=None and app["s_year"]!=None and app["degree_type"]!=None and app["interest"]!=None and app["experience"]!=None):
       cursor.execute("UPDATE applications SET status = 'review' WHERE student_id = %s and semester = %s and s_year = %s", (app["student_id"], app["semester"], app["s_year"]))
       db.commit()
-  
+      
+def validate_email(email):
+    pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+    return re.match(pattern, email) is not None
 
 
 ####################################################
@@ -91,7 +110,7 @@ def checkComplete():
 ####################################################
 
 # Reset the database
-@app.route('/reset', methods=['GET', 'POST'])
+@app.route('/reset')
 def reset():
   cur = db.cursor(dictionary=True)
   with open('phase2create.sql', 'r') as f:
@@ -118,7 +137,7 @@ def checkout():
     # Commit data to enrollment table
     if request.method == 'POST':
         cursor = db.cursor(dictionary=True)
-        semester = _get_curr_semester()
+        semester = _get_next_semester()
         for cid in session["registration"]:
             cursor.execute("INSERT INTO student_courses (student_id, class_id, grade, csem, cyear) VALUES (%s, %s, 'IP', %s, %s)", (session['user_id'], cid, semester[0], semester[1]))
             db.commit()
@@ -170,14 +189,11 @@ def add():
       cursor.execute('''SELECT p.prereq_id FROM class_section c
       JOIN course i ON c.course_id = i.id
       JOIN prerequisite p ON i.id = p.course_id
-      WHERE i.id = %s''',(cid, ))
+      WHERE c.class_id = %s''',(course, ))
       ids = cursor.fetchall()
-      print(ids)
 
       cursor.execute("SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id JOIN course i ON c.course_id = i.id WHERE s.student_id = %s GROUP BY i.id", (session['user_id'],))
       taken = cursor.fetchall()
-      for row in taken:
-        print(row['id'])
       
       for id in ids:
         # Check if the id appears in taken 
@@ -201,7 +217,7 @@ def add():
 
           if (my_class_time[0] > curr_class_time[0] - 0.5 and my_class_time[0] < curr_class_time[1] + 0.5) or (my_class_time[1] > curr_class_time[0] - 0.5 and my_class_time[1] < curr_class_time[1] + 0.5):
               flash("This class has a time conflict with a class you've already added", "error")
-              return redirect('/regsiter') 
+              return redirect('/register') 
         
 
       # Now we have to check for the classes that already got checked out but for current semester/year
@@ -250,18 +266,75 @@ def remove():
 
     return redirect('/register')
 
+@app.route("/update_info", methods=['POST'])
+def update_all():
+  cursor = db.cursor(dictionary=True)
+  user_id = request.form.get('user_id')
+
+  # Check if user exists
+  cursor.execute("SELECT * FROM user WHERE user_id = %s", (user_id, ))
+  data = cursor.fetchone()
+
+  # Update first name
+  fname = request.form['fname']
+  if fname != "":
+    fname = fname.title()
+
+  # Update last name
+  lname = request.form['lname']
+  if lname != "":
+    lname = lname.title()
+
+  # Update email
+  email = request.form['email']
+  if email != "":
+    if validate_email(email) == False:
+      flash("Invalid email. Please use the format: username@domain.com", "error")
+      return redirect('/userloggedin')
+
+  # Update phone number
+  number = request.form['number']
+  if number != "":
+    if re.match(r'^\d{3}-\d{3}-\d{4}$', number) == None:
+      flash("Invalid phone number. Please use the format: 123-456-7890", "error")
+      return redirect('/userloggedin')
+
+  # Update database
+  if fname != "" and data['fname'] != fname:
+    flash("Successfully updated first name", "success")
+    cursor.execute("UPDATE user SET fname = %s WHERE user_id = %s", (fname, user_id))
+    db.commit()
+
+  if lname != "" and data['lname'] != lname:
+    flash("Successfully updated last name", "success")
+    cursor.execute("UPDATE user SET lname = %s WHERE user_id = %s", (lname, user_id))
+    db.commit()
+
+  if email != "" and data['email'] != email:
+    flash("Successfully updated email", "success")
+    cursor.execute("UPDATE user SET email = %s WHERE user_id = %s", (email, user_id))
+    db.commit()
+    
+
+  if number != "" and data['user_phoneNUM'] != number:
+    flash("Successfully updated phone number", "success")
+    cursor.execute("UPDATE user SET user_phoneNUM = %s WHERE user_id = %s", (number, user_id))
+    db.commit()
+    
+  return redirect('/userloggedin', message=message)
+
 
 ####################################################
 #                    HOME PAGE                     #
 ####################################################
 
+
 @app.route('/')
 def home_page():
   _reconnect()
-  if 'username' in session: 
-    return redirect('/userloggedin')
-  
-  return render_template("home.html", title = 'Home Page')
+
+  return render_template("home.html", title = 'Home Page', session = session)
+
 
 ####################################################
 #                    LOGIN PAGE                    #
@@ -340,7 +413,12 @@ def catalog():
   if 'user_id' in session:
     logged = True
 
-  return render_template('catalog.html', dept=dept, course=course, prereq=prereq, logged=logged)
+  user = None
+  if logged:
+    cursor.execute("SELECT * FROM user WHERE user_id = %s", (session['user_id'],))
+    user = cursor.fetchone()
+
+  return render_template('catalog.html', dept=dept, course=course, prereq=prereq, logged=logged, user=user)
 
 ####################################################
 #                  LOGIN REDIRECT                  #
@@ -365,10 +443,6 @@ def user():
     elif(session['type'] == 6):
       return redirect('/welcome')
 
-    #check for applicant 
-    if(session['type'] == 7):
-      return redirect('/cac')
-
     #check for faculty advisor
     elif(session['type'] == 1):
       return redirect('/faculty')
@@ -389,7 +463,7 @@ def register():
 
     # Connect to database
     cursor = db.cursor(dictionary=True)
-    semester = _get_curr_semester()
+    semester = _get_next_semester()
     query = "SELECT * FROM class_section cs \
             JOIN course c ON cs.course_id = c.id WHERE \
             cs.csem = %s AND cs.cyear = %s"
@@ -492,23 +566,65 @@ def register():
 @app.route('/faculty', methods=['GET', 'POST'])
 def faculty():
   if sessionType() == 1:
-    if request.method == "GET":
-      return render_template('dashboard.html')
-      
-    if request.method == "POST": 
-        user = get_session['user']
-        return render_template('dashboard.html',  user=user)
+    _reconnect()
+
+    cur = db.cursor(dictionary = True)
+    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN faculty f ON u.user_id = f.faculty_id WHERE u.username = %s", (session['username'],))
+    data = cur.fetchone()
+
+    cur_sem = _get_curr_semester()
+    next_sem = _get_next_semester()
+
+    cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
+    semesters = cur.fetchall()
+
+    new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
+    semesters.append(new_semester)  
+
+    semesters = sorted(semesters, key=lambda x: (-int(x['cyear']), x['csem']))
+
+    cur.execute('''SELECT * FROM class_section c JOIN course i ON c.course_id = i.id 
+    JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s''', (session['user_id'],))
+    registration = cur.fetchall()
+
+    cur.execute('''SELECT * FROM student_courses s 
+    JOIN class_section c ON s.class_id = c.class_id 
+    AND s.csem = c.csem AND s.cyear = c.cyear WHERE c.faculty_id = %s''', (session['user_id'],))
+    classes = cur.fetchall()
+
+    return render_template('dashboard.html', data=data, cur_sem=cur_sem, next_sem=next_sem, semesters=semesters, 
+                           registration=registration, classes=classes)
 
   else:
     return redirect('/')
 
+@app.route('/class/<class_id>/<csem>/<cyear>', methods=['GET', 'POST'])
+def class_page(class_id, csem, cyear):
+  _reconnect()
+
+  cur = db.cursor(dictionary = True)
+  cur.execute('''SELECT * FROM class_section c JOIN course i ON c.course_id = i.id 
+  JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s AND c.class_id = %s AND c.csem = %s AND c.cyear = %s''', 
+              (session['user_id'], class_id, csem, cyear))
+  registration = cur.fetchall()
+
+  print(registration)
+
+  cur.execute('''SELECT * FROM student_courses s 
+  JOIN class_section c ON s.class_id = c.class_id 
+  AND s.csem = c.csem AND s.cyear = c.cyear WHERE c.class_id = %s AND c.csem = %s AND c.cyear = %s''', (class_id, csem, cyear))
+  classes = cur.fetchall()
+
+
+  return render_template('class.html', registration=registration, classes=classes,
+                          class_id=class_id, csem=csem, cyear=cyear)
 
 #alumni log in
 @app.route('/alumnilogging')
 def alumnilogging():
     if sessionType() == 2:
       cur = db.cursor(dictionary = True)
-      cur.execute("SELECT email, user_address, user_id, user_phoneNUM FROM user WHERE username = %s", (session['username'],))
+      cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN alumni a ON u.user_id = a.student_id JOIN degrees d ON a.degree_id = d.degree_id WHERE u.username = %s", (session['username'],))
       data = cur.fetchone()
       db.commit()
       return render_template("alumni.html", title = 'Alumni Logged In', data = data)
@@ -519,12 +635,55 @@ def alumnilogging():
 #student log in 
 @app.route('/studentlogging')
 def studentlogging():
+  _reconnect()
+
   if sessionType() == 4 or sessionType() == 5:
     cur = db.cursor(dictionary = True)
-    cur.execute("SELECT email, user_address, user_id, user_phoneNUM FROM user WHERE username = %s", (session['username'],))
+    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN students s ON u.user_id = s.student_id JOIN degrees d ON s.degree_id = d.degree_id WHERE u.username = %s", (session['username'],))
     data = cur.fetchone()
-    db.commit()
 
+    cur_sem = _get_curr_semester()
+    next_sem = _get_next_semester()
+
+    cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
+    semesters = cur.fetchall()
+
+    new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
+    semesters.append(new_semester)  
+
+    semesters = sorted(semesters, key=lambda x: (-int(x['cyear']), x['csem']))
+
+    cur.execute('''SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id 
+    AND s.csem = c.csem AND s.cyear = c.cyear JOIN course i ON c.course_id = i.id JOIN user u ON c.faculty_id = u.user_id 
+    WHERE student_id = %s''', (session['user_id'],))
+    registration = cur.fetchall()
+
+    # intervals = [("1:00", 1.0),("1:30", 1.5),
+    #               ("2:00", 2.0),("2:30", 2.5),
+    #               ("3:00", 3.0),("3:30", 3.5),
+    #               ("4:00", 4.0),("4:30", 4.5),
+    #               ("5:00", 5.0),("5:30", 5.5),
+    #               ("6:00", 6.0),("6:30", 6.5),
+    #               ("7:00", 7.0),("7:30", 7.5),
+    #               ("8:00", 8.0),("8:30", 8.5),
+    #               ("9:00", 9.0),("9:30", 9.5),]
+    # week = ['M', 'T', 'W', 'R', 'F']
+    # semester = _get_curr_semester()
+    # cur.execute('''SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id 
+    #   AND s.csem = c.csem AND s.cyear = c.cyear JOIN course i ON c.course_id = i.id 
+    #   WHERE s.student_id = %s AND s.cyear = %s AND s.csem = %s ORDER BY c.class_time, CASE c.day_of_week 
+    #   WHEN 'M' THEN 1 
+    #   WHEN 'T' THEN 2 
+    #   WHEN 'W' THEN 3 
+    #   WHEN 'R' THEN 4
+    #   ELSE 5 
+    #   END''', (session['user_id'], semester[1], semester[0]))   
+    # schedule = cur.fetchall()
+    
+    # times = {}
+    # for row in schedule:
+    #   time = _calendar_map(row['class_time'])
+    #   times[row['class_id']] = [time[0], time[1], time[2], row['day_of_week']]
 
     #cur.execute("SELECT status FROM student_status WHERE student_id = %s", (session['user_id'],))
     #checksuspended = cur.fetchone()
@@ -553,7 +712,8 @@ def studentlogging():
     suspended = cur.fetchone()
     db.commit()
 
-    return render_template("student.html", title = 'Student Logged In', data = data, suspended = suspended)
+    return render_template("student.html", title = 'Student Logged In', data = data, suspended = suspended, 
+                           registration = registration, semesters = semesters, cur_sem = cur_sem)
   
   else:
     return redirect('/')
@@ -764,9 +924,28 @@ def form():
       return render_template("form1.html")
 
     if request.method == 'POST':
+      courseselected = 0
+      totalcourse = 0
+      for i in range(100, 122):
+        checkboxes = request.form.getlist(str(i))
+        for e in checkboxes:
+          if(e == "yes"):
+            studentid = session['user_id']
+            cur.execute("SELECT c.id FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (studentid, ))
+            courses = cur.fetchall()
+            for courseid in courses:
+              totalcourse += 1
+              if(courseid['id'] == i):
+                courseselected += 1
+         
+      if(totalcourse != courseselected):
+          return render_template("form1.html")
+
+
       check = 0
       for i in range(100, 122):
         checkboxes = request.form.getlist(str(i))
+
         for checkbox in checkboxes:
           if(checkbox == "yes"):
             if (check == 0):
@@ -793,6 +972,8 @@ def form():
               #print("reaches the else")
               #cur.execute("INSERT into student_courses (student_id, class_id, grade) VALUES (%s, %s, %s)", (session['user_id'], i, 'IP'))
               #db.commit()
+
+              
 
             cur.execute("INSERT into form1answer (student_id, courseID) VALUES (%s, %s)", (session['user_id'], i))
             db.commit()
@@ -1037,7 +1218,7 @@ def graduatethestudent(id, type):
         y = 20
       if(type == '5'):
         y = 21
-      cur.execute("INSERT into alumni (student_id, degree_id, grad_year) VALUES (%s, %s, %s)", (id, y, 2023))
+      cur.execute("INSERT into alumni (student_id, degree_id, semester, grad_year) VALUES (%s, %s, %s, %s)", (id, y, 'Spring', 2023))
       db.commit()
       cur.execute("DELETE from student_advisors WHERE studentID = %s ", (id, ))
       db.commit()
@@ -1104,6 +1285,8 @@ def removeuser(id, type):
 
         cur.execute("DELETE from student_advisors WHERE advisorID = %s", (id, ))
         db.commit()
+        cur.execute("DELETE from faculty WHERE faculty_id = %s", (id, ))
+        db.commit()
         cur.execute("DELETE from user WHERE user_id = %s", (id, ))
         db.commit()
 
@@ -1133,6 +1316,7 @@ def addthestudent():
       address =  (request.form["address"])
       phone =  (request.form["phone"])
       type = (request.form["dates"])
+      sem = (request.form["semester"])
       admit = (request.form["admityear"])
 
       if(type == "ms"):
@@ -1170,7 +1354,7 @@ def addthestudent():
       
       cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, x, fname, lname, unm, passwrd, address, phone, ssn, email))
       db.commit()
-      cur.execute("INSERT into students (student_id, degree_id, admit_year) VALUES (%s, %s, %s)", (id, y, admit))
+      cur.execute("INSERT into students (student_id, degree_id, semester, admit_year) VALUES (%s, %s, %s, %s)", (id, y, sem, admit))
       db.commit()
       cur.execute("INSERT into need_advisor (student_id) VALUES (%s)", (id, ))
       db.commit()
@@ -1213,77 +1397,89 @@ def applygrad():
 def coursehist(id):
   if sessionType() == 0 or sessionType() == 4 or sessionType() == 5 or sessionType() == 2 or sessionType() == 3:
   #connect to the database
+    _reconnect()
+
     cur = db.cursor(dictionary = True)
-    if request.method == "POST":
-      #cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
-      #data = cur.fetchall()
-      #class_ids = [row['class_id'] for row in data]
-      #print(data)
-      #cur.execute("SELECT id, course_name, course_num, credit_hours from course")
-      #cour = cur.fetchall()
-      #db.commit()
+    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN students s ON u.user_id = s.student_id JOIN degrees d ON s.degree_id = d.degree_id WHERE u.username = %s", (session['username'],))
+    data = cur.fetchone()
 
-      #cur.execute("SELECT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE cs.class_id IN ({}) GROUP BY c.id".format(','.join(['%s']*len(class_ids))), class_ids)
-      #answer = cur.fetchall()
+  
+    #cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
+    #data = cur.fetchall()
+    #class_ids = [row['class_id'] for row in data]
+    #print(data)
+    #cur.execute("SELECT id, course_name, course_num, credit_hours from course")
+    #cour = cur.fetchall()
+    #db.commit()
 
-      cur.execute("SELECT DISTINCT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours, sc.class_id, sc.grade FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE sc.student_id = %s", (id, ))
-      courses = cur.fetchall()
+    #cur.execute("SELECT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE cs.class_id IN ({}) GROUP BY c.id".format(','.join(['%s']*len(class_ids))), class_ids)
+    #answer = cur.fetchall()
 
+    cur.execute("SELECT * FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (id, ))
+    courses = cur.fetchall()
 
+    grade_points = 0
+    num_courses = 0
+    #credits = 0
+    cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
+    student_grades = cur.fetchall()
+    db.commit()
 
-      grade_points = 0
-      num_courses = 0
-      #credits = 0
-      cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
-      student_grades = cur.fetchall()
-      db.commit()
+    #cur.execute("SELECT class_section.class_id, course_id FROM class_section JOIN student_courses ON class_section.class_id = student_courses.class_id WHERE student_courses.student_id = %s", (id,))
+    #data2 = cur.fetchall()
+    cur_sem = _get_curr_semester()
+    next_sem = _get_next_semester()
 
-      #cur.execute("SELECT class_section.class_id, course_id FROM class_section JOIN student_courses ON class_section.class_id = student_courses.class_id WHERE student_courses.student_id = %s", (id,))
-      #data2 = cur.fetchall()
+    cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
+    semesters = cur.fetchall()
 
-      
+    # new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
+    # semesters.append(new_semester)  
 
-      for i in range(len(student_grades)):
-        #cur.execute("SELECT credit_hours FROM course JOIN class_section ON course.id = class_section.course_id WHERE class_section.class_id = %s", (student_grades[i]['class_id'], ))
-        #course_hours = cur.fetchone()
-        #cur.execute("Select course_id from class_section where class_id = %s", (student_grades[i]['class_id'], ))
-        #cur.execute("SELECT credit_hours FROM course WHERE id = %s", (student_grades[i]['class_id'], ))
-        #course_hours = cur.fetchone()
-        #credits += course_hours['credit_hours']
-        grade = student_grades[i]['grade'] 
-        #num_courses = num_courses + 1
-        if grade == 'A':
-            grade_points = grade_points + 4
-            num_courses = num_courses + 1
-        if grade == 'A-':
-            grade_points = grade_points + 3.7
-            num_courses = num_courses + 1
-        if grade == 'B+':
-            grade_points = grade_points + 3.3
-            num_courses = num_courses + 1
-        if grade == 'B':
-            grade_points = grade_points + 3
-            num_courses = num_courses + 1
-        if grade == 'B-':
-            grade_points = grade_points + 2.7
-            num_courses = num_courses + 1
-        if grade == 'C+':
-            grade_points = grade_points + 2.3
-            num_courses = num_courses + 1
-        if grade == 'C':
-            grade_points = grade_points + 2
-            num_courses = num_courses + 1
-        if grade == 'C-':
-            grade_points = grade_points + 1.7
-            num_courses = num_courses + 1
-        if grade == 'F':
-            grade_points = grade_points + 0
-            num_courses = num_courses + 1
-      if num_courses == 0:
-        num_courses = 1
-      gpa = grade_points / num_courses
-      gpa = round(gpa, 2)
-      return render_template("coursehist.html", id = id, gpa = gpa, courses = courses)
+    # semesters = sorted(semesters, key=lambda x: (-int(x['cyear']), x['csem']))
+
+    for i in range(len(student_grades)):
+      #cur.execute("SELECT credit_hours FROM course JOIN class_section ON course.id = class_section.course_id WHERE class_section.class_id = %s", (student_grades[i]['class_id'], ))
+      #course_hours = cur.fetchone()
+      #cur.execute("Select course_id from class_section where class_id = %s", (student_grades[i]['class_id'], ))
+      #cur.execute("SELECT credit_hours FROM course WHERE id = %s", (student_grades[i]['class_id'], ))
+      #course_hours = cur.fetchone()
+      #credits += course_hours['credit_hours']
+      grade = student_grades[i]['grade'] 
+      #num_courses = num_courses + 1
+      if grade == 'A':
+          grade_points = grade_points + 4
+          num_courses = num_courses + 1
+      if grade == 'A-':
+          grade_points = grade_points + 3.7
+          num_courses = num_courses + 1
+      if grade == 'B+':
+          grade_points = grade_points + 3.3
+          num_courses = num_courses + 1
+      if grade == 'B':
+          grade_points = grade_points + 3
+          num_courses = num_courses + 1
+      if grade == 'B-':
+          grade_points = grade_points + 2.7
+          num_courses = num_courses + 1
+      if grade == 'C+':
+          grade_points = grade_points + 2.3
+          num_courses = num_courses + 1
+      if grade == 'C':
+          grade_points = grade_points + 2
+          num_courses = num_courses + 1
+      if grade == 'C-':
+          grade_points = grade_points + 1.7
+          num_courses = num_courses + 1
+      if grade == 'F':
+          grade_points = grade_points + 0
+          num_courses = num_courses + 1
+    if num_courses == 0:
+      num_courses = 1
+    gpa = grade_points / num_courses
+    gpa = round(gpa, 2)
+    return render_template("coursehist.html", id = id, gpa = gpa, courses = courses, data = data,
+                            semesters = semesters, cur_sem = cur_sem, next_sem = next_sem, session=session)
   else:
     return redirect('/')
 
@@ -1306,6 +1502,25 @@ def addfaculty():
       address =  (request.form["address"])
       phone =  (request.form["phone"])
       type = (int)(request.form["type"])
+      depart = request.form["depart"]
+
+      count = 0
+      inst = 0
+      advi = 0
+      rev = 0
+      for i in range(0, 3):
+        checkboxes = request.form.getlist(str(i))
+        for e in checkboxes:
+          if(e == "yes"):
+            count += 1
+            if(count == 1):
+              inst = 1
+            elif(count == 2):
+              advi = 1
+            elif(count == 3):
+              rev = 1
+
+
 
 
       while True:
@@ -1334,6 +1549,8 @@ def addfaculty():
         return render_template("userexists.html")
       
       cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, type, fname, lname, unm, passwrd, address, phone, ssn, email))
+      db.commit()
+      cur.execute("INSERT into faculty (faculty_id, department, instructor, advisor, reviewr) VALUES (%s, %s, %s, %s, %s)", (id, depart, inst, advi, rev))
       db.commit()
       return redirect('/')
 
@@ -1411,6 +1628,7 @@ def addalumni():
       phone =  (request.form["phone"])
       type = (int)(request.form["type"])
       degree = (int)(request.form["dates"])
+      sem = (request.form["semester"])
       year = (int)(request.form["gradyear"])
 
       while True:
@@ -1440,7 +1658,7 @@ def addalumni():
       
       cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, type, fname, lname, unm, passwrd, address, phone, ssn, email))
       db.commit()
-      cur.execute("INSERT into alumni (student_id, degree_id, grad_year) VALUES (%s, %s, %s)", (id, degree, year))
+      cur.execute("INSERT into alumni (student_id, degree_id, semester, grad_year) VALUES (%s, %s, %s, %s)", (id, degree, sem, year))
       db.commit()
       return redirect('/')
 
@@ -2132,7 +2350,7 @@ def welcome():
     cursor = db.cursor(dictionary = True)
     
     cursor.execute("SELECT fname FROM user WHERE user_id = %s", (session['user_id'],))
-    name = cursor.fetchone()
+    name = cursor.fetchall()
     print(name)
 
     cursor.execute("SELECT fname, student_id, semester, s_year FROM applications INNER JOIN user ON applications.student_id = user.user_ID WHERE status = 'review'")
@@ -2201,9 +2419,11 @@ def application():
        cursor.execute("INSERT INTO applications VALUES ('review', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,CURDATE(),'sent','not decided')", 
                       (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))
+
        
        cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
        those = cursor.fetchone()
+
        uid = session["user_id"]
        
        rname = request.form["field_rName"]
@@ -2218,7 +2438,9 @@ def application():
        affil2 = request.form["field_affil2"]
        email2 = request.form["field_email2"]
        
+
        cursor.execute("INSERT INTO letter (user_id, l_semester,l_year,letter_id,recommenderName, recommenderAffil, recommenderEmail) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname, affil, email,)) 
+
        db.commit()
        cursor.execute("INSERT INTO letter1 (user_id,l_semester,l_year,letter_id,recommenderName1, recommenderAffil1, recommenderEmail1) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname1, affil1, email1,)) 
        db.commit()
@@ -2229,6 +2451,8 @@ def application():
        db.commit()
        return render_template("complete.html",data = data,those = those)
    return render_template("application.html", info = info)
+
+
 
 @app.route('/incomplete',  methods = ["POST", "GET"])
 def incomplete():
@@ -2261,8 +2485,8 @@ def incomplete():
        cursor.execute("INSERT INTO applications VALUES ('incomplete', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,CURDATE(),'sent','not decided')", 
                       (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))      
-       cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
-       those = cursor.fetchone()
+                       gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))
+
        uid = session["user_id"]
        uid1 = session["user_id"]
        uid2 = session["user_id"]
@@ -2279,6 +2503,7 @@ def incomplete():
        affil2 = request.form["field_affil2"]
        email2 = request.form["field_email2"]
        
+
       #  cursor.execute("INSERT INTO letter (user_id, l_semester,l_year,letter_id,recommenderName, recommenderAffil, recommenderEmail) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname, affil, email,)) 
       #  db.commit()
       #  cursor.execute("INSERT INTO letter1 (user_id,l_semester,l_year,letter_id,recommenderName1, recommenderAffil1, recommenderEmail1) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname1, affil1, email1,)) 
@@ -2393,6 +2618,7 @@ def updateincomplete():
        affil2 = request.form["field_affil2"]
        email2 = request.form["field_email2"]
        cursor.execute("INSERT INTO letter (user_id, letter_id, contents, recommenderName, recommenderAffil, recommenderEmail,  recommenderName1, recommenderAffil1, recommenderEmail1,  recommenderName2, recommenderAffil2, recommenderEmail2) VALUES (%s, '', 'please', %s, %s, %s,%s,%s,%s,%s,%s,%s)", (uid, rname, affil, email,  rname1, affil1, email1,  rname2, affil2, email2,))
+
        db.commit()
        return redirect('/welcome')
    return render_template("editApp.html", info = info)
@@ -2426,6 +2652,7 @@ def editApp(semester, year):
 @app.route('/reviews')
 def reviews():
    cursor = db.cursor(buffered = True)
+
    cursor.execute("SELECT user_id from user where user_type = 6")
    appinfo = cursor.fetchall()
    justs = []
@@ -2526,6 +2753,7 @@ def Decision(student_id,semester,s_year):
   if request.method == "POST": 
     print("this")
     cursor = db.cursor(dictionary=True, buffered = True)
+
     fee = request.form.getlist('Fee')
     fee = fee[0]
     print(fee)
@@ -2555,29 +2783,12 @@ def Decision(student_id,semester,s_year):
         cursor.execute("INSERT into phd_req (student_id, thesisapproved) VALUES (%s, %s)", (student_id, 'False'))
         db.commit()
 
+
     print(student_id)
     db.commit()
+
     return redirect("/gradsec")
   return render_template("decision.html",info = info )
 
 
-@app.route('/cac')
-def cac():
-   cursor = db.cursor(buffered = True)
-   cursor.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s", (6,))
-   applicants = cursor.fetchall()
-   cursor.execute("SELECT user_id, fname, lname, p_semester, p_year FROM review INNER JOIN user on user.user_id = review.review_id")
-   reviews = cursor.fetchall() 
-   return render_template("cac.html", applicants = applicants, reviews = reviews)
-
-@app.route('/cacview')
-def cacview():
-   cursor = db.cursor(buffered = True)
-   cursor.execute("SELECT user_id from user where user_type = 6")
-   info = cursor.fecthall()
-   cursor.execute("SELECT * from user INNER JOIN applications ON user_id = student_id WHERE user_id = %s", (info["user_id"],))
-   appinfo = cursor.fetchall()
-   return render_template("cacview.html", appinfo = appinfo)
-
 app.run(host='0.0.0.0', port=8080)
-

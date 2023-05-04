@@ -3,27 +3,33 @@
   <head>
     <title> Update Personal Info </title>
     <link href="/static/style.css" rel="stylesheet" type="text/css" />
-    <script>
-      function onlyNumberKey(evt) {
-            
-          // Only ASCII character in that range allowed
-          var ASCIICode = (evt.which) ? evt.which : evt.keyCode
-          if (ASCIICode > 31 && (ASCIICode < 48 || ASCIICode > 57))
-              return false;
-          return true;
-      }
-  </script>
-  </head>
-  <body class = "bcolor"> 
-    <form action = "{{ url_for('updateInfo') }}" method = "post">
-        First Name <input type = "text" name = "fname" value = "{{ info['fname'] }}"> <br>
-        Middle Initila<input type = "text" name = "minit" value = "{{ info['minit'] }}"> <br>
-        Last Name<input type = "text" name = "lname" value = "{{ info['lname'] }}"> <br>
-        Address <input type = "text" name = "address" value = "{{ info['address'] }}"> <br>
-        SSN<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "ssn" value = "{{ info['ssn'] }}"> <br>
-        Email <input type = "text" name = "email" value = "{{ info['email'] }}"><br>
-        Phone number<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "phone_no" value = "{{ info['phone_no'] }}"> <br>
-        <input type = "submit" class = "button">
+    <div class="buttons">
+
+      <form action = "/updateinfo" method = "POST"> 
+        <h3>University ID: {{ '{:08d}'.format(session['user_id']) }}</h3>
+        <h4>Last Name: 
+          <input type="text" placeholder= "{{session['lname']}}" name = "lname">
+        </h4>
+  
+        <h4> First Name: 
+         <input type="text" placeholder= "{{session['fname']}}" name = "fname">
+        </h4>
+  
+      <h4>Email Address: 
+      <input type="text" placeholder="{{data['email']}}" name= "email">
+      </h4>
+  
+      <h4>Address: 
+      <input type="text" placeholder="{{data['user_address']}}" name= "address">
+      </h4>
+  
+      <h4>Phone Number: 
+      <input type="text" placeholder="{{data['user_phoneNUM']}}" name= "phonenum">
+      </h4>
+  
+      <button type="submit">Submit</button>
       </form>
+  
+      </div>
   </body>
 </html>
