@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS students;
 CREATE TABLE students (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
+  semester varchar(6) NOT NULL,
   admit_year   INT(4) NOT NULL,
   PRIMARY KEY (student_id),
   FOREIGN KEY (student_id) REFERENCES user(user_id)
@@ -79,9 +80,9 @@ DROP TABLE IF EXISTS faculty;
 CREATE TABLE faculty (
   faculty_id      INT(8) NOT NULL,
   department      VARCHAR(50) NOT NULL,
-  instructor      BOOLEAN,
-  advisor         BOOLEAN,
-  reviewr         BOOLEAN,
+  instructor      int(1),
+  advisor         int(1),
+  reviewr         int(1),
   PRIMARY KEY (faculty_id),
   FOREIGN KEY (faculty_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
@@ -200,6 +201,7 @@ DROP TABLE IF EXISTS alumni;
 CREATE TABLE alumni (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
+  semester varchar(6) NOT NULL,
 	grad_year int(4) NOT NULL,
   PRIMARY KEY (student_id)
 );
@@ -336,16 +338,17 @@ insert into user values (10101010, 7, 'Chairman', 'Chair', 'cac', 'passed', '200
 INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','','');
 INSERT INTO applications VALUES ('incomplete','65656565','Spring','2024','','','','','','','','','','','','','','','','','','','','','','','');
 
-insert into alumni values (77777777, 20, 2014);
+insert into alumni values (77777777, 20, 'Spring', 2014);
 
-insert into students values (55555555, 20, 2021);
-insert into students values (66666666, 20, 2021);
-insert into students values (99999999, 21, 2021);
+insert into students values (55555555, 20, 'Spring', 2021);
+insert into students values (66666666, 20, 'Fall' , 2021);
+insert into students values (99999999, 21, 'Fall',  2021);
 
 insert into phd_req values(99999999, 'False');
 
-insert into faculty values (11111111, 'CSCI', TRUE, TRUE, TRUE);
-insert into faculty values (22222222, 'ECE', TRUE, TRUE, TRUE);
+insert into faculty values (11111111, 'CSCI', 1, 1, 1);
+insert into faculty values (22222222, 'CSCI', 1, 1, 0);
+insert into faculty values (10101010, 'CSCI', 1, 1, 1);
 
 
 insert into student_advisors values(55555555, 11111111);

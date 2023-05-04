@@ -26,12 +26,23 @@
         <li class="nav-item">
           <a class="nav-link" href="/reset">Reset</a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/userlogin">Login</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="/signup">Apply</a>
-        </li>
+        {% if session['user_id'] != null %}
+          <li class="nav-item">
+            <a class="nav-link" href="/userloggedin">Account</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/logout">Logout</a>
+          </li>
+        {% else %}
+          <li class="nav-item">
+            <a class="nav-link" href="/signup">Apply</a>
+          </li>
+
+          <li class="nav-item">
+            <a class="nav-link" href="/userlogin">Login</a>
+          </li>
+        {% endif %}
       </ul>
     </div>
   </nav>
@@ -43,6 +54,7 @@
     <div class="glass container position-absolute top-50 start-50 translate-middle w-50 py-2">
       <div class="jumbotron">
         <div class="container d-flex flex-column ">
+          {% if session['user_id'] == null %}
           <h1 class="display-2"> Welcome to Horizon College</h1>
           <p class="lead">At Horizon, we're dedicated to providing a world-class education that prepares our students for success in today's fast-paced world.
             We believe that education is about more than just getting a degree. It's about discovering your passions, building relationships, 
@@ -51,6 +63,12 @@
           <p class="lead">
             <a class="btn btn-warning" href="/signup" role="button">Apply Now</a>
           </p>
+
+          {% else %}
+
+          <h1 class="display-2"> Welcome {{session['fname']}} {{session['lname']}}</h1>
+
+          {% endif %}
         </div>
       </div>
     </div>
@@ -63,3 +81,4 @@
   </body> 
 
 </html>
+
