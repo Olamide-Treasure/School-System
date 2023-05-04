@@ -57,8 +57,7 @@
     <label for="s_year">Year:</label>
     <select id="s_year" name="s_year" value = "{{ app['s_year'] }}"> 
       <option value="">{{ app['s_year'] }}</option>
-      <option value="2021">2021</option>
-      <option value="2022">2022</option>
+      <option value="">Choose one</option>
       <option value="2023">2023</option>
       <option value="2024">2024</option>
     </select><br>
@@ -175,19 +174,19 @@
     <fieldset>
       <legend>Request Letter</legend>
       <a class="test">Letter 1:  </a> <br>
-        <input type="text" name="field_rName" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
-            <input type="text" name="field_email" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
-            <input type="text" name="field_affil" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+        <input type="text" name="field_rName" placeholder="Name of recommender" value = "{{letter['recommenderName']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+            <input type="text" name="field_email" placeholder ="Email of recommender" value = "{{letter['recommenderAffil']}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+            <input type="text" name="field_affil" placeholder ="Affiliation" value = "{{letter['recommenderEmail']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
             <br>
       <a class="test">Letter 2</a> <br>
-      <input type="text" name="field_rName1" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
-      <input type="text" name="field_email1" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
-      <input type="text" name="field_affil1" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_rName1" placeholder="Name of recommender" value = "{{letter1['recommenderName1']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_email1" placeholder ="Email of recommender" value = "{{letter1['recommenderAffil1']}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+      <input type="text" name="field_affil1" placeholder ="Affiliation" value = "{{letter1['recommenderEmail1']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
       <br>
       <a class="test">Letter 3</a> <br>
-      <input type="text" name="field_rName2" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
-      <input type="text" name="field_email2" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
-      <input type="text" name="field_affil2" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_rName2" placeholder="Name of recommender" value = "{{letter2['recommenderName2']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_email2" placeholder ="Email of recommender" value = "{{letter2['recommenderAffil2']}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+      <input type="text" name="field_affil2" placeholder ="Affiliation" value = "{{letter2['recommenderEmail2']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
       
     </fieldset>
 
