@@ -325,6 +325,13 @@
                                         <p class="mb-0">Day: <strong>{{days[class['day_of_week']]}}</strong></p>
                                         <p class="mb-0">Time: <strong>{{class['class_time']}}</strong></p>
                                         <p class="mb-0">Credits: <strong>{{class['credit_hours']}}</strong></p>
+                                        {% set register=namespace(total=0) %}
+                                        {% for row in classes %}
+                                          {% if row['csem'] == cur_sem[0] and row['cyear']|string() == cur_sem[1]|string() and class['class_id'] == row['class_id'] %}
+                                            {% set register.total = register.total + 1 %}
+                                          {% endif %}
+                                        {% endfor %}
+                                        <p class="mb-0">Registered Students: <strong>{{register.total}}</strong></p>
                                       </div>
                                       <div class="ms-2 me-auto mx-0">
                                         <form method="GET" action="/class/{{class['class_id']}}/{{class['csem']}}/{{class['cyear']}}">
@@ -334,8 +341,8 @@
                                     </div>
                                     {% set grade=namespace(bool=0) %}
                                     {% for row in classes %}
-                                      {% if row['grade'] == "IP" %}
-                                        {set grade.bool = 1 %}
+                                      {% if row['grade'] == "IP" and row['csem'] == sem['csem'] and row['cyear']|string() == sem['cyear']|string() %}
+                                        {% set grade.bool = 1 %}
                                       {% endif %}
                                     {% endfor %}
                                     {% if grade.bool == 1 %}
@@ -369,6 +376,13 @@
                                         <p class="mb-0">Day: <strong>{{days[class['day_of_week']]}}</strong></p>
                                         <p class="mb-0">Time: <strong>{{class['class_time']}}</strong></p>
                                         <p class="mb-0">Credits: <strong>{{class['credit_hours']}}</strong></p>
+                                        {% set register=namespace(total=0) %}
+                                        {% for row in classes %}
+                                          {% if row['csem'] == next_sem[0] and row['cyear']|string() == next_sem[1]|string() and class['class_id'] == row['class_id'] %}
+                                            {% set register.total = register.total + 1 %}
+                                          {% endif %}
+                                        {% endfor %}
+                                        <p class="mb-0">Registered Students: <strong>{{register.total}}</strong></p>
                                       </div>
                                       <div class="ms-2 me-auto mx-0">
                                         <form method="GET" action="/class/{{class['class_id']}}/{{class['csem']}}/{{class['cyear']}}">
@@ -403,6 +417,13 @@
                                         <p class="mb-0">Day: <strong>{{days[class['day_of_week']]}}</strong></p>
                                         <p class="mb-0">Time: <strong>{{class['class_time']}}</strong></p>
                                         <p class="mb-0">Credits: <strong>{{class['credit_hours']}}</strong></p>
+                                        {% set register=namespace(total=0) %}
+                                        {% for row in classes %}
+                                          {% if row['csem'] == sem['csem'] and row['cyear']|string() == sem['cyear']|string() and class['class_id'] == row['class_id'] %}
+                                            {% set register.total = register.total + 1 %}
+                                          {% endif %}
+                                        {% endfor %}
+                                        <p class="mb-0">Registered Students: <strong>{{register.total}}</strong></p>
                                       </div>
                                       <div class="ms-2 me-auto mx-0">
                                         <form method="GET" action="/class/{{class['class_id']}}/{{class['csem']}}/{{class['cyear']}}">
@@ -412,8 +433,8 @@
                                     </div>
                                     {% set grade=namespace(bool=0) %}
                                     {% for row in classes %}
-                                      {% if row['grade'] == "IP" %}
-                                        {set grade.bool = 1 %}
+                                      {% if row['grade'] == "IP" and row['csem'] == sem['csem'] and row['cyear']|string() == sem['cyear']|string() %}
+                                        {% set grade.bool = 1 %}
                                       {% endif %}
                                     {% endfor %}
                                     {% if grade.bool == 1 %}
@@ -523,7 +544,7 @@
 
               <div class="ms-2 me-auto mx-0">
                 <form method="GET" action="{{url_for('reviews')}}">
-                  <button type="submit" class="btn btn-warning" onclick="window.location.href=''">Applications</button>
+                  <button type="submit" class="btn btn-warning">Applications</button>
                 </form>
               </div>
 

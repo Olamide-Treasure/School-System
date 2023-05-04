@@ -8,11 +8,11 @@
 }
 
 a {
-    color:rgb(255,115,115);
+  color:rgb(255,115,115);
 }
 
 a:hover {
-    color:rgb(229, 102, 102);
+  color:rgb(229, 102, 102);
 }
 
 /* ===== Scrollbar CSS ===== */
