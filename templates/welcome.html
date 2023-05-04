@@ -6,48 +6,18 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
    
   </head>
-  <body class = 'bcolor'>
+  <body>
    
-    
-    {% if session['user_type'] == "applicant" %}
     <c class = welcome> <b> Welcome to your page {{ name }}! <br>
       ID: {{ session['ID'] }}</b> </c> <br>
       <form action = '/application'> <input type = "submit" class = "button" name = "submit" Value = "Create new application here "> </form> 
+      {% for app in apps %}
       <form action = '/view'> <input type = "submit" class = "button" name = "submit" Value = "View your application here"> </form>
+      {% endfor %}
       <form action = '/infoViewer'> <input type = "submit" class = "button" name = "submit" Value = "Update personal info here "> </form>
-    {% endif %}
-    
-    {% if session['user_type'] == 'reviewer' %}
-      <form action = '/reviews'> <input type="submit" class = "button" name="submit" Value="Review applications"></form>
-    {% endif %}
 
-    {% if session['user_type'] == "admin" %}
-      <br>
-      <a href = '/resetDB'> Reset Database </a>
-      <br>
-      Create new user
-      <form action = "{{ url_for('makeUser') }}" method = "post">
-        <input type = "text" name = "user_type" placeholder = "Usertype"> 
-        <input type = "text" name = "fname" placeholder = "First name">
-        <input type = "text" name = "lname" placeholder = "Last name">
-        <input type = "text" name = "ID" placeholder = "ID">
-        <input type = "text" name = "password" placeholder = "password">
-        <input type = "submit">
-      </form>
-      <a href="/admininfos">View students Info</a>
-    {% endif %}
-
-    {% if session['user_type'] == "GS" %}
-    Application needing final review <br>
-    <form action = '/reviews'> <input type="submit" class = "button" name="submit" Value="Review applications"></form>
-     
-    {% endif %}
-
-    {% if session['user_type'] == "CAC" %}
-    <form action = '/reviews'> <input type="submit" class = "button" name="submit" Value="Review applications"></form>
-      
-    {% endif %}
-
-    <form action='/logout'>  <input type="submit" class = "logout button" name="logout" value="logout"> </b> </form>
+    <form action="/logout"> 
+      <button type="submit">Log Out</button>
+  </form>
   </body>
 </html>

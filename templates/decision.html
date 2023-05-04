@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<body>
+    
+    {% for infos in info %}
+      <form action ="/Decision/{{ infos['student_id'] }}/{{ infos['semester'] }}/{{ infos['s_year'] }}" method="POST">
+    {% endfor %}
+    Matriculation Fee Received? 
+   <select name="Fee" id="reasons">
+    <option value="YES">YES</option>
+    <option value="NO">NO</option>
+   </select>
+    <br>
+    <br>
+
+    Accept as a student?
+    <select name = "student">
+    <option value="ACCEPT">ACCEPT</option>
+    <option value="REJECT">REJECT</option>
+    </select>
+    <br> 
+    <br>
+
+    <br>
+    <br>
+
+        <input type = "submit">  </form>
+</body>
+</html>

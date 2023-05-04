@@ -28,15 +28,25 @@
         <hr color=#3F000F;>
         <h2> Application needing review </h2>
         {% for review in reviews: %}
-        <p> {{review['fname']}} {{review['lname']}} {{review['p_semester']}} {{review['p_year']}} application</a>
-          &nbsp&nbsp&nbsp <form action="/finalDecision/{{review['user_id']}}">
+        <p> {{review['fname']}} {{review['lname']}} {{review['semester']}} {{review['s_year']}} application</a>
+          {{ review['s_year'] }} <br>
+          &nbsp&nbsp&nbsp <form action="/finalDecision/{{ review['user_id'] }}/{{ review['semester'] }}/{{ review['s_year'] }}"> 
+            {{ review['s_year'] }} <br>
             <button type="submit">Make Final decision</button>
           </form>
         </p>
         {% endfor %}
 
     <hr color=#3F000F;>
-
+    <h2> Application needing Matriculation </h2>
+        {% for admit in admits: %}
+        <p> {{admit['fname']}} {{admit['lname']}} {{admit['a_semester']}} {{admit['a_year']}} application</a>
+          &nbsp&nbsp&nbsp <form action="/Decision/{{ admit['user_id'] }}/{{ admit['a_semester'] }}/{{ admit['a_year'] }}"> 
+            <button type="submit">Admit as a student</button>
+          </form>
+        </p>
+        {% endfor %}
+        <hr color=#3F000F;>
     <form action="/all_suspended"> 
       <button type="submit">Suspended Students</button>
     </form>
