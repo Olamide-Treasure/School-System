@@ -35,7 +35,7 @@
    <c class = "note"> <b> Note: if a field does not apply to you, fill in N/A </b></c> <br> 
 
    <br>
-   <form action = '/application', method="POST">
+   <form action = '/updateApp', method="POST">
     <fieldset> 
        <legend> Personal Information</legend> 
       First Name <input type = "text" name = "fname" value = "{{ info['fname'] }}" readonly> 
@@ -49,22 +49,23 @@
    <fieldset>
     <legend>General Information</legend>
     <label for="semester">Semester:</label>
-    <select id="semester" name="semester">
-      <option value="">Choose one</option>
+    <select id="semester" name="semester" value = "{{ app['semester'] }}">
+      <option value="">{{ app['semester'] }}</option>
       <option value="FALL">Fall</option>
       <option value="SPRING">Spring</option>
     </select><br>
     <label for="s_year">Year:</label>
-    <select id="s_year" name="s_year">
+    <select id="s_year" name="s_year" value = "{{ app['s_year'] }}"> 
+      <option value="">{{ app['s_year'] }}</option>
       <option value="">Choose one</option>
       <option value="2023">2023</option>
       <option value="2024">2024</option>
     </select><br>
     <label for="degree_type">Degree applying for:</label>
-    <select id="degree_type" name="degree_type" >
-      <option value="">Choose one</option>
-      <option value="Masters">MS</option>
-      <option value="PHD">PhD</option>
+    <select id="degree_type" name="degree_type" value = "{{ app['degree_type'] }}">
+      <option value="">{{ app['degree_type'] }}</option>
+      <option value="Masters">MS Degree</option>
+      <option value="PHD">PhD Degree</option>
     </select>
   </fieldset>
 
@@ -72,24 +73,24 @@
 
     <fieldset>
       <legend>Previous Degree Information</legend>
-      Degree type: <select id="prev_degree_type" name="prev_degree_type" ><br>
-        <option value = "">Choose one</option>
+      Degree type: <select id="prev_degree_type" name="prev_degree_type" value="{{app['prev_degree_type']}}"><br>
+        <option value = "">{{app['prev_degree_type']}}</option>
         <option value = "Masters">Masters</option>
         <option value = "BS/BA">BS/BA</option>
 
       </select> 
       <br>
       <div id="masters" style="display: none">
-      Master's GPA: <input type="text" name="prior_ms_deg_gpa">
-      Master's Major: <input type="text" name="prior_ms_deg_major">
-      Master's Graduation year: <input type="text" name="prior_ms_deg_year" onkeypress="return onlyNumberKey(event)" maxlength="4">
-      Master's University: <input type="text" name="prior_ms_deg_university">
+      Master's GPA: <input type="text" name="prior_ms_deg_gpa" value="{{app['prior_ms_deg_gpa']}}">
+      Master's Major: <input type="text" name="prior_ms_deg_major" value="{{app['prior_ms_deg_major']}}">
+      Master's Graduation year: <input type="text" name="prior_ms_deg_year" value="{{app['prior_ms_deg_year']}}">
+      Master's University: <input type="text" name="prior_ms_deg_university" value="{{app['prior_ms_deg_university']}}">
       </div>
       <div id="bach" style="display: none">
-        Bachelor's GPA: <input type="text" name="prior_bac_deg_gpa" >
-        Bachelor's Major: <input type="text" name="prior_bac_deg_major">
-        Bachelor's Graduation year: <input type="text" name="prior_bac_deg_year" onkeypress="return onlyNumberKey(event)"  maxlength="4">
-        Bachelor's University: <input type="text" name="prior_bac_deg_university" >
+        Bachelor's GPA: <input type="text" name="prior_bac_deg_gpa" value="{{app['prior_bac_deg_gpa']}}">
+        Bachelor's Major: <input type="text" name="prior_bac_deg_major" value="{{app['prior_bac_deg_major']}}">
+        Bachelor's Graduation year: <input type="text" name="prior_bac_deg_year" value="{{app['prior_bac_deg_year']}}">
+        Bachelor's University: <input type="text" name="prior_bac_deg_university" value="{{app['prior_bac_deg_university']}}">
       </div>
     </fieldset>
     
@@ -98,17 +99,17 @@
     <fieldset id="GRE", style="display: none">
       <legend>Credentials</legend>
       <label for="GRE_year">Year GRE was taken:</label>
-      <input type="text" id="GRE_year" name="GRE_year" onkeypress="return onlyNumberKey(event)" maxlength="4"><br>
+      <input type="text" id="GRE_year" name="GRE_year" value="{{app['GRE_year']}}"><br>
       <label for="GRE_verbal">GRE Verbal:</label>
-      <input type="text" id="GRE_verbal" name="GRE_verbal" maxlength="3" onkeypress="return onlyNumberKey(event)"><br>
+      <input type="text" id="GRE_verbal" name="GRE_verbal" value="{{app['GRE_verbal']}}" maxlength="3" onkeypress="return onlyNumberKey(event)"><br>
       <label for="GRE_quatitative">GRE Quantitative:</label>
-      <input type="text" id="GRE_quantitative" name="GRE_quantitative" maxlength="3" onkeypress="return onlyNumberKey(event)"><br>
+      <input type="text" id="GRE_quantitative" name="GRE_quantitative" value="{{app['GRE_quantitative']}}" maxlength="3" onkeypress="return onlyNumberKey(event)"><br>
       <label for="GRE_advanced_score">GRE Advanced Score:</label>
-      <input type="text" id="GRE_advanced_score" name="GRE_advanced_score" maxlength="3" onkeypress="return onlyNumberKey(event)">
-      Subject: <input type="text" name="GRE_advanced_subject" ><br>
+      <input type="text" id="GRE_advanced_score" name="GRE_advanced_score" value="{{app['GRE_advanced_score']}}" maxlength="3" onkeypress="return onlyNumberKey(event)">
+      Subject: <input type="text" name="GRE_advanced_subject" value="{{app['GRE_advanced_subject']}}"><br>
       <label for="TOEFL_score">TOEFL - Score:</label>
-      <input type="text" id="TOEFL_score" name="TOEFL_score"  onkeypress="return onlyNumberKey(event)">
-      Date of exam: <input type="text" name="TOEFL_date" >
+      <input type="text" id="TOEFL_score" name="TOEFL_score"  value="{{app['TOEFL_score']}}" onkeypress="return onlyNumberKey(event)">
+      Date of exam: <input type="text" name="TOEFL_date" value="{{app['TOEFL_date']}}">
     </fieldset>
     <script>
       const degreeTypeSelect = document.querySelector('#degree_type');
@@ -165,31 +166,30 @@
     
     <fieldset>
       <legend>Areas of Interest and Experience</legend>
-      Areas of Interest: <input type="text" name="interest" ><br>
-      Experience: <input type="text" name="experience" >
+      Areas of Interest: <input type="text" name="interest" value="{{app['interest']}}"><br>
+      Experience: <input type="text" name="experience" value="{{app['experience']}}">
     </fieldset>
     <br>
     
     <fieldset>
       <legend>Request Letter</legend>
       <a class="test">Letter 1:  </a> <br>
-        <input type="text" name="field_rName" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
-            <input type="text" name="field_email" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
-            <input type="text" name="field_affil" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+        <input type="text" name="field_rName" placeholder="Name of recommender" value = "{{letter['recommenderName']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+            <input type="text" name="field_email" placeholder ="Email of recommender" value = "{{letter['recommenderAffil']}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+            <input type="text" name="field_affil" placeholder ="Affiliation" value = "{{letter['recommenderEmail']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
             <br>
       <a class="test">Letter 2</a> <br>
-      <input type="text" name="field_rName1" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
-      <input type="text" name="field_email1" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
-      <input type="text" name="field_affil1" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_rName1" placeholder="Name of recommender" value = "{{letter1['recommenderName1']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_email1" placeholder ="Email of recommender" value = "{{letter1['recommenderAffil1']}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+      <input type="text" name="field_affil1" placeholder ="Affiliation" value = "{{letter1['recommenderEmail1']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
       <br>
       <a class="test">Letter 3</a> <br>
-      <input type="text" name="field_rName2" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
-      <input type="text" name="field_email2" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
-      <input type="text" name="field_affil2" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_rName2" placeholder="Name of recommender" value = "{{letter2['recommenderName2']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <input type="text" name="field_email2" placeholder ="Email of recommender" value = "{{letter2['recommenderAffil2']}}" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+      <input type="text" name="field_affil2" placeholder ="Affiliation" value = "{{letter2['recommenderEmail2']}}" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
       
     </fieldset>
-    
-    
+
     <fieldset>
       <legend>Transcript</legend>
     <label for="transcript"></label>
@@ -249,8 +249,8 @@
     
     <br>
     
-    <button type="submit" class="button" name="submit" id = complete formaction="/application"> SUBMIT </button>
-    <button type="submit" class="button" name="submit" id = completes formaction="/incomplete"> Save and continue later </button>
+    <button type="submit" class="button" name="submit" id = complete formaction="/updateapplication"> SUBMIT </button>
+    <button type="submit" class="button" name="submit" id = completes formaction="/updateincomplete"> Save and continue later </button>
   </form>
 
      

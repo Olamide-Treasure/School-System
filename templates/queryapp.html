@@ -47,7 +47,7 @@
       <div class="container">
         <h1>My Account</h1>
         <h3 class="fw-light"><c> <b> Welcome to your page {{ name }}! <br>
-          ID: {{ session['ID'] }}</b> </c> <br> </h3>
+          ID: {{ session['user_id'] }}</b> </c> <br> </h3>
       </div>
     </div>
     <div class="row">
@@ -62,23 +62,19 @@
               <div class="row">
                 <div class="col">
                   <div class="row mb-2" id="students">
-                    <h2>Start new application</h2>
-                        <form action = '/application'> <input type = "submit" class = "button" name = "submit" Value = "Create new application here "> </form> 
-                            <hr color=#3F000F;>
-                   </div>
+                    <h1>LIST OF APPLICANTS </h1>
+                        {% if appinfo[3] is not none %} 
+                            {{ appinfo[3] }} 
+                        {% endif %} 
+                        {% if appinfo[2] is not none %} 
+                            {{ appinfo[2] }} 
+                        {% endif %} 
 
-                   <div class="row mb-2" id="applicants">
-                    <h2> View previous applications </h2>
-                    {% for app in apps %}
-                    <form action = '/view'> <input type = "submit" class = "button" name = "submit" Value = "View your application here"> </form>
-                    {% endfor %}
-                      <hr color=#3F000F;>
-                   </div>
-
-                   <div class="row mb-2" id="review">
-                    <form action = '/infoViewer'> <input type = "submit" class = "button" name = "submit" Value = "Update personal info here "> </form>
-                    <hr color=#3F000F;>
-                   </div>
+            <p> {{appinfo['fname']}} {{appinfo['lname']}}</a>
+                &nbsp&nbsp&nbsp <form action="/queryinfo"> 
+                <button type="submit">View information</button>
+                </form>
+            </p>
 
                    <div class="row mb-2" id="logout">
                     <form action="/logout"> 
@@ -103,3 +99,7 @@
 </body>
 
 </html>
+
+
+
+

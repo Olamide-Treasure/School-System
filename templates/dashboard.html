@@ -1,3 +1,4 @@
+
 <html>
   <head>
     <title>Student Page - {{data['fname']}} {{data['lname']}}</title>
@@ -28,6 +29,8 @@
         <li class="nav-item">
           <a class="nav-link" href="/logout">Logout</a>
         </li>
+
+        
       </ul>
     </div>
   </nav>
@@ -59,19 +62,19 @@
               <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
               <a class="p-2 rounded text-decoration-none" href="#account_info">Account Info</a>
             </div>
-            {% if data['instructor'] == True %}
+            {% if data['instructor'] == 1 %}
               <div class="container" style="display: flex; align-items: center;">
                 <i class="fa-solid fa-chalkboard-user" style="color:rgb(255,115,115);"></i>
                 <a class="p-2 rounded text-decoration-none" href="#instructor_info">Instructor Info</a>
               </div>
             {% endif %}
-            {% if data['advisor'] == True %}
+            {% if data['advisor'] == 1 %}
               <div class="container" style="display: flex; align-items: center;">
                 <i class="fa-solid fa-user-tie" style="color:rgb(255,115,115);"></i>
                 <a class="p-2 rounded text-decoration-none" href="#advisor_info">Advisor Info</a>
               </div>
             {% endif %}
-            {% if data['reviewr'] == True %}
+            {% if data['reviewr'] == 1 %}
               <div class="container" style="display: flex; align-items: center;">
                 <i class="fa-solid fa-magnifying-glass" style="color:rgb(255,115,115);"></i>
                 <a class="p-2 rounded text-decoration-none" href="#reviewer_info">Reviewer Info</a>
@@ -261,7 +264,7 @@
                 </div>
               </div>
 
-              {% if data['instructor'] == True %}
+              {% if data['instructor'] == 1 %}
                 <br>
                 <div class="item-2 mb-3">
 
@@ -451,6 +454,85 @@
 
                 </div>   
               {% endif %}
+
+
+
+
+              {% if data['advisor'] == 1 %}
+              <br>
+              <div class="item-2 mb-3">
+
+                <div class="row">
+                  <div class="col">
+                    <div class="row mb-2" id="advisor_info">
+                      <h2>Advisor Info</h2>
+                    </div>
+                  </div>
+                </div>
+
+
+                <div class="row">
+                  <div class="col-7">
+                    <p class="fw-light border-bottom pb-3">
+                      Select Master's or PhD Student and View their Information</p>
+                  </div>
+                </div>
+
+                <div class="row">
+                  <div class="dropdown">
+
+                    <button class="btn btn-warning dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                      <bold>View Students</bold>
+                    </button>
+                    <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" href="{{url_for('master_students')}}">Masters Students</a>
+              
+                      <a class="dropdown-item" href="{{url_for('phd_students')}}">PhD Students</a>
+                     
+                  </div>
+                </div>
+         
+                </div>
+
+              </div>   
+           
+            {% endif %}
+
+
+
+
+            {% if data['reviewr'] == 1 %}
+            <br>
+            <div class="item-2 mb-3">
+
+              <div class="row">
+                <div class="col">
+                  <div class="row mb-2" id="reviewer_info">
+                    <h2>Review Information</h2>
+                  </div>
+                </div>
+              </div>
+
+
+              <div class="row">
+                <div class="col-7">
+                  <p class="fw-light border-bottom pb-3">
+                    Review Applications</p>
+                </div>
+              </div>
+
+              <div class="ms-2 me-auto mx-0">
+                <form method="GET" action="{{url_for('reviews')}}">
+                  <button type="submit" class="btn btn-warning" onclick="window.location.href=''">Applications</button>
+                </form>
+              </div>
+
+            </div>
+
+
+              {% endif %}
+
+
             </div>
           </div>
         </div>

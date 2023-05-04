@@ -22,11 +22,11 @@ Select a Student and an Advisor to assign for the Advisor/Advisee
 <label for= "student">Select a Student:</label>
 <select name= "student" id= "student" required>
     {% for s in mstudents: %}
-  <option value="{{s['user_id']}}">{{s['fname']}} {{s['lname']}}</option>
+  <option value="{{s['user_id']}}">{{s['fname']}} {{s['lname']}}: {{s['user_id']}}</option>
   {% endfor %}
 
   {% for p in pstudents: %}
-  <option value="{{p['user_id']}}">{{p['fname']}} {{p['lname']}}</option>
+  <option value="{{p['user_id']}}">{{p['fname']}} {{p['lname']}}: {{p['user_id']}}</option>
   {% endfor %}
 </select>
 <br><br>
@@ -34,7 +34,7 @@ Select a Student and an Advisor to assign for the Advisor/Advisee
 <label for= "advisor">Select a Advisor:</label>
 <select name= "advisor" id= "advisor" required>
     {% for a in advisors: %}
-  <option value="{{a['user_id']}}">{{a['fname']}} {{a['lname']}}</option>
+  <option value="{{a['user_id']}}">{{a['fname']}} {{a['lname']}}: {{a['user_id']}}</option>
   {% endfor %}
 </select>
 <br><br>
@@ -54,6 +54,7 @@ Select a Student and an Advisor to assign for the Advisor/Advisee
 
 
 </html>
+
 
 
 

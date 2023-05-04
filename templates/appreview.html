@@ -78,7 +78,7 @@
             
         </ul>
 
-        <form action ="/reviews/{{appinfo[1]}}" method="POST">
+        <form action ="/reviews/{{appinfo[1]}}/{{appinfo[2]}}/{{appinfo[3]}}" method="POST">
             <textarea id="comment" name="comment" rows="6" cols="30" placeholder="Comments for applicant" maxlength="150" textarea style="resize: none"></textarea><br>
             <input type="checkbox" id="reject" name="decision" value="reject" onclick="onlyOne(this);showDropdown()">
             <label for="reject">Reject</label><br>
@@ -103,36 +103,28 @@
                 <label for="dcourse">Deficiency course if any</label><br>
                 <input type="text" name="dcourse" placeholder=""><br>
             </div>
-            {% if session['type'] == 1 %}
-            <button id="submit" class = "button" type ="submit"> Submit Review </button>  </form>
-        {% endif %}
-    <br>
 
-        {% if session['type'] == 3 %}
-        Transcript Received? 
-            <select name="Transcript" id="reasons">
-                <option value="YES">YES</option>
-                <option value="NO">NO</option>
-            </select><br>
+            <h1>Letter of recommendation</h1>
+            Letter 1: {{letter[0]}} <br>
+            Letter 2: {{letter[1]}} <br>
+            Letter 2: {{letter[2]}} <br>
 
-        Final Decision:
-            <select name = "Decision">
-            <option value = "Reject"> Reject </option>
-            <option value = "Admit"> Admit </option>
-            <option value = "Admit with aid"> Admit with aid </option> <br> 
-            <br>
-            <input type = "submit" formaction = '/finalDecision/{{["UID"]}}'>  </form>
-        {% endif %}
+         
 
         {% if session['type'] == 7 %}
-
+        <form action ="/cac" method="POST">
         Final Decision:
-            <select name = "Decision">
+            <select name = "fdecision">
             <option value = "Reject"> Reject </option>
             <option value = "Admit"> Admit </option>
             <option value = "Admit with aid"> Admit with aid </option> <br> 
             <br>
-            <input type = "submit" formaction = '/cac'> </form>
+            <input type = "submit"> </form>
+        </form>
+        {% endif %}
+        {% if session['type'] == 1 %}
+        <input type = "submit"> </form>
+        </form>
         {% endif %}
 
 

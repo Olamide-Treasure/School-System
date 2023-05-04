@@ -1,4 +1,5 @@
--- Active: 1682009432499@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
+
+-- Active: 1682346338578@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
 
 
 use integration;
@@ -9,6 +10,7 @@ DROP TABLE IF EXISTS students;
 CREATE TABLE students (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
+  semester varchar(6) NOT NULL,
   admit_year   INT(4) NOT NULL,
   PRIMARY KEY (student_id),
   FOREIGN KEY (student_id) REFERENCES user(user_id)
@@ -29,10 +31,22 @@ CREATE TABLE user_type (
   primary key(id)
 );
 
+DROP TABLE IF EXISTS admitted;
+CREATE TABLE admitted(
+  a_id int(8),
+  a_semester varchar(10),
+  a_year year,
+  accept varchar(30),
+  fee varchar(5),
+  congrats varchar(10),
+  primary key(a_id,a_semester,a_year),
+  foreign key(a_id) references user(user_id) ON DELETE CASCADE,
+  foreign key(a_id,a_semester,a_year) references applications(student_id,semester,s_year) ON DELETE CASCADE
+);
 
 DROP TABLE IF EXISTS applications;
 CREATE TABLE applications ( 
-  status varchar(30),
+  status varchar(30), 
   student_id int(8),
   semester varchar(10),
   s_year year,
@@ -56,6 +70,7 @@ CREATE TABLE applications (
   prior_ms_deg_major varchar(20),
   prior_ms_deg_year varchar(4),
   prior__deg_university varchar(20),
+  s_date date,
   transcript varchar(30),
   student varchar(30),
   primary key(student_id,semester,s_year),
@@ -66,9 +81,9 @@ DROP TABLE IF EXISTS faculty;
 CREATE TABLE faculty (
   faculty_id      INT(8) NOT NULL,
   department      VARCHAR(50) NOT NULL,
-  instructor      BOOLEAN,
-  advisor         BOOLEAN,
-  reviewer        BOOLEAN,
+  instructor      int(1),
+  advisor         int(1),
+  reviewr         int(1),
   PRIMARY KEY (faculty_id),
   FOREIGN KEY (faculty_id) REFERENCES user(user_id) ON DELETE CASCADE
 );
@@ -85,30 +100,64 @@ CREATE TABLE review (
   GAS_comment varchar(100),
   decision varchar(30),
   recom_advisor varchar(30),
-  primary key(review_id,p_year,p_semester),
+  primary key(review_id,student_id,p_year,p_semester),
   foreign key(student_id) references user(user_id) ON DELETE CASCADE,
   foreign key(review_id) references user(user_id) ON DELETE CASCADE,
-  foreign key(review_id,p_semester,p_year) references applications(student_id,semester,s_year) ON DELETE CASCADE
+  foreign key(student_id,p_semester,p_year) references applications(student_id,semester,s_year) ON DELETE CASCADE
 );
 
+
+DROP TABLE IF EXISTS transcript;
+CREATE TABLE transcript (
+  t_id int(8),
+  t_semester varchar(10),
+  t_year year,
+  school varchar(20),
+  email varchar(20),
+  contents varchar(600),
+  primary key(t_id,t_semester,t_year),
+  foreign key(t_id) references user(user_id) ON DELETE CASCADE
+);
 
 DROP TABLE IF EXISTS letter;
 CREATE TABLE letter (
   user_id int(8),
+  l_semester varchar(10),
+  l_year year,
   letter_id int(5) AUTO_INCREMENT,
-  contents varchar(600),
   recommenderName varchar(20),
   recommenderAffil varchar(20),
   recommenderEmail varchar(20),
+  contents varchar(600),
+  primary key(letter_id,user_id,l_semester,l_year),
+  foreign key(user_id) references user(user_id) ON DELETE CASCADE
+);
 
+DROP TABLE IF EXISTS letter1;
+CREATE TABLE letter1 (
+  user_id int(8),
+  l_semester varchar(10),
+  l_year year,
+  letter_id int(5) AUTO_INCREMENT,
   recommenderName1 varchar(20),
   recommenderAffil1 varchar(20),
   recommenderEmail1 varchar(20),
+  contents varchar(600),
+  primary key(letter_id,user_id,l_semester,l_year),
+  foreign key(user_id) references user(user_id) ON DELETE CASCADE
+);
 
+DROP TABLE IF EXISTS letter2;
+CREATE TABLE letter2 (
+  user_id int(8),
+  l_semester varchar(10),
+  l_year year,
+  letter_id int(5) AUTO_INCREMENT,
   recommenderName2 varchar(20),
   recommenderAffil2 varchar(20),
   recommenderEmail2 varchar(20),
-  primary key(letter_id),
+  contents varchar(600),
+  primary key(letter_id,user_id,l_semester,l_year),
   foreign key(user_id) references user(user_id) ON DELETE CASCADE
 );
 
@@ -165,6 +214,7 @@ DROP TABLE IF EXISTS alumni;
 CREATE TABLE alumni (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
+  semester varchar(6) NOT NULL,
 	grad_year int(4) NOT NULL,
   PRIMARY KEY (student_id)
 );
@@ -298,19 +348,20 @@ INSERT INTO user VALUES (12312312, 6, 'Lennon', 'John','ljohn', 'passes', '2003 
 insert into user values (65656565, 6, 'Rayra', 'Starr', 'raystarr', 'tplgik2890', '2005 H St NW, Washington, DC 20052', '202-955-1020', '202-91-1131', 'raystarr@gwu.edu');
 insert into user values (10101010, 7, 'Chairman', 'Chair', 'cac', 'passed', '2005 F St NW, Washington, DC 20052', '202-443-1100', '222-72-1110', 'cac@gwu.edu');
 
-INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','');
-INSERT INTO applications VALUES ('incomplete','65656565','Spring','2024','','','','','','','','','','','','','','','','','','','','','','');
+INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','','');
+INSERT INTO applications VALUES ('incomplete','65656565','Spring','2024','','','','','','','','','','','','','','','','','','','','','','','');
 
-insert into alumni values (77777777, 20, 2014);
+insert into alumni values (77777777, 20, 'Spring', 2014);
 
-insert into students values (55555555, 20, 2021);
-insert into students values (66666666, 20, 2021);
-insert into students values (99999999, 21, 2021);
+insert into students values (55555555, 20, 'Spring', 2021);
+insert into students values (66666666, 20, 'Fall' , 2021);
+insert into students values (99999999, 21, 'Fall',  2021);
 
 insert into phd_req values(99999999, 'False');
 
-insert into faculty values (11111111, 'CSCI', TRUE, TRUE, TRUE);
-insert into faculty values (22222222, 'ECE', TRUE, TRUE, TRUE);
+insert into faculty values (11111111, 'CSCI', 1, 1, 1);
+insert into faculty values (22222222, 'CSCI', 1, 1, 0);
+insert into faculty values (10101010, 'CSCI', 1, 1, 1);
 
 
 insert into student_advisors values(55555555, 11111111);
@@ -384,26 +435,26 @@ insert into class_section values(48, 'Fall', '2022', 'W', '18:00-20:30', 121, 11
 insert into class_section values(49, 'Fall', '2022', 'R', '16:00-18:30', 117, 11111111);
 
 -- SPRING 2022 --
--- insert into class_section values(30, 'Spring', '2022', 'M', '15:00-17:30', 100, 11111111);
--- insert into class_section values(31, 'Spring', '2022', 'T', '15:00-17:30', 101, 11111111);
--- insert into class_section values(32, 'Spring', '2022', 'W', '15:00-17:30', 102, 11111111);
--- insert into class_section values(33, 'Spring', '2022', 'M', '18:00-20:30', 104, 11111111);
--- insert into class_section values(34, 'Spring', '2022', 'T', '18:00-20:30', 105, 11111111);
--- insert into class_section values(35, 'Spring', '2022', 'W', '18:00-20:30', 106, 11111111);
--- insert into class_section values(36, 'Spring', '2022', 'R', '18:00-20:30', 107, 11111111);
--- insert into class_section values(37, 'Spring', '2022', 'T', '15:00-17:30', 108, 11111111);
--- insert into class_section values(38, 'Spring', '2022', 'M', '18:00-20:30', 110, 11111111);
--- insert into class_section values(39, 'Spring', '2022', 'M', '15:30-18:00', 111, 11111111);
--- insert into class_section values(40, 'Spring', '2022', 'R', '18:00-20:30', 109, 11111111);
--- insert into class_section values(41, 'Spring', '2022', 'W', '18:00-20:30', 112, 11111111);
--- insert into class_section values(42, 'Spring', '2022', 'T', '18:00-20:30', 113, 11111111);
--- insert into class_section values(43, 'Spring', '2022', 'M', '18:00-20:30', 114, 11111111);
--- insert into class_section values(44, 'Spring', '2022', 'W', '18:00-20:30', 115, 11111111);
--- insert into class_section values(45, 'Spring', '2022', 'W', '15:00-17:30', 118, 11111111);
--- insert into class_section values(46, 'Spring', '2022', 'M', '18:00-20:30', 119, 11111111);
--- insert into class_section values(47, 'Spring', '2022', 'T', '18:00-20:30', 120, 11111111);
--- insert into class_section values(48, 'Spring', '2022', 'W', '18:00-20:30', 121, 11111111);
--- insert into class_section values(49, 'Spring', '2022', 'R', '16:00-18:30', 117, 11111111);
+insert into class_section values(30, 'Spring', '2022', 'M', '15:00-17:30', 100, 11111111);
+insert into class_section values(31, 'Spring', '2022', 'T', '15:00-17:30', 101, 11111111);
+insert into class_section values(32, 'Spring', '2022', 'W', '15:00-17:30', 102, 11111111);
+insert into class_section values(33, 'Spring', '2022', 'M', '18:00-20:30', 104, 11111111);
+insert into class_section values(34, 'Spring', '2022', 'T', '18:00-20:30', 105, 11111111);
+insert into class_section values(35, 'Spring', '2022', 'W', '18:00-20:30', 106, 11111111);
+insert into class_section values(36, 'Spring', '2022', 'R', '18:00-20:30', 107, 11111111);
+insert into class_section values(37, 'Spring', '2022', 'T', '15:00-17:30', 108, 11111111);
+insert into class_section values(38, 'Spring', '2022', 'M', '18:00-20:30', 110, 11111111);
+insert into class_section values(39, 'Spring', '2022', 'M', '15:30-18:00', 111, 11111111);
+insert into class_section values(40, 'Spring', '2022', 'R', '18:00-20:30', 109, 11111111);
+insert into class_section values(41, 'Spring', '2022', 'W', '18:00-20:30', 112, 11111111);
+insert into class_section values(42, 'Spring', '2022', 'T', '18:00-20:30', 113, 11111111);
+insert into class_section values(43, 'Spring', '2022', 'M', '18:00-20:30', 114, 11111111);
+insert into class_section values(44, 'Spring', '2022', 'W', '18:00-20:30', 115, 11111111);
+insert into class_section values(45, 'Spring', '2022', 'W', '15:00-17:30', 118, 11111111);
+insert into class_section values(46, 'Spring', '2022', 'M', '18:00-20:30', 119, 11111111);
+insert into class_section values(47, 'Spring', '2022', 'T', '18:00-20:30', 120, 11111111);
+insert into class_section values(48, 'Spring', '2022', 'W', '18:00-20:30', 121, 11111111);
+insert into class_section values(49, 'Spring', '2022', 'R', '16:00-18:30', 117, 11111111);
 
 
 
