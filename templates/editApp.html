@@ -192,16 +192,60 @@
 
     <fieldset>
       <legend>Transcript</legend>
+    <label for="transcript"></label>
+    <select id="transcript" name="transcript">
+      <option value="">Choose one</option>
+      <option value="Upload">Upload Transcript</option>
+      <option value="Request">Request Transcript</option>
+    </select><br>
+      
+      <div id="mail" style="display: none">
       <a class="test"> Request Official Transcript  </a> <br>
         <input type="text" name="field_rName" placeholder="Name of School" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
         <input type="text" name="field_email" placeholder ="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
         <br>
+      </div>
+
+        <div id="upload" style="display: none">
         <a class="test">Upload Unofficial Transcript  </a> <br>
         <input type = "file" id = "myFile" name = "filename">
-
-        </inpuit>
+       </div>
 
     </fieldset>
+    <script>
+      const transcriptselect = document.querySelector('#transcript');
+      const mailFieldset = document.querySelector('#mail');
+      const uploadFieldset = document.querySelector('#upload');
+
+      const upload = document.querySelector('#upload')
+      const mail = document.querySelector('#mail')
+      transcriptselect.addEventListener('change', () => {
+        if (transcriptselect.value === 'Request') {
+          mail.style.display = 'block';
+          uploadFieldset.style.display = 'block';
+          upload.style.display = 'none';
+        } else if (transcriptselect.value === 'Upload') {
+          upload.style.display = 'block';
+          mailFieldset.style.display = 'block';
+          mail.style.display = 'none';
+          //const resetInputs1 = GRE.getElementsByTagName("input");
+          const resetInputs2 = mail.getElementsByTagName("input");
+
+          // Loop through the inputs and clear their values
+          for (let i = 0; i < resetInputs1.length; i++) {
+            resetInputs1[i].value = "";
+          }
+          for (let i = 0; i < resetInputs2.length; i++) {
+            resetInputs2[i].value = "";
+          }
+        } else {
+          mailFieldset.style.display = 'none';
+          upload.style.display = 'none';
+          mail.style.display ='none';
+        }
+      });
+
+    </script>
     
     <br>
     
