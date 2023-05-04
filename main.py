@@ -324,6 +324,19 @@ def update_all():
   return redirect('/userloggedin', message=message)
 
 
+@app.route("/update_grade", methods=['GET', 'POST'])
+def update_grade():
+    if request.method == 'POST':
+      cursor = db.cursor(dictionary=True)
+
+      grade = request.form['grade']
+      student_id = request.form['student'] 
+      class_id = request.form['class']
+  
+      cursor.execute("UPDATE student_courses SET grade = %s WHERE student_id = %s AND class_id = %s", (grade, student_id, class_id))
+      db.commit()
+      return redirect('/userloggedin')
+
 ####################################################
 #                    HOME PAGE                     #
 ####################################################
@@ -332,7 +345,6 @@ def update_all():
 @app.route('/')
 def home_page():
   _reconnect()
-
   return render_template("home.html", title = 'Home Page', session = session)
 
 
@@ -570,7 +582,7 @@ def faculty():
 
     print(session['username'])
     cur = db.cursor(dictionary = True)
-    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN faculty f ON u.user_id = f.faculty_id WHERE u.username = %s", (session['username'],))
+    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN faculty f ON u.user_id = f.faculty_id WHERE u.user_id = %s", (session['user_id'],))
     data = cur.fetchone()
 
     cur_sem = _get_curr_semester()
@@ -603,9 +615,6 @@ def faculty():
 
 @app.route('/class/<class_id>/<csem>/<cyear>', methods=['GET', 'POST'])
 def class_page(class_id, csem, cyear):
-  print(class_id)
-  print(csem)
-  print(cyear)
   cyear = str(cyear)
   _reconnect()
 
@@ -613,17 +622,16 @@ def class_page(class_id, csem, cyear):
   cur.execute('''SELECT * FROM class_section c JOIN course i ON c.course_id = i.id 
   JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s AND c.class_id = %s AND c.csem = %s AND c.cyear = %s''', 
               (session['user_id'], class_id, csem, cyear))
-  print(cur.fetchone())
   course = cur.fetchone()
-
 
   cur.execute('''SELECT * FROM student_courses s 
   JOIN class_section c ON s.class_id = c.class_id 
   AND s.csem = c.csem AND s.cyear = c.cyear
   JOIN user u ON s.student_id = u.user_id WHERE c.class_id = %s AND c.csem = %s AND c.cyear = %s''', (class_id, csem, cyear))
   classes = cur.fetchall()
+  
+  return render_template('class.html', course=course, classes=classes, session=session, csem=csem, cyear=cyear)
 
-  return render_template('class.html', course=course, classes=classes, session=session)
 
 #alumni log in
 @app.route('/alumnilogging')
@@ -1979,9 +1987,6 @@ def phd_students():
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
 
-      
-      cursor.close()
-
       return render_template('phd_students.html', students=result)
 
   else:
@@ -2068,7 +2073,6 @@ def faculty_transcript(transcript_id):
         gpa = grade_points / num_courses
         gpa = round(gpa, 2)
 
-        cursor.close()
 
     return render_template('student_transcript.html', transcript=result, userdata = userdata, gpa = gpa)
 
@@ -2136,10 +2140,9 @@ def faculty_form(user_id):
 
             for r in result:
               print(r)
-            cursor.close()
 
             return render_template('review_formone.html', form_one=result, phdapp = phdapp)
-    
+
 
       elif request.method == "POST":
       # get the form values 
@@ -2213,7 +2216,6 @@ def faculty_form(user_id):
           phdapp =cursor.fetchall()
           for r in result:
             print(r)
-          cursor.close()
           db.commit()
           flash(f'Student Thesis has been approved!', category="success")
 
@@ -2264,7 +2266,6 @@ def faculty_form_masters(user_id):
             result =cursor.fetchall()
             for r in result:
               print(r)
-            cursor.close()
 
             return render_template('review_formone_masters.html', form_one=result)
   else:
@@ -2297,7 +2298,6 @@ def master_students():
 
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
-      cursor.close()
 
       return render_template('master_students.html', students=result)
   else:
