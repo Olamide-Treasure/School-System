@@ -217,7 +217,7 @@ def add():
 
           if (my_class_time[0] > curr_class_time[0] - 0.5 and my_class_time[0] < curr_class_time[1] + 0.5) or (my_class_time[1] > curr_class_time[0] - 0.5 and my_class_time[1] < curr_class_time[1] + 0.5):
               flash("This class has a time conflict with a class you've already added", "error")
-              return redirect('/regsiter') 
+              return redirect('/register') 
         
 
       # Now we have to check for the classes that already got checked out but for current semester/year
