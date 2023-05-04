@@ -440,6 +440,7 @@ def catalog():
 
 @app.route('/userloggedin', methods=['GET', 'POST'])
 def user():
+  _reconnect()
   if 'username' in session: 
     #check for the student logging in
     if(session['type'] == 5 or session['type'] == 4):
