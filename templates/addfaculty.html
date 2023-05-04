@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="static/home.css">
   </head>
 <body>
-  <h1> Add Faculty Advisor </h1>
+  <h1> Add Faculty </h1>
   <form action="/addfaculty" method = "POST">
       Enter First Name: 
    <input type="text" name="fname" required><br>
@@ -31,9 +31,33 @@
     <input type="text" name="phone" required><br>
 
     <input type = "hidden" name = "type" value = 1>
+    <input type = "hidden" name = "depart" value = "CSCI">
     <br>
+
+    <p>An Instructor</p>
+    <input type="radio" name = "0" value="yes"> Yes </br>
+    <input type="radio" name = "0" value="no" checked> No </br>
+    
+    <p>An Advisor</p>
+    <input type="radio" name = "1" value="yes"> Yes </br>
+    <input type="radio" name = "1" value="no" checked> No </br>
+
+    <p>Reviewer</p>
+    <input type="radio" name = "2" value="yes"> Yes </br>
+    <input type="radio" name = "2" value="no" checked> No </br>
+
+
+
   <button type="submit">Submit</button>
  </form>
+
+
+ <script>
+  const form = document.getElementById("form");
+  const checkboxes = form.querySelectorAll("input[type='radio']");
+  const errorMessage = document.getElementById("error-message");
+</script>
+
 
     <form action = "/"> 
     <button type="submit">Return to Home Page</button>
