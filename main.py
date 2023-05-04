@@ -1784,7 +1784,6 @@ def phd_students():
 
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
-      cursor.close()
 
       return render_template('phd_students.html', students=result)
 
@@ -1872,7 +1871,6 @@ def faculty_transcript(transcript_id):
         gpa = grade_points / num_courses
         gpa = round(gpa, 2)
 
-        cursor.close()
 
     return render_template('student_transcript.html', transcript=result, userdata = userdata, gpa = gpa)
 
@@ -1923,7 +1921,6 @@ def faculty_form(user_id):
             result =cursor.fetchall()
             for r in result:
               print(r)
-            cursor.close()
 
             return render_template('review_formone.html', form_one=result)
     
@@ -1984,7 +1981,6 @@ def faculty_form(user_id):
           result =cursor.fetchall()
           for r in result:
             print(r)
-          cursor.close()
           db.commit()
           flash(f'Student Thesis has been approved!', category="success")
 
@@ -2035,7 +2031,6 @@ def faculty_form_masters(user_id):
             result =cursor.fetchall()
             for r in result:
               print(r)
-            cursor.close()
 
             return render_template('review_formone_masters.html', form_one=result)
   else:
@@ -2068,7 +2063,6 @@ def master_students():
 
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
-      cursor.close()
 
       return render_template('master_students.html', students=result)
   else:
@@ -2485,7 +2479,7 @@ def incomplete():
        cursor.execute("INSERT INTO applications VALUES ('incomplete', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,CURDATE(),'sent','not decided')", 
                       (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))      
-                       gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))
+       db.commit()
 
        uid = session["user_id"]
        uid1 = session["user_id"]
