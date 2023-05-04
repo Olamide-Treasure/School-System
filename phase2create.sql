@@ -9,7 +9,7 @@ DROP TABLE IF EXISTS students;
 CREATE TABLE students (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
-	  semester varchar(4) NOT NULL,
+	  semester varchar(6) NOT NULL,
   admit_year   INT(4) NOT NULL,
   PRIMARY KEY (student_id),
   FOREIGN KEY (student_id) REFERENCES user(user_id)
@@ -166,7 +166,7 @@ DROP TABLE IF EXISTS alumni;
 CREATE TABLE alumni (
 	student_id int(8) NOT NULL,
 	degree_id int(2) NOT NULL,
-	  semester varchar(4) NOT NULL,
+	  semester varchar(6) NOT NULL,
 	grad_year int(4) NOT NULL,
   PRIMARY KEY (student_id)
 );
