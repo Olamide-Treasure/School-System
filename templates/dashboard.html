@@ -61,19 +61,19 @@
               <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
               <a class="p-2 rounded text-decoration-none" href="#account_info">Account Info</a>
             </div>
-            {% if data['instructor'] == True %}
+            {% if data['instructor'] == 1 %}
               <div class="container" style="display: flex; align-items: center;">
                 <i class="fa-solid fa-chalkboard-user" style="color:rgb(255,115,115);"></i>
                 <a class="p-2 rounded text-decoration-none" href="#instructor_info">Instructor Info</a>
               </div>
             {% endif %}
-            {% if data['advisor'] == True %}
+            {% if data['advisor'] == 1 %}
               <div class="container" style="display: flex; align-items: center;">
                 <i class="fa-solid fa-user-tie" style="color:rgb(255,115,115);"></i>
                 <a class="p-2 rounded text-decoration-none" href="#advisor_info">Advisor Info</a>
               </div>
             {% endif %}
-            {% if data['reviewr'] == True %}
+            {% if data['reviewr'] == 1 %}
               <div class="container" style="display: flex; align-items: center;">
                 <i class="fa-solid fa-magnifying-glass" style="color:rgb(255,115,115);"></i>
                 <a class="p-2 rounded text-decoration-none" href="#reviewer_info">Reviewer Info</a>
@@ -263,7 +263,7 @@
                 </div>
               </div>
 
-              {% if data['instructor'] == True %}
+              {% if data['instructor'] == 1 %}
                 <br>
                 <div class="item-2 mb-3">
 
@@ -457,7 +457,7 @@
 
 
 
-              {% if data['advisor'] == True %}
+              {% if data['advisor'] == 1 %}
               <br>
               <div class="item-2 mb-3">
 
@@ -500,7 +500,7 @@
 
 
 
-            {% if data['reviewr'] == True %}
+            {% if data['reviewr'] == 1 %}
             <br>
             <div class="item-2 mb-3">
 
