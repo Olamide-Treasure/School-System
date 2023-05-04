@@ -31,10 +31,21 @@ CREATE TABLE user_type (
   primary key(id)
 );
 
+DROP TABLE IF EXISTS admitted;
+CREATE TABLE admitted(
+  a_id int(8),
+  a_semester varchar(10),
+  a_year year,
+  accept varchar(30),
+  fee varchar(5),
+  primary key(a_id,a_semester,a_year),
+  foreign key(a_id) references user(user_id) ON DELETE CASCADE,
+  foreign key(a_id,a_semester,a_year) references applications(student_id,semester,s_year) ON DELETE CASCADE
+);
 
 DROP TABLE IF EXISTS applications;
 CREATE TABLE applications ( 
-  status varchar(30),
+  status varchar(30), 
   student_id int(8),
   semester varchar(10),
   s_year year,
@@ -58,6 +69,7 @@ CREATE TABLE applications (
   prior_ms_deg_major varchar(20),
   prior_ms_deg_year varchar(4),
   prior__deg_university varchar(20),
+  s_date date,
   transcript varchar(30),
   student varchar(30),
   primary key(student_id,semester,s_year),
@@ -87,30 +99,52 @@ CREATE TABLE review (
   GAS_comment varchar(100),
   decision varchar(30),
   recom_advisor varchar(30),
-  primary key(review_id,p_year,p_semester),
+  primary key(review_id,student_id,p_year,p_semester),
   foreign key(student_id) references user(user_id) ON DELETE CASCADE,
   foreign key(review_id) references user(user_id) ON DELETE CASCADE,
-  foreign key(review_id,p_semester,p_year) references applications(student_id,semester,s_year) ON DELETE CASCADE
+  foreign key(student_id,p_semester,p_year) references applications(student_id,semester,s_year) ON DELETE CASCADE
 );
 
 
 DROP TABLE IF EXISTS letter;
 CREATE TABLE letter (
   user_id int(8),
+  l_semester varchar(10),
+  l_year year,
   letter_id int(5) AUTO_INCREMENT,
-  contents varchar(600),
   recommenderName varchar(20),
   recommenderAffil varchar(20),
   recommenderEmail varchar(20),
+  contents varchar(600),
+  primary key(letter_id,user_id,l_semester,l_year),
+  foreign key(user_id) references user(user_id) ON DELETE CASCADE
+);
 
+DROP TABLE IF EXISTS letter1;
+CREATE TABLE letter1 (
+  user_id int(8),
+  l_semester varchar(10),
+  l_year year,
+  letter_id int(5) AUTO_INCREMENT,
   recommenderName1 varchar(20),
   recommenderAffil1 varchar(20),
   recommenderEmail1 varchar(20),
+  contents varchar(600),
+  primary key(letter_id,user_id,l_semester,l_year),
+  foreign key(user_id) references user(user_id) ON DELETE CASCADE
+);
 
+DROP TABLE IF EXISTS letter2;
+CREATE TABLE letter2 (
+  user_id int(8),
+  l_semester varchar(10),
+  l_year year,
+  letter_id int(5) AUTO_INCREMENT,
   recommenderName2 varchar(20),
   recommenderAffil2 varchar(20),
   recommenderEmail2 varchar(20),
-  primary key(letter_id),
+  contents varchar(600),
+  primary key(letter_id,user_id,l_semester,l_year),
   foreign key(user_id) references user(user_id) ON DELETE CASCADE
 );
 
@@ -301,8 +335,8 @@ INSERT INTO user VALUES (12312312, 6, 'Lennon', 'John','ljohn', 'passes', '2003 
 insert into user values (65656565, 6, 'Rayra', 'Starr', 'raystarr', 'tplgik2890', '2005 H St NW, Washington, DC 20052', '202-955-1020', '202-91-1131', 'raystarr@gwu.edu');
 insert into user values (10101010, 7, 'Chairman', 'Chair', 'cac', 'passed', '2005 F St NW, Washington, DC 20052', '202-443-1100', '222-72-1110', 'cac@gwu.edu');
 
-INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','');
-INSERT INTO applications VALUES ('incomplete','65656565','Spring','2024','','','','','','','','','','','','','','','','','','','','','','');
+INSERT INTO applications VALUES ('review','12312312','Fall','2023','MS','','','','','','','','','','','','','','','','','','','','','','');
+INSERT INTO applications VALUES ('incomplete','65656565','Spring','2024','','','','','','','','','','','','','','','','','','','','','','','');
 
 insert into alumni values (77777777, 20, 'Spring', 2014);
 

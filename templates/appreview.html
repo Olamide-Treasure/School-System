@@ -78,7 +78,7 @@
             
         </ul>
 
-        <form action ="/reviews/{{appinfo[1]}}" method="POST">
+        <form action ="/reviews/{{appinfo[1]}}/{{appinfo[2]}}/{{appinfo[3]}}" method="POST">
             <textarea id="comment" name="comment" rows="6" cols="30" placeholder="Comments for applicant" maxlength="150" textarea style="resize: none"></textarea><br>
             <input type="checkbox" id="reject" name="decision" value="reject" onclick="onlyOne(this);showDropdown()">
             <label for="reject">Reject</label><br>
@@ -103,6 +103,12 @@
                 <label for="dcourse">Deficiency course if any</label><br>
                 <input type="text" name="dcourse" placeholder=""><br>
             </div>
+
+            <h1>Letter of recommendation</h1>
+            Letter 1: {{letter[0]}} <br>
+            Letter 2: {{letter[1]}} <br>
+            Letter 2: {{letter[2]}} <br>
+
             {% if session['type'] == 1 %}
             <button id="submit" class = "button" type ="submit"> Submit Review </button>  </form>
         {% endif %}
