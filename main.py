@@ -2545,5 +2545,3 @@ def finalDecision(student_id):
 
 app.run(host='0.0.0.0', port=8080)
 
-
-
