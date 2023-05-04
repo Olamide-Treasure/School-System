@@ -38,6 +38,7 @@ CREATE TABLE admitted(
   a_year year,
   accept varchar(30),
   fee varchar(5),
+  congrats varchar(10),
   primary key(a_id,a_semester,a_year),
   foreign key(a_id) references user(user_id) ON DELETE CASCADE,
   foreign key(a_id,a_semester,a_year) references applications(student_id,semester,s_year) ON DELETE CASCADE
@@ -105,6 +106,18 @@ CREATE TABLE review (
   foreign key(student_id,p_semester,p_year) references applications(student_id,semester,s_year) ON DELETE CASCADE
 );
 
+
+DROP TABLE IF EXISTS transcript;
+CREATE TABLE transcript (
+  t_id int(8),
+  t_semester varchar(10),
+  t_year year,
+  school varchar(20),
+  email varchar(20),
+  contents varchar(600),
+  primary key(t_id,t_semester,t_year),
+  foreign key(t_id) references user(user_id) ON DELETE CASCADE
+);
 
 DROP TABLE IF EXISTS letter;
 CREATE TABLE letter (
