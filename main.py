@@ -568,6 +568,7 @@ def faculty():
   if sessionType() == 1:
     _reconnect()
 
+    print(session['username'])
     cur = db.cursor(dictionary = True)
     cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN faculty f ON u.user_id = f.faculty_id WHERE u.username = %s", (session['username'],))
     data = cur.fetchone()
@@ -577,6 +578,8 @@ def faculty():
 
     cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
     semesters = cur.fetchall()
+
+    print(semesters)
 
     new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
     semesters.append(new_semester)  
@@ -600,24 +603,27 @@ def faculty():
 
 @app.route('/class/<class_id>/<csem>/<cyear>', methods=['GET', 'POST'])
 def class_page(class_id, csem, cyear):
+  print(class_id)
+  print(csem)
+  print(cyear)
+  cyear = str(cyear)
   _reconnect()
 
   cur = db.cursor(dictionary = True)
   cur.execute('''SELECT * FROM class_section c JOIN course i ON c.course_id = i.id 
   JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s AND c.class_id = %s AND c.csem = %s AND c.cyear = %s''', 
               (session['user_id'], class_id, csem, cyear))
-  registration = cur.fetchall()
+  print(cur.fetchone())
+  course = cur.fetchone()
 
-  print(registration)
 
   cur.execute('''SELECT * FROM student_courses s 
   JOIN class_section c ON s.class_id = c.class_id 
-  AND s.csem = c.csem AND s.cyear = c.cyear WHERE c.class_id = %s AND c.csem = %s AND c.cyear = %s''', (class_id, csem, cyear))
+  AND s.csem = c.csem AND s.cyear = c.cyear
+  JOIN user u ON s.student_id = u.user_id WHERE c.class_id = %s AND c.csem = %s AND c.cyear = %s''', (class_id, csem, cyear))
   classes = cur.fetchall()
 
-
-  return render_template('class.html', registration=registration, classes=classes,
-                          class_id=class_id, csem=csem, cyear=cyear)
+  return render_template('class.html', course=course, classes=classes, session=session)
 
 #alumni log in
 @app.route('/alumnilogging')
