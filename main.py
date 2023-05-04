@@ -2119,7 +2119,7 @@ def faculty_transcript(transcript_id):
 @app.route('/faculty/advisees/formone/<user_id>', methods=['GET', 'POST'])
 def faculty_form(user_id): 
 
-   _reconnect()
+  _reconnect()
 
   if sessionType() == 1:
     if session.get('user_id') == None:
@@ -2265,7 +2265,7 @@ def faculty_form(user_id):
 
 @app.route('/faculty/advisees/formone/masters/<user_id>', methods=['GET', 'POST'])
 def faculty_form_masters(user_id): 
-   _reconnect()
+  _reconnect()
     
   if sessionType() == 1:
     if session.get('user_id') == None:
@@ -2313,7 +2313,7 @@ def faculty_form_masters(user_id):
 
 @app.route('/faculty/advisees/masters')
 def master_students():
-   _reconnect()
+  _reconnect()
 
   if sessionType() == 1:
     if session.get('user_id') == None:
@@ -2340,14 +2340,14 @@ def master_students():
 
       return render_template('master_students.html', students=result)
   else:
-    return redirect('/')
+      return redirect('/')
 
 
 
 
 @app.route('/student/<student_id>', methods=['GET', 'POST'])
 def gs_student_data(student_id):
-   _reconnect()
+  _reconnect()
   if request.method == "POST":
     if sessionType() == 3:
 
@@ -2552,7 +2552,7 @@ def gs_student_data(student_id):
 
 @app.route('/graduate/<student_id>')
 def gs_graduate(student_id):
-   _reconnect()
+  _reconnect()
   if sessionType() == 3:
     data = list()
     data.insert(0, student_id)
@@ -2585,7 +2585,7 @@ def gs_graduate(student_id):
 
 @app.route('/all_suspended')
 def gs_all_suspended():
-   _reconnect()
+  _reconnect()
   if sessionType() == 3:
     cur = db.cursor(dictionary = True)
     suspended_students_names = list()
@@ -2606,7 +2606,7 @@ def gs_all_suspended():
 
 @app.route('/assign_advisor/<student_id>', methods=['GET', 'POST'])
 def gs_assign_advisor(student_id):
-   _reconnect()
+  _reconnect()
   if sessionType() == 3:
     cur = db.cursor(dictionary = True)
 
@@ -2634,7 +2634,7 @@ def gs_assign_advisor(student_id):
 
 @app.route('/welcome')
 def welcome():
-   _reconnect()
+    _reconnect()
     cursor = db.cursor(dictionary = True)
     
     cursor.execute("SELECT fname FROM user WHERE user_id = %s", (session['user_id'],))
@@ -2657,7 +2657,7 @@ def infoViewer():
 
 @app.route('/view', methods=['POST', 'GET'])
 def view():
-   _reconnect()
+ _reconnect()
  cursor = db.cursor(dictionary=True, buffered = True)
  this = session["user_id"]
  cursor.execute("SELECT * FROM user INNER JOIN applications on user_id = student_id where user_id = %s;", (this,))
@@ -2973,7 +2973,7 @@ def updateincomplete():
 
 @app.route('/complete/<user_id>/<l_semester>/<l_year>',methods = ["POST", "GET"])
 def complete(user_id,l_semester,l_year):
-   _reconnect()
+  _reconnect()
   if request.method == 'POST':
     cursor = db.cursor(dictionary=True,buffered = True)
     content = request.form["content"]
@@ -2993,7 +2993,7 @@ def complete(user_id,l_semester,l_year):
 
 @app.route('/editApp/<semester>/<s_year>')
 def editApp(semester, s_year):
-   _reconnect()
+  _reconnect()
   cursor = db.cursor(dictionary=True)
   print(22, semester)
   print(33, s_year)
@@ -3077,7 +3077,7 @@ def gsview():
 
 @app.route('/finalDecision/<student_id>/<semester>/<s_year>', methods = ["POST", "GET"])
 def finalDecision(student_id,semester,s_year):
-   _reconnect()
+  _reconnect()
   print(1,s_year)
   cursor = db.cursor(dictionary = True, buffered = True)
   this0 = student_id
@@ -3112,7 +3112,7 @@ def finalDecision(student_id,semester,s_year):
 
 @app.route('/Decision/<student_id>/<semester>/<s_year>', methods = ["POST", "GET"])
 def Decision(student_id,semester,s_year):
-   _reconnect()
+  _reconnect()
   cursor = db.cursor(dictionary = True, buffered = True)
   cursor.execute("SELECT student_id, semester, s_year FROM applications WHERE student_id = %s", (student_id,))
   info = cursor.fetchall()
@@ -3160,7 +3160,7 @@ def Decision(student_id,semester,s_year):
 
 @app.route('/queryone', methods = ["POST", "GET"])
 def queryone():
-   _reconnect()
+  _reconnect()
   cursor = db.cursor(dictionary = True, buffered = True)
   cursor.execute("SELECT lname, user_id FROM user where user_type = 6")
   name = cursor.fetchall()
@@ -3190,7 +3190,7 @@ def queryinfo():
 
 @app.route('/querytwo', methods = ["POST", "GET"])
 def querytwo():
-   _reconnect()
+  _reconnect()
   cursor = db.cursor(dictionary = True, buffered = True)
   if request.method == "POST":
     cursor = db.cursor(dictionary = True, buffered = True)
@@ -3207,7 +3207,7 @@ def querytwo():
 
 @app.route('/querythree', methods = ["POST", "GET"])
 def querythree():
-   _reconnect()
+  _reconnect()
   cursor = db.cursor(dictionary = True, buffered = True)
   if request.method == "POST":
     cursor = db.cursor(dictionary = True, buffered = True)
@@ -3226,7 +3226,7 @@ def querythree():
 
 @app.route('/cac')
 def cac():
-   _reconnect()
+  _reconnect()
   return redirect('/reviews')
   # cursor = db.cursor(buffered = True)
   # cursor.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s", (6,))
@@ -3238,7 +3238,7 @@ def cac():
 
 @app.route('/cacview')
 def cacview():
-   _reconnect()
+  _reconnect()
   cursor = db.cursor(buffered = True)
   cursor.execute("SELECT user_id from user where user_type = 6")
   info = cursor.fecthall()
