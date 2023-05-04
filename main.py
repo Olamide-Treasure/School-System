@@ -2493,7 +2493,7 @@ def incomplete():
        cursor.execute("INSERT INTO applications VALUES ('incomplete', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,CURDATE(),'sent','not decided')", 
                       (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))      
-        db.commit()
+       db.commit()
 
        cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
        those = cursor.fetchone()
