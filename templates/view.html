@@ -16,6 +16,8 @@
         <c class = labels> <b> Status: {{items["status"]}} </b> </c>
         <br>
         {% if items["status"] == "incomplete" %}
+        111 {{items['semester']}}
+        111 {{items['s_year']}}
         <form action="/editApp/{{items['semester']}}/{{items['s_year']}}"> <input type="submit" class = "button" value="Edit App"> </b> </form>
         <br>
         {% endif %}

@@ -38,6 +38,7 @@ CREATE TABLE admitted(
   a_year year,
   accept varchar(30),
   fee varchar(5),
+  congrats varchar(10),
   primary key(a_id,a_semester,a_year),
   foreign key(a_id) references user(user_id) ON DELETE CASCADE,
   foreign key(a_id,a_semester,a_year) references applications(student_id,semester,s_year) ON DELETE CASCADE

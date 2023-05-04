@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+    <link href="/static/style.css" rel="stylesheet" type="text/css" />
+    <head>
+        <script>
+            function onlyOne(checkbox) {
+                var checkboxes = document.getElementsByName('decision')
+                checkboxes.forEach((item) => {
+                    if (item !== checkbox) item.checked = false
+                })
+            }
+            function showDropdown() {
+                var checkbox = document.getElementById("reject");
+                var dropdown = document.getElementById("rejectDropdown");
+                
+                if (checkbox.checked == true) {
+                    dropdown.style.display = "block";
+                } else {
+                    dropdown.style.display = "none";
+                }
+            }
+            function showDropdown2() {
+                var checkbox1 = document.getElementById("badmit");
+                var checkbox2 = document.getElementById("noaid");
+                var checkbox3 = document.getElementById("aid");
+
+                var aidDropdown = document.getElementById("aidDropdown");
+                if (checkbox1.checked || checkbox2.checked || checkbox3.checked) {
+                    aidDropdown.style.display = 'block';
+                } else {
+                    aidDropdown.style.display = 'none';
+                }
+            }
+        </script>
+    </head>
+    <body class = "bcolor">
+        <form action='/logout'>  <input type="submit" class = "logout button" name="logout" value="logout"> </b> </form>
+        
+        <h1>LIST OF APPLICANTS </h1>
+            {% if appinfo[3] is not none %} 
+                {{ appinfo[3] }} 
+            {% endif %} 
+            {% if appinfo[2] is not none %} 
+                {{ appinfo[2] }} 
+            {% endif %} 
+
+            <p> {{appinfo['fname']}} {{appinfo['lname']}}</a>
+                &nbsp&nbsp&nbsp <form action="/queryinfo"> 
+                <button type="submit">View information</button>
+                </form>
+            </p>
+         
+    </body>
+</html>
