@@ -46,14 +46,57 @@
 
   <body>
     <div class="container border shadow rounded">
-      <h1>{{registration['course_name']}}</h1>
-      {% if classes == None %}
-          <h2>No Students</h2>
-      {% else %}
-          {% for student in classes %}
-              <p>{{student['student_id']}}</p>
-          {% endfor %}
-      {% endif %}
+      <div class="container my-2">
+        <h1>{{course['course_name']}}</h1>
+        <h3>{{course['csem']}} {{course['cyear']}}</h3>
+      </div>
+
+      <br>
+      <div class="container p-1">
+        <p class="fw-bold">Student Roster:</p>
+        {% if classes == None %}
+          <h2 class="fw-light">No Students</h2>
+        {% else %}
+          <div class="d-flex flex-wrap">
+            {% for student in classes %}
+              
+                <div class="container rounded border w-25 p-2 m-2">
+                  <p>Full Name: {{student['fname']}} {{student['lname']}}</p>
+                  <p>Student ID: {{student['student_id']}}</p>
+
+                  {% if student['grade'] == "IP" %}
+                    <p>Grade: {{student['grade']}}</p>
+                    <form action="/update_grade" method="POST">
+                      <label for="grade">Grade</label>
+                      <select name="grade" id="grade">
+                          <option value="A">A</option>
+                          <option value="A-">A-</option>
+                          <option value="B+">B+</option>
+                          <option value="B">B</option>
+                          <option value="B-">B-</option>
+                          <option value="C+">C+</option>
+                          <option value="C">C</option>
+                          <option value="F">F</option>
+                      </select>
+                      <input type="hidden" name="class" id="class" value="{{row1['cid']}}">
+                      <input type="hidden" name="student" id="student" value="{{row2['uni_id']}}">
+                      <input type="submit" class="btn btn-sm btn-outline-secondary">
+                    </form>
+                    <span class="badge bg-warning rounded-pill">Needs Submission</span>
+                  {% else %}
+                    <p>Grade: {{student['grade']}}</p>
+                    <span class="badge bg-success rounded-pill">Submitted Grades</span>
+                  {% endif %}
+                </div>
+                
+
+
+            {% endfor %}
+          </div>
+        {% endif %}
+        <button class="btn btn-warning" onclick="window.location.href='/userloggedin'">Back</button>
+      </div>
+      
     </div>
   </body>
 </html>
