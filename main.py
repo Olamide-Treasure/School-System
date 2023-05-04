@@ -217,7 +217,7 @@ def add():
 
           if (my_class_time[0] > curr_class_time[0] - 0.5 and my_class_time[0] < curr_class_time[1] + 0.5) or (my_class_time[1] > curr_class_time[0] - 0.5 and my_class_time[1] < curr_class_time[1] + 0.5):
               flash("This class has a time conflict with a class you've already added", "error")
-              return redirect('/regsiter') 
+              return redirect('/register') 
         
 
       # Now we have to check for the classes that already got checked out but for current semester/year
@@ -323,6 +323,19 @@ def update_all():
     
   return redirect('/userloggedin', message=message)
 
+
+@app.route("/update_grade", methods=['GET', 'POST'])
+def update_grade():
+    if request.method == 'POST':
+      cursor = db.cursor(dictionary=True)
+
+      grade = request.form['grade']
+      student_id = request.form['student'] 
+      class_id = request.form['class']
+  
+      cursor.execute("UPDATE student_courses SET grade = %s WHERE student_id = %s AND class_id = %s", (grade, student_id, class_id))
+      db.commit()
+      return redirect('/userloggedin')
 
 ####################################################
 #                    HOME PAGE                     #
@@ -598,24 +611,24 @@ def faculty():
 
 @app.route('/class/<class_id>/<csem>/<cyear>', methods=['GET', 'POST'])
 def class_page(class_id, csem, cyear):
+  cyear = str(cyear)
   _reconnect()
 
   cur = db.cursor(dictionary = True)
   cur.execute('''SELECT * FROM class_section c JOIN course i ON c.course_id = i.id 
   JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s AND c.class_id = %s AND c.csem = %s AND c.cyear = %s''', 
               (session['user_id'], class_id, csem, cyear))
-  registration = cur.fetchall()
+  print(cur.fetchone())
+  course = cur.fetchone()
 
-  print(registration)
 
   cur.execute('''SELECT * FROM student_courses s 
   JOIN class_section c ON s.class_id = c.class_id 
-  AND s.csem = c.csem AND s.cyear = c.cyear WHERE c.class_id = %s AND c.csem = %s AND c.cyear = %s''', (class_id, csem, cyear))
+  AND s.csem = c.csem AND s.cyear = c.cyear
+  JOIN user u ON s.student_id = u.user_id WHERE c.class_id = %s AND c.csem = %s AND c.cyear = %s''', (class_id, csem, cyear))
   classes = cur.fetchall()
 
-
-  return render_template('class.html', registration=registration, classes=classes,
-                          class_id=class_id, csem=csem, cyear=cyear)
+  return render_template('class.html', course=course, classes=classes, session=session)
 
 #alumni log in
 @app.route('/alumnilogging')
@@ -1732,7 +1745,6 @@ def phd_students():
 
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
-      cursor.close()
 
       return render_template('phd_students.html', students=result)
 
@@ -1820,7 +1832,6 @@ def faculty_transcript(transcript_id):
         gpa = grade_points / num_courses
         gpa = round(gpa, 2)
 
-        cursor.close()
 
     return render_template('student_transcript.html', transcript=result, userdata = userdata, gpa = gpa)
 
@@ -1871,8 +1882,6 @@ def faculty_form(user_id):
             result =cursor.fetchall()
             for r in result:
               print(r)
-            cursor.close()
-
             return render_template('review_formone.html', form_one=result)
     
 
@@ -1932,7 +1941,6 @@ def faculty_form(user_id):
           result =cursor.fetchall()
           for r in result:
             print(r)
-          cursor.close()
           db.commit()
           flash(f'Student Thesis has been approved!', category="success")
 
@@ -1983,7 +1991,6 @@ def faculty_form_masters(user_id):
             result =cursor.fetchall()
             for r in result:
               print(r)
-            cursor.close()
 
             return render_template('review_formone_masters.html', form_one=result)
   else:
@@ -2016,7 +2023,6 @@ def master_students():
 
       cursor.execute(query,(adv_id,) )
       result =cursor.fetchall()
-      cursor.close()
 
       return render_template('master_students.html', students=result)
   else:
