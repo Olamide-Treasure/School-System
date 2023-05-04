@@ -63,7 +63,12 @@
         <p class="fw-bold me-5">Degree</p>
         {% set degrees = {'MS Degree' : 'Master of Science', 'PHD Degree' : 'Doctor of Philosophy'} %}
         <p class="me-1">{{degrees[data['degree_name']]}} -</p>
-        <p class="fw-light" style="font-size: 13; margin-top: 3px;">Pursuing as of {{data['admit_year']}}</p>
+
+        {% if data['user_type'] == 2 %}
+          <p class="fw-light" style="font-size: 13; margin-top: 3px;">Pursuing as of {{data['grad_year']}}</p>
+        {% else %}
+          <p class="fw-light" style="font-size: 13; margin-top: 3px;">Pursuing as of {{data['admit_year']}}</p>
+        {% endif %}
       </div>
 
       <div class="container border-bottom border-dark mb-1 w-75 d-flex flex-column align-items-start px-0">

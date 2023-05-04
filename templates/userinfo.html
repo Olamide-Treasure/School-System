@@ -3,115 +3,342 @@
     <title>User Info</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KK94CHFLLe+nY2dmCWGMq91rCGa5gtU4mk92HdvYe+M/SXH301p5ILy+dN9+nJOZ" crossorigin="anonymous">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
-    <link rel="stylesheet" href="static/home.css">
- 
+    <script src="https://kit.fontawesome.com/f16edda68d.js" crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="static/student.css">
   </head>
 
+  <nav class="navbar navbar-expand-md bg-body p-3 shadow-sm">
+    <a class="navbar-brand" href="/">Logo</a>
+
+    <div class="collapse navbar-collapse" id="main-navigation">
+      <ul class="navbar-nav mr-auto mt-2 mt-lg-0">
+        <li class="nav-item">
+          <a class="nav-link" href="/">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/catalog">Catalog</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/userloggedin">Account</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/logout">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <br>
+
   <body>
-<center>
-    <h1 class = "sameen"> Information </h1>
-    </center>
 
+    <body style="background-color: rgb(248, 248, 248);">
+      <div class="container mt-2">
+        <div class="row mb-2">
+          <div class="container">
+            <h1>User Info</h1>
+            <h3 class="fw-light">{{data['fname']}} {{data['lname']}} ({{data['name']}})</h3>
+            {% if suspended %}
+            <h4 class="fw-bold">Currectly Suspended</h4>
+            {% endif %}
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-2">
+            <div class="flex-shrink-0 pt-2 py-3 sticky-top">
+              <div class="container" style="display: flex; align-items: center;">
+                <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
+                <a class="p-2 rounded text-decoration-none" href="#account_info" style="color:rgb(255,115,115);">Account Information</a>
+              </div>
 
-      {% if not data %}
-        <p>No information found</p>
-        {% else %}
+              {% if alumnicourses or studentcourses %}
+              <div class="container" style="display: flex; align-items: center;">
+                <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
+                <a class="p-2 rounded text-decoration-none" href="#transcript" style="color:rgb(255,115,115);">Transcript</a>
+              </div>
+              {%endif%}
+
+              {% if studentcourses %}
+              <div class="container" style="display: flex; align-items: center;">
+                <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
+                <a class="p-2 rounded text-decoration-none" href="#graduate" style="color:rgb(255,115,115);">Graduate studentcourses</a>
+              </div>
+
+              <div class="container" style="display: flex; align-items: center;">
+                <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
+                <a class="p-2 rounded text-decoration-none" href="#form1" style="color:rgb(255,115,115);">View Form 1</a>
+              </div>
+
+              {% for a in notappr: %}
+                    {% if a['student_id'] == data['user_id'] %}
+              <div class="container" style="display: flex; align-items: center;">
+                <i class="fa-solid fa-user" style="color:rgb(255,115,115);"></i>
+                <a class="p-2 rounded text-decoration-none" href="#thesis" style="color:rgb(255,115,115);">Approve Thesis</a>
+              </div>
+                {% endif %}
+              {% endfor %}
+              
+              {% endif %}
     
-      
+            </div>
+    
+    
+          </div>
+          <div class="col-10">
+            <div class="container-fluid">
+              <div class="container rounded-2 p-5 border shadow" style="background-color: white;">
+                <div class="item-1 mb-3">
+    
+                  <div class="row">
+                    <div class="col">
+                      <div class="row mb-2" id="account_info">
+                        <h2>Account Information</h2>
+                      </div>
+    
+    
+                      <div class="row mb-3 w-25">
+                        <div class="container">
+                          <div class="container border-bottom px-0 ml-2">
+                            <p><i>Personal Information</i></p>
+                          </div>
+                        </div>
+                      </div>
+    
+                      <div class="row">
+    
+                        
+                        <div class="col-7">
+                          <div class="row">
+                            
+                            <form action = "/updateuserinfo/{{data['user_id']}}" method = "POST"> 
 
-            <div class="buttons">
+                            <div class="row mb-3">
+                              <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                  <i class="fa-solid fa-user-tag"></i>
+                                  <label for="fname" class="form-label mx-2 mb-0">First Name</label>
+                                </div>
+                                <input class="form-control" type="text" name="fname" id="fname"
+                                  placeholder="{{data['fname']}}" />
+  
+                                
+                              </div>
+                              <div class="col-6">
+                                <div class="d-flex align-items-center">
+                                  <i class="fa-solid fa-user-tag"></i>
+                                  <label for="lname" class="form-label mx-2 mb-0">Last Name</label>
+                                </div>
+                                <input class="form-control" type="text" name="lname" id="lname"
+                                  placeholder="{{data['lname']}}" />    
+                              </div>
+                            </div>
+                              <div class="row">
+                                <div class="col">
+                                <div class="d-flex align-items-center">
+                                  <i class="fa-solid fa-envelope"></i>
+                                  <label for="number" class="form-label mx-2 mb-0">Email</label>
+                                </div>
+                                <input class="form-control" type="email" name="email" id="email"
+                                  placeholder="{{data['email']}}" />
+                                <p class="fw-lighter" style="font-size: 12.5;">Format: username@domain.com</p>
+                              </div>
+                              </div>
 
-                <form action = "/updateuserinfo/{{data['user_id']}}" method = "POST"> 
-                  <h3>University ID: {{ '{:08d}'.format(data['user_id']) }}</h3>
-                  <h4>Last Name: 
-                    <input type="text" placeholder= "{{data['lname']}}" name = "lname">
-                  </h4>
-            
-                  <h4> First Name: 
-                   <input type="text" placeholder= "{{data['fname']}}" name = "fname">
-                  </h4>
-            
-                <h4>Email Address: 
-                <input type="text" placeholder="{{data['email']}}" name= "email">
-                </h4>
-            
-                <h4>Address: 
-                <input type="text" placeholder="{{data['user_address']}}" name= "address">
-                </h4>
-            
-                <h4>Phone Number: 
-                <input type="text" placeholder="{{data['user_phoneNUM']}}" name= "phonenum">
-                </h4>
-            
-                <button type="submit">Submit</button>
-                </form>
-            
+                              <div class="row">
+                                <div class="col">
+                                <div class="d-flex align-items-center">
+                                  <i class="fa-solid fa-phone"></i>
+                                  <label for="phonenum" class="form-label mx-2 mb-0">Phone Number</label>
+                                </div>
+                                <input class="form-control" type="text" name="phonenum" id="phonenum"
+                                  placeholder="{{data['user_phoneNUM']}}" />
+  
+                                <p class="fw-lighter" style="font-size: 12.5;">Format: 123-456-7890</p>
+                                </div>
+                              </div>
+
+                              <div class="row mb-2">
+                                <div class="col">
+                                <div class="d-flex align-items-center">
+                                  <i class="fa-solid fa-location-dot"></i>
+                                  <label for="address" class="form-label mx-2 mb-0">Address</label>
+                                </div>
+                                <input class="form-control" type="text" name="address" id="address"
+                                  placeholder="{{data['user_address']}}" />
+                                  </div>
+                              </div>
+                  
+                              <button type="submit" class="btn btn-warning">Update</button>
+                            </form> 
+    
+                            
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
-  
-    {% endif %}
+                <br>
 
-    {% if alumnicourses %}
+                <div>
+                  <div class="row mb-3 w-25">
+                    <div class="container">
+                      <div class="container border-bottom px-0 ml-2">
+                        <p><i>University Information</i></p>
+                      </div>
+                    </div>
+                  </div>
 
-    <form action = "/coursehist/{{data['user_id']}}" > 
-    <button type="submit">View Transcript</button>
-    </form>
+                  <div class="row">
 
-    {% elif studentcourses %}
+                    <div class="col-5">
+                      <p class="fw-light">
+                        Keeping your university information up-to-date is essential for
+                        maintaining accurate records and ensuring that you receive important
+                        updates and communications from the university. Use the form below
+                        to update your university information, such as your major, class standing,
+                        or contact information. </p>
+                    </div>
+                    <div class="col-7">
+
+                      <div class="row">
+                        <div class="container-fluid px-0 d-flex flex-row">
+                          <div class="col-6">
+                            <form action="/update_id" id="id_fomr" method="POST">
+                              <div class="d-flex align-items-center">
+                                <i class="fa-solid fa-id-card"></i>
+                                <label for="id" class="form-label mx-2 mb-0">University ID</label>
+                              </div>
+                              <input disabled class="form-control" type="text" name="id" id="id"
+                                placeholder="{{data['user_id']}}" />
+                              <input type="hidden" name="user_id" id="user_id" value="{{data['user_id']}}" />
+                            </form>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <br>
+
+                {% if alumnicourses or studentcourses%}
+                  <div class="item-2 mb-3">
+                    <div class="row">
+                      <div class="col">
+                        <div class="row mb-2" id="transcript">
+                          <h2>Transcript</h2>
+                        </div>
     
-    <div class="buttons">
-
-    <form action = "/coursehist/{{data['user_id']}}" > 
-    <button type="submit">View Transcript</button>
-    </form>
-
-    <form action = "/graduatethestudent/{{data['user_id']}}/{{data['user_type']}}"  method = "POST"> 
-     <button type="submit">Graduate {{data['fname']}}</button>
-    </form>
-
-
-    {% for a in notappr: %}
-      {% if a['student_id'] == data['user_id'] %}
-        <form action = "/approvethesis/{{data['user_id']}}"> 
-        <button type="submit">Approve Thesis</button>
-        </form>
-      {% endif %}
-    {% endfor %}
-
-
-    <form action = "/viewform1/{{data['user_id']}}"> 
-    <button type="submit">View Form 1</button>
-    </form>
-
-    {% if not suspended %}
-    {% else %}
-    <p>Currectly Suspended</p>
-    {% endif %}
+                        <div class="row">
+                          <div class="col-7">
+                            <div class="container mb-3 border-bottom p-0">
+                              <p class="fw-light">The view transcript feature allows alumni to access and 
+                                review their academic records from their time at the university. This feature 
+                                provides alumni with a convenient way to check their grades, GPA, and course 
+                                history for personal or professional purposes. With just a few clicks, alumni 
+                                can retrieve an official copy of their transcript or view an unofficial 
+                                transcript online. </p>
+                            </div>
+                            <form action = "/coursehist/{{data['user_id']}}" method = "POST"> 
+                              <button class="btn btn-warning" type="submit">View Transcript</button>
+                            </form>
+                          </div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
 
 
-    </div>
+                {% if studentcourses%}
+                  <div class="item-2 mb-3">
+                    <div class="row">
+                      <div class="col">
+                        <div class="row mb-2" id="graduate">
+                          <h2>Graduate Student</h2>
+                        </div>
+    
+                        <div class="row">
+                          <div class="col-7">
+                            <div class="container mb-3 border-bottom p-0">
+                              <p class="fw-light">Use this button to bypass the website and graduate said student from the school.
+                                They will become an alumni and will no longer be able to register for classes.
+                              </p>
+                            </div>
+                            <form action = "/graduatethestudent/{{data['user_id']}}/{{data['user_type']}}"  method = "POST"> 
+                              <button class="btn btn-warning" type="submit">Graduate {{data['fname']}}</button>
+                             </form>
+                          </div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
 
-    {% else %}
+                  <div class="item-2 mb-3">
+                    <div class="row">
+                      <div class="col">
+                        <div class="row mb-2" id="form1">
+                          <h2>View Form 1 Submissions</h2>
+                        </div>
+    
+                        <div class="row">
+                          <div class="col-7">
+                            <div class="container mb-3 border-bottom p-0">
+                              <p class="fw-light">View any form 1 submission that this student has submitted into the university.
+                                
+                              </p>
+                            </div>
+                            <form action = "/viewform1/{{data['user_id']}}"> 
+                              <button class="btn btn-warning" type="submit">View Form 1</button>
+                              </form>
+                          </div>
+                        </div>
+                        
+                      </div>
+                    </div>
+                  </div>
+
+
+                  {% for a in notappr: %}
+                    {% if a['student_id'] == data['user_id'] %}
+
+
+                    <div class="item-2 mb-3">
+                      <div class="row">
+                        <div class="col">
+                          <div class="row mb-2" id="thesis">
+                            <h2>Approve Thesis</h2>
+                          </div>
+      
+                          <div class="row">
+                            <div class="col-7">
+                              <div class="container mb-3 border-bottom p-0">
+                                <p class="fw-light">Approve the thesis of the student.
+                                  
+                                </p>
+                              </div>
+                              <form action = "/approvethesis/{{data['user_id']}}"> 
+                                <button class="btn btn-warning" type="submit">Approve Thesis</button>
+                                </form>
+                            </div>
+                          </div>
+                          
+                        </div>
+                      </div>
+                    </div>
+                      
+                    {% endif %}
+                  {% endfor %}
+                {% endif %}
+              </div> 
+            </div> 
+          </div>
+        </div>
+      </div>
   
-
-    {% endif %}
-
-    <div class="buttons">
-    <form action = "/remove/{{data['user_id']}}/{{data['user_type']}}" method = "POST"> 
-    <button type="submit">Remove</button>
-    </form>
-
-    <form action = "/"> 
-     <button type="submit">Home Page</button>
-    </form>
-    </div>
-
-
-
-
-
-
-
-</body>
+  
+  </body>
 
 </html>

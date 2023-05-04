@@ -585,7 +585,6 @@ def faculty():
   if sessionType() == 1:
     _reconnect()
 
-    print(session['username'])
     cur = db.cursor(dictionary = True)
     cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN faculty f ON u.user_id = f.faculty_id WHERE u.user_id = %s", (session['user_id'],))
     data = cur.fetchone()
@@ -595,13 +594,11 @@ def faculty():
 
     cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
     semesters = cur.fetchall()
-
-    print(semesters)
-
+    
     new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
-    semesters.append(new_semester)  
-
-    semesters = sorted(semesters, key=lambda x: (-int(x['cyear']), x['csem']))
+    if new_semester not in semesters:
+      semesters.append(new_semester)  
+      semesters = sorted(semesters, key=lambda x: (-int(x['cyear']), x['csem']))
 
     cur.execute('''SELECT * FROM class_section c JOIN course i ON c.course_id = i.id 
     JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s''', (session['user_id'],))
@@ -628,6 +625,7 @@ def class_page(class_id, csem, cyear):
   JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s AND c.class_id = %s AND c.csem = %s AND c.cyear = %s''', 
               (session['user_id'], class_id, csem, cyear))
   course = cur.fetchone()
+  print(course)
 
   cur.execute('''SELECT * FROM student_courses s 
   JOIN class_section c ON s.class_id = c.class_id 
@@ -745,13 +743,32 @@ def admin():
   _reconnect()
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
-    cur.execute("SELECT email, user_address, user_id, user_phoneNUM FROM user WHERE username = %s", (session['username'],))
+    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id WHERE u.username = %s", (session['username'],))
     data = cur.fetchone()
-    db.commit()
-    return render_template("admin.html", title = 'Admin Logged In', data = data)
+    
+    cur.execute("SELECT * FROM user u JOIN faculty f ON u.user_id = f.faculty_id WHERE user_type = %s", (1, ))
+    faculty = cur.fetchall()
+
+    cur.execute("SELECT * FROM user u JOIN alumni a ON u.user_id = a.student_id WHERE user_type = %s", (2, ))
+    alumni = cur.fetchall()
+
+    cur.execute("SELECT * FROM user WHERE user_type = %s", (3, ))
+    grad = cur.fetchall()
+
+    cur.execute("SELECT * FROM user u JOIN students s ON u.user_id = s.student_id WHERE user_type = %s", (4, ))
+    master = cur.fetchall()
+
+    cur.execute("SELECT * FROM user u JOIN students s ON u.user_id = s.student_id WHERE user_type = %s", (5, ))
+    phd = cur.fetchall()
+
+    cur.execute("SELECT * FROM phd_req WHERE thesisapproved = %s", ('False', ))
+    notappr = cur.fetchall()
+
+    return render_template("admin.html", title = 'Admin Logged In', data = data, faculty=faculty, 
+                           alumni=alumni, grad=grad, master=master, phd=phd, notappr=notappr)
   else:
     return redirect('/')
-
+  
 
 #grad sec log in 
 student_info = list()
@@ -1217,41 +1234,7 @@ def studentcourse():
     return redirect('/')
 
 
-@app.route('/facultylist')
-def facultylist():
-  _reconnect()
-  if sessionType() == 0:
-    cur = db.cursor(dictionary = True)
 
-    cur.execute("SELECT * FROM user WHERE user_type = %s", (1, ))
-    data = cur.fetchall()
-    db.commit()
-    return render_template("facultylist.html", data = data)
-
-  else:
-    return redirect('/')
-
-
-@app.route('/gradlist')
-def gradlist():
-  _reconnect()
-  if sessionType() == 0:
-    cur = db.cursor(dictionary = True)
-
-    cur.execute("SELECT * FROM user WHERE user_type = %s", (4, ))
-    data = cur.fetchall()
-    db.commit()
-    cur.execute("SELECT * FROM user WHERE user_type = %s", (5, ))
-    phd = cur.fetchall()
-    cur.execute("SELECT * FROM phd_req WHERE thesisapproved = %s", ('False', ))
-    notappr = cur.fetchall()
-    #for i in notappr:
-      #print(i)
-    db.commit()
-    return render_template("gradlist.html", data = data, phd = phd, notappr = notappr)
-
-  else:
-    return redirect('/')
 
 
 @app.route('/approvethesis/<id>')
@@ -1266,34 +1249,6 @@ def approvethesis(id):
     return redirect('/')
 
 
-
-@app.route('/gradseclist')
-def gradseclist():
-  _reconnect()
-  if sessionType() == 0:
-    cur = db.cursor(dictionary = True)
-
-    cur.execute("SELECT * FROM user WHERE user_type = %s", (3, ))
-    data = cur.fetchall()
-    db.commit()
-    return render_template("gradseclist.html", data = data)
-  else:
-    return redirect('/')
-
-
-@app.route('/alumnilist')
-def alumnilist():
-  _reconnect()
-  if sessionType() == 0:
-    cur = db.cursor(dictionary = True)
-
-    cur.execute("SELECT * FROM user WHERE user_type = %s", (2, ))
-    data = cur.fetchall()
-    db.commit()
-    return render_template("alumnilist.html", data = data)
-  else:
-    return redirect('/')
-
 #beginning of sameen's part
 
 @app.route('/user/<id>/<type>')
@@ -1302,9 +1257,8 @@ def userinfo(id, type):
   if sessionType() == 0:
     cur = db.cursor(dictionary = True)
 
-    cur.execute("SELECT * FROM user WHERE user_id = %s", (id, ))
+    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id WHERE user_id = %s", (id, ))
     data = cur.fetchone()
-    db.commit()
     studentcourses = None
     alumnicourses = None
     notappr = None
@@ -1313,7 +1267,6 @@ def userinfo(id, type):
     
     if type == '4' or type == '5':
       studentcourses = "student"
-      db.commit()
       cur.execute("SELECT * FROM phd_req WHERE thesisapproved = %s", ('False', ))
       notappr = cur.fetchall()
       cur.execute("SELECT grade FROM student_courses WHERE student_id = %s", (id,))
@@ -1362,6 +1315,7 @@ def updateuserinfo(id):
 
   if request.method == 'POST':
     #update the sql database here
+
     if((request.form["lname"])):
       cur.execute("UPDATE user SET lname = %s WHERE user_id = %s", ( str((request.form["lname"])), id))
       db.commit()
@@ -1373,15 +1327,13 @@ def updateuserinfo(id):
     if((request.form["email"])):
       cur.execute("UPDATE user SET email = %s WHERE user_id = %s", ( str((request.form["email"])), id))
       db.commit()
-
     if((request.form["address"])):
       cur.execute("UPDATE user SET user_address = %s WHERE user_id = %s", ( str((request.form["address"])), id))
       db.commit()
-
     if((request.form["phonenum"])):
       cur.execute("UPDATE user SET user_phoneNUM = %s WHERE user_id = %s", ( str((request.form["phonenum"])), id))
       db.commit()
-    
+
 
     return redirect('/')
 
@@ -1629,8 +1581,17 @@ def coursehist(id):
     _reconnect()
 
     cur = db.cursor(dictionary = True)
-    cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN students s ON u.user_id = s.student_id JOIN degrees d ON s.degree_id = d.degree_id WHERE u.username = %s", (session['username'],))
+
+    cur.execute("SELECT * FROM students WHERE student_id = %s", (id,))
+    check = cur.fetchone()
+
+    if check == None:
+      cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN alumni a ON u.user_id = a.student_id JOIN degrees d ON a.degree_id = d.degree_id WHERE u.user_id = %s", (id,))
+    else:
+      cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN students s ON u.user_id = s.student_id JOIN degrees d ON s.degree_id = d.degree_id WHERE u.user_id = %s", (id,))
     data = cur.fetchone()
+
+    print(data)
 
   
     #cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
@@ -2648,14 +2609,6 @@ def welcome():
 
     return render_template("applicant.html", apps = apps, name = name['fname'])
 
-@app.route('/infoViewer')
-def infoViewer():
-   _reconnect()
-   cursor = db.cursor(dictionary = True)
-   cursor.execute("SELECT * FROM user WHERE user_id = %s", (session['user_id'],))
-   data = cursor.fetchone()
-   return render_template("updateinfo.html", data = data)
-
 @app.route('/view', methods=['POST', 'GET'])
 def view():
  _reconnect()
@@ -3027,13 +2980,13 @@ def reviews():
 
    cursor.execute("SELECT user_id from user where user_type = 6")
    appinfo = cursor.fetchall()
+   
    justs = []
    for data in appinfo:
         justs.extend(data)
    cursor.execute("SELECT student_id, semester, s_year FROM applications WHERE (student_id,semester,s_year) NOT IN (SELECT student_id,p_semester,p_year FROM review WHERE student_id = %s AND review_id = %s) AND status ='review'", (justs[0],session["user_id"],))
    infos = cursor.fetchall()
    print(justs)
-   db.commit()
    return render_template("review.html", applicants = infos)
 
 @app.route('/reviews/<student_id>/<semester>/<s_year>', methods=['GET','POST'])
