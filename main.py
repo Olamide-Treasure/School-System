@@ -110,7 +110,7 @@ def validate_email(email):
 ####################################################
 
 # Reset the database
-@app.route('/reset', methods=['GET', 'POST'])
+@app.route('/reset')
 def reset():
   cur = db.cursor(dictionary=True)
   with open('phase2create.sql', 'r') as f:
@@ -1281,6 +1281,8 @@ def removeuser(id, type):
 
         cur.execute("DELETE from student_advisors WHERE advisorID = %s", (id, ))
         db.commit()
+        cur.execute("DELETE from faculty WHERE faculty_id = %s", (id, ))
+        db.commit()
         cur.execute("DELETE from user WHERE user_id = %s", (id, ))
         db.commit()
 
@@ -1499,20 +1501,20 @@ def addfaculty():
       depart = request.form["depart"]
 
       count = 0
-      inst = False
-      advi = False
-      rev = False
+      inst = 0
+      advi = 0
+      rev = 0
       for i in range(0, 3):
         checkboxes = request.form.getlist(str(i))
         for e in checkboxes:
           if(e == "yes"):
             count += 1
             if(count == 1):
-              inst = True
+              inst = 1
             elif(count == 2):
-              advi = True
+              advi = 1
             elif(count == 3):
-              rev = True
+              rev = 1
 
 
 
