@@ -315,7 +315,8 @@ insert into students values (99999999, 21, 'Fall',  2021);
 insert into phd_req values(99999999, 'False');
 
 insert into faculty values (11111111, 'CSCI', TRUE, TRUE, TRUE);
-insert into faculty values (22222222, 'ECE', TRUE, TRUE, TRUE);
+insert into faculty values (22222222, 'CSCI', TRUE, TRUE, FALSE);
+insert into faculty values (10101010, 'CSCI', TRUE, TRUE, TRUE);
 
 
 insert into student_advisors values(55555555, 11111111);
