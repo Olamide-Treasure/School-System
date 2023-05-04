@@ -332,7 +332,7 @@ def update_all():
 @app.route('/')
 def home_page():
   _reconnect()
-  
+
   return render_template("home.html", title = 'Home Page', session = session)
 
 
@@ -1214,7 +1214,7 @@ def graduatethestudent(id, type):
         y = 20
       if(type == '5'):
         y = 21
-      cur.execute("INSERT into alumni (student_id, degree_id, grad_year) VALUES (%s, %s, %s)", (id, y, 2023))
+      cur.execute("INSERT into alumni (student_id, degree_id, semester, grad_year) VALUES (%s, %s, %s, %s)", (id, y, 'Spring', 2023))
       db.commit()
       cur.execute("DELETE from student_advisors WHERE studentID = %s ", (id, ))
       db.commit()
@@ -1310,6 +1310,7 @@ def addthestudent():
       address =  (request.form["address"])
       phone =  (request.form["phone"])
       type = (request.form["dates"])
+      sem = (request.form["semester"])
       admit = (request.form["admityear"])
 
       if(type == "ms"):
@@ -1347,7 +1348,7 @@ def addthestudent():
       
       cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, x, fname, lname, unm, passwrd, address, phone, ssn, email))
       db.commit()
-      cur.execute("INSERT into students (student_id, degree_id, admit_year) VALUES (%s, %s, %s)", (id, y, admit))
+      cur.execute("INSERT into students (student_id, degree_id, semester, admit_year) VALUES (%s, %s, %s, %s)", (id, y, sem, admit))
       db.commit()
       cur.execute("INSERT into need_advisor (student_id) VALUES (%s)", (id, ))
       db.commit()
@@ -1495,6 +1496,25 @@ def addfaculty():
       address =  (request.form["address"])
       phone =  (request.form["phone"])
       type = (int)(request.form["type"])
+      depart = request.form["depart"]
+
+      count = 0
+      inst = False
+      advi = False
+      rev = False
+      for i in range(0, 3):
+        checkboxes = request.form.getlist(str(i))
+        for e in checkboxes:
+          if(e == "yes"):
+            count += 1
+            if(count == 1):
+              inst = True
+            elif(count == 2):
+              advi = True
+            elif(count == 3):
+              rev = True
+
+
 
 
       while True:
@@ -1523,6 +1543,8 @@ def addfaculty():
         return render_template("userexists.html")
       
       cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, type, fname, lname, unm, passwrd, address, phone, ssn, email))
+      db.commit()
+      cur.execute("INSERT into faculty (faculty_id, department, instructor, advisor, reviewr) VALUES (%s, %s, %s, %s, %s)", (id, depart, inst, advi, rev))
       db.commit()
       return redirect('/')
 
@@ -1600,6 +1622,7 @@ def addalumni():
       phone =  (request.form["phone"])
       type = (int)(request.form["type"])
       degree = (int)(request.form["dates"])
+      sem = (request.form["semester"])
       year = (int)(request.form["gradyear"])
 
       while True:
@@ -1629,7 +1652,7 @@ def addalumni():
       
       cur.execute("INSERT into user (user_id, user_type, fname, lname, username, user_password, user_address, user_phoneNUM, ssn, email) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (id, type, fname, lname, unm, passwrd, address, phone, ssn, email))
       db.commit()
-      cur.execute("INSERT into alumni (student_id, degree_id, grad_year) VALUES (%s, %s, %s)", (id, degree, year))
+      cur.execute("INSERT into alumni (student_id, degree_id, semester, grad_year) VALUES (%s, %s, %s, %s)", (id, degree, sem, year))
       db.commit()
       return redirect('/')
 
@@ -2521,4 +2544,6 @@ def finalDecision(student_id):
 #make into a student if yes
 
 app.run(host='0.0.0.0', port=8080)
+
+
 
