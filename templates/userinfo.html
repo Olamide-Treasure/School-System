@@ -332,6 +332,10 @@
                     {% endif %}
                   {% endfor %}
                 {% endif %}
+
+                <form action="/remove/{{id}}/{{type}}" method="POST">
+                  <button class="btn btn-warning" type=submit>Remove</button>
+                </form>
               </div> 
             </div> 
           </div>

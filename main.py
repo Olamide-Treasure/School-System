@@ -329,11 +329,15 @@ def update_grade():
     if request.method == 'POST':
       cursor = db.cursor(dictionary=True)
 
-      grade = request.form['grade']
+      grade = str(request.form['grade'])
       student_id = request.form['student'] 
       class_id = request.form['class']
+      csem = str(request.form['csem'])
+      cyear = str(request.form['cyear'])
   
-      cursor.execute("UPDATE student_courses SET grade = %s WHERE student_id = %s AND class_id = %s", (grade, student_id, class_id))
+
+  
+      cursor.execute("UPDATE student_courses SET grade = %s WHERE student_id = %s AND class_id = %s AND csem = %s AND cyear = %s", (grade, student_id, class_id, csem, cyear))
       db.commit()
       return redirect('/userloggedin')
 
@@ -1165,7 +1169,7 @@ def userinfo(id, type):
 
     #advsior: get the advisees, option to view their form 1, see the phd studnets and approve their thesis
 
-    return render_template("userinfo.html", data = data, alumnicourses = alumnicourses, studentcourses = studentcourses, notappr = notappr, suspended = suspended)
+    return render_template("userinfo.html", data = data, alumnicourses = alumnicourses, studentcourses = studentcourses, notappr = notappr, suspended = suspended, id=id, type=type)
   
   else:
     return redirect('/')
@@ -1769,7 +1773,7 @@ def faculty_login():
             try:
                 sql = '''SELECT * from user where username=%s AND user_password=%s '''
                 
-                print(f'DATA: {username}: {password}')
+          
                 cursor= db.cursor(dictionary=True)
                 cursor.execute(sql, (username, password))
                 result = cursor.fetchone()
@@ -2366,7 +2370,22 @@ def gs_student_data(student_id):
       advisor_name = cur.fetchall()
       student_info.insert(6, advisor_name)
     
-      return render_template ("student_data.html", student_info=student_info, student_id = student_id)
+      cur_sem = _get_curr_semester()
+      next_sem = _get_next_semester()
+
+      cur.execute("SELECT DISTINCT csem, cyear FROM student_courses ORDER BY cyear DESC, csem")
+      semesters = cur.fetchall()
+      
+      new_semester = {'csem': next_sem[0], 'cyear': str(next_sem[1])}
+      if new_semester not in semesters:
+        semesters.append(new_semester)  
+        semesters = sorted(semesters, key=lambda x: (-int(x['cyear']), x['csem']))
+
+      cur.execute("SELECT * FROM student_courses s JOIN class_section c ON s.class_id = c.class_id AND s.csem = c.csem AND s.cyear = c.cyear JOIN course i ON c.course_id = i.id WHERE s.student_id = %s ORDER BY c.cyear DESC, c.csem", (student_id, ))
+      schedule=cur.fetchall()
+
+      return render_template ("student_data.html", student_info=student_info, student_id = student_id, 
+                              cur_sem=cur_sem, next_sem=next_sem, semesters=semesters, schedule=schedule)
   
     else:
       return redirect('/')
