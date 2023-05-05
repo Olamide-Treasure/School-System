@@ -59,6 +59,55 @@
             </ul>
           {% endif %}
      </li>
+    
+    <div class="container">
+      <h3>Class Schedule</h3>
+      {% for sem in semesters %}
+        <h5 class="fw-light">{{sem['csem']}} {{sem['cyear']}}</h5>
+        {% for class in schedule %}
+          <ul class="list-group">
+
+          {% if class['csem'] == sem['csem'] and class['cyear']|string() == sem['cyear']|string() %}
+            <li class="list-group-item my-2">
+              <div class="row">
+                <div class="col-6">
+                  <p class="fw-bold me-2">{{class['course_name']}}</p>
+                  <div class="container">          
+                    <p>Time: {{class['class_time']}}</p>
+                    <p>Day: {{class['credit_hours']}}</p>
+                    <p>Current Grade: {{class['grade']}}</p>
+                  </div>
+                </div>
+                <div class="col-6">
+                  <form action="/update_grade" method="POST">
+                    <label for="grade">Submit Grade</label>
+                    <select name="grade" id="grade">
+                        <option value="A">A</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B">B</option>
+                        <option value="B-">B-</option>
+                        <option value="C+">C+</option>
+                        <option value="C">C</option>
+                        <option value="F">F</option>
+                    </select>
+                    <input type="hidden" name="class" id="class" value="{{class['class_id']}}">
+                    <input type="hidden" name="student" id="student" value="{{student_id}}">
+                    <input type="hidden" name="csem" id="csem" value="{{class['csem']}}">
+                    <input type="hidden" name="cyear" id="cyear" value="{{class['cyear']}}">
+                    <input type="submit" class="btn btn-sm btn-outline-secondary">
+                  </form>
+                </div>
+              </div>
+              
+            </li>
+          {% endif %}
+          </ul>
+        {% endfor %}
+      {% endfor %}
+    </div>
+
+
 
     <hr color=#3F000F;>
 

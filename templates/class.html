@@ -82,8 +82,10 @@
                           <option value="C">C</option>
                           <option value="F">F</option>
                       </select>
-                      <input type="hidden" name="class" id="class" value="{{course['cid']}}">
+                      <input type="hidden" name="class" id="class" value="{{student['class_id']}}">
                       <input type="hidden" name="student" id="student" value="{{student['student_id']}}">
+                      <input type="hidden" name="csem" id="csem" value="{{csem}}">
+                      <input type="hidden" name="cyear" id="cyear" value="{{cyear}}">
                       <input type="submit" class="btn btn-sm btn-outline-secondary">
                     </form>
                     <span class="badge bg-warning rounded-pill">Needs Submission</span>
