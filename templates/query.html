@@ -134,20 +134,32 @@
                              
                             <button type = "submit"> Search</button>
                         </form> 
-                        {{error}}
-                   </div>
 
-                   <div class="row mb-2" id="applicants">
-                    <h2> View previous applications </h2>
-                    {% for app in apps %}
-                    <form action = '/view'> <input type = "submit" class = "button" name = "submit" Value = "View your application here"> </form>
-                    {% endfor %}
-                      <hr color=#3F000F;>
-                   </div>
-
-                   <div class="row mb-2" id="review">
-                    <form action = '/infoViewer'> <input type = "submit" class = "button" name = "submit" Value = "Update personal info here "> </form>
-                    <hr color=#3F000F;>
+                        <h2>Statistics on number of applicants and total admitted and total rejected</h2>
+                        <form action = '/queryfour' method = 'post'> 
+                            <label for="semester">Semester:</label>
+                            <select id="semester" name="semester">    
+                                <option value=""></option>
+                                <option value="FALL">FALL</option>
+                                <option value="SPRING">SPRING</option>
+                            </select>
+                        
+                            <label for="year">Year:</label>
+                            <select id="year" name="year">    
+                                <option value=""></option>
+                                <option value="2023">2023</option>
+                                <option value="2024">2024</option>
+                            </select>
+                        
+                            <label for="degree_type">Degree:</label>
+                            <select id="degree_type" name="degree_type">    
+                                <option value=""></option>
+                                <option value="MS">MS</option>
+                                <option value="PHD">PHD</option>
+                            </select><br>
+                             
+                            <button type = "submit"> Search</button>
+                        </form> 
                    </div>
 
                    <div class="row mb-2" id="logout">

@@ -7,6 +7,8 @@
   </head>
   <body class = "bcolor">
     <form action='/logout'>  <input type="submit" class = "logout button" name="logout" value="logout"> </b> </form>
+    <form action='/userloggedin'>  <input type="submit" class = "button" value="Back to Account"> </b> </form>
+    <form action='/'>  <input type="submit" class = "button" value="Home"> </b> </form>
     <c class = just> <b> Your application(s) </b> </c> <br>
     {% for items in content %}
 
@@ -59,6 +61,13 @@
         {% endif %}
 
     {% endfor %}
+       
+    <br>
+       <c class = labels> <b> {{rejec["Rsemester"]}} {{rejec["Rs_year"]}} application</b> </c>
+        <br>
+        <c class = labels> <b> Status: Reject </b> </c>
+        <br>
+    
     <form action='/'>  <input type="submit" class = "button" value="Back"> </b> </form>
   </body>
 </html>

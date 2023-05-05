@@ -767,7 +767,7 @@ def gs_student_names():
     cur.execute("SELECT fname, lname, user_id FROM user WHERE user_type = %s", (6,))
     applicants = cur.fetchall()
 
-    cur.execute("SELECT user_id, fname, lname, p_semester, p_year FROM review INNER JOIN user ON student_id = user_id INNER JOIN applications ON applications.student_id = review.student_id WHERE status = 'Review'")
+    cur.execute("SELECT user_id, fname, lname, p_semester, p_year FROM review INNER JOIN user ON user_id = student_id WHERE status = 'seen'")
     reviews = cur.fetchall()
 
     cur.execute("SELECT user_id, fname, lname, a_semester, a_year FROM admitted INNER JOIN user on user.user_id = admitted.a_id WHERE accept = 'ACCEPT'")
@@ -2527,7 +2527,7 @@ def gs_student_data(student_id):
 
 
       if gradcheck == 1:
-        cur.execute("DELETE FROM applied_grad WHERE student_id", (student_id, ))
+        cur.execute("DELETE FROM applied_grad WHERE student_id = %s", (student_id, ))
 
     # get advisor
       cur.execute("SELECT advisorID FROM student_advisors WHERE studentID = %s", (student_id, ))
@@ -2664,6 +2664,9 @@ def view():
  data = cursor.fetchall()
  cursor.execute("SELECT semester,s_year FROM applications WHERE student_id = %s", (session["user_id"],))
  just = cursor.fetchone()
+ print(just)
+ cursor.execute("SELECT * FROM Rapplications WHERE Rstudent_id = %s AND Rsemester = %s AND Rs_year = %s", (session["user_id"], just['semester'], just['s_year']))
+ rejec = cursor.fetchone()
  if request.method == "POST": 
     print("this")
     cursor = db.cursor(dictionary=True, buffered = True)
@@ -2676,7 +2679,7 @@ def view():
     cursor.execute("INSERT INTO admitted VALUES (%s,%s,%s,%s,%s,'')", (this, just['semester'],just['s_year'],student,fee))
     db.commit()
     return redirect('/welcome')
- return render_template("view.html", content = data, this = this)
+ return render_template("view.html", content = data, this = this, rejec = rejec)
 
 @app.route('/application', methods=['GET', 'POST'])
 def application():
@@ -2712,18 +2715,32 @@ def application():
                       (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university,transcript))
        db.commit()
+      #  cursor.execute("INSERT INTO review (student_id, review_id, p_semester, p_year, rev_rating, deficiency_course, reason_reject, GAS_comment, decision, recom_advisor,status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,'submitted')", (this, '', semester,s_year, '', '', '', '', '', ''))
+      #  db.commit()
        
-
-       
-       cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
+       print(111, this)
+       print(111, semester)
+       print(111, s_year)
+       cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s AND semester = %s AND s_year = %s",(this,semester,s_year,))
        those = cursor.fetchone()
-
-       if transcript == "Request":
-        school = request.form["field_rName"]
-        email =  request.form["field_email"]
-        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email) VALUES (%s,%s,%s,%s,%s )", (those['student_id'], those['semester'], those['s_year'], school,email,)) 
+       
+       print(transcript)
+       if transcript == 'Request':
+        print("this1")
+        school = request.form["schools"]
+        print("this2")
+        email =  request.form["emails"]
+        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email,decision) VALUES (%s,%s,%s,%s,%s,'Requested' )", (those['student_id'], those['semester'], those['s_year'], school,email,)) 
         db.commit()
-  
+
+       if transcript == 'Upload':
+        school = request.form["schools"]
+        email =  request.form["emails"]
+        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email,decision) VALUES (%s,%s,%s,%s,%s,'Uploaded' )", (those['student_id'], those['semester'], those['s_year'], school,email,)) 
+        db.commit()
+       cursor.execute("SELECT decision FROM transcript WHERE t_id = %s AND t_semester = %s AND t_year = %s",(this,semester,s_year,))
+       decide = cursor.fetchone()
+    
        uid = session["user_id"]
        
        rname = request.form["field_rName"]
@@ -2748,7 +2765,7 @@ def application():
        cursor.execute("SELECT recommenderName FROM letter INNER JOIN user on user.user_id = letter.user_id WHERE letter.user_id = %s", (uid,))
        data = cursor.fetchone()
        db.commit()
-       return render_template("complete.html",data = data,those = those)
+       return render_template("complete.html",data = data,those = those, decide = decide)
    return render_template("application.html", info = info)
 
 
@@ -2788,14 +2805,30 @@ def incomplete():
                        gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university))      
        db.commit()
 
-       cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
-       those = cursor.fetchone()
+      #  cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
+      #  those = cursor.fetchone()
 
-       if transcript == "Request Transcript":
-        school = request.form["field_rName"]
-        email =  request.form["field_email"]
-        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email) VALUES (%s,%s,%s,%s,%s )", (those['student_id'], those['semester'], those['s_year'], school,email,)) 
+       print(111, this)
+       print(111, semester)
+       print(111, s_year)
+       cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s AND semester = %s AND s_year = %s",(this,semester,s_year,))
+       those = cursor.fetchone()
+       
+       if transcript == 'Request':
+        print("this1")
+        school = request.form["schools"]
+        print("this2")
+        email =  request.form["emails"]
+        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email,decision) VALUES (%s,%s,%s,%s,%s,'Requested' )", (those['student_id'], those['semester'], those['s_year'], school,email,)) 
         db.commit()
+
+       if transcript == 'Upload':
+        school = request.form["schools"]
+        email =  request.form["emails"]
+        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email,decision) VALUES (%s,%s,%s,%s,%s,'Uploaded' )", (those['student_id'], those['semester'], those['s_year'], school,email,)) 
+        db.commit()
+       cursor.execute("SELECT decision FROM transcript WHERE t_id = %s AND t_semester = %s AND t_year = %s",(this,semester,s_year,))
+       decide = cursor.fetchone()
 
        uid = session["user_id"]
        
@@ -2812,11 +2845,11 @@ def incomplete():
        email2 = request.form["field_email2"]
        
 
-       cursor.execute("INSERT INTO letter (user_id, l_semester,l_year,letter_id,recommenderName, recommenderAffil, recommenderEmail) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname, affil, email,)) 
+       cursor.execute("INSERT INTO letter (user_id, l_semester,l_year,letter_id,recommenderName , recommenderEmail, recommenderAffil) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname,email, affil,)) 
        db.commit()
-       cursor.execute("INSERT INTO letter1 (user_id,l_semester,l_year,letter_id,recommenderName1, recommenderAffil1, recommenderEmail1) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname1, affil1, email1,)) 
+       cursor.execute("INSERT INTO letter1 (user_id,l_semester,l_year,letter_id,recommenderName1 , recommenderEmail1, recommenderAffil1) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname1,email1, affil1,)) 
        db.commit()
-       cursor.execute("INSERT INTO letter2 (user_id,l_semester,l_year,letter_id,recommenderName2, recommenderAffil2, recommenderEmail2) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname2, affil2, email2,)) 
+       cursor.execute("INSERT INTO letter2 (user_id,l_semester,l_year,letter_id,recommenderName2, recommenderEmail2 , recommenderAffil2) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname2,email2, affil2,)) 
        db.commit()
       #  cursor.execute("SELECT recommenderName FROM letter INNER JOIN user on user.user_id = letter.user_id WHERE letter.user_id = %s", (uid,))
       #  data = cursor.fetchone()
@@ -2926,15 +2959,15 @@ def updateincomplete():
        this = session["user_id"]
        transcript = request.form["transcript"]
        cursor.execute("SELECT semester, s_year FROM applications WHERE student_id = %s AND status = 'incomplete'", (this,))
-       just = cursor.fetchall()
+       just = cursor.fetchone()
        justs = []
        for data in just:
         justs.extend(data)
         print(0, data)
-        print(4, justs)
+        print(4, just)
         cursor.execute("UPDATE applications SET status = 'incomplete', student_id = %s, semester = %s, s_year = %s, degree_type = %s, prior_bac_deg_name = '', prior_bac_deg_gpa = %s, prior_bac_deg_major = %s, prior_bac_deg_year = %s, prior_bac_deg_university = %s, GRE_verbal = %s, GRE_year = %s, GRE_quatitative = %s, GRE_advanced_score = %s, GRE_advanced_subject = %s, TOEFL_score = %s, TOEFL_date = %s, interest = %s, experience = %s, prior_ms_deg_name = '', prior_ms_deg_gpa = %s, prior_ms_deg_major = %s, prior_ms_deg_year = %s, prior__deg_university = %s, transcript= 'sent', student = 'not decided' WHERE student_id = %s AND semester = %s AND s_year = %s", 
-                     (this, data['semester'], data['s_year'], degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
-                    gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university,this,data['semester'], data['s_year'],))
+                     (this, just['semester'], just['s_year'], degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
+                    gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university,this,just['semester'], just['s_year'],))
         db.commit()
 
        cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
@@ -2961,11 +2994,11 @@ def updateincomplete():
        email2 = request.form["field_email2"]
        
 
-       cursor.execute("UPDATE letter SET user_id = %s, l_semester = %s, l_year = %s, recommenderName = %s, recommenderAffil = %s, recommenderEmail = %s WHERE user_id = %s AND l_semester = %s AND l_year = %s", (those['student_id'], those['semester'], those['s_year'], rname, affil, email,those['student_id'], those['semester'], those['s_year'],))
+       cursor.execute("UPDATE letter SET user_id = %s, l_semester = %s, l_year = %s, recommenderName = %s, recommenderEmail = %s, recommenderAffil = %s WHERE user_id = %s AND l_semester = %s AND l_year = %s", (those['student_id'], those['semester'], those['s_year'], rname,email, affil,those['student_id'], those['semester'], those['s_year'],))
        db.commit()
-       cursor.execute("UPDATE letter1 SET user_id = %s, l_semester = %s, l_year = %s, recommenderName1 = %s, recommenderAffil1 = %s, recommenderEmail1 = %s WHERE user_id = %s AND l_semester = %s AND l_year = %s", (those['student_id'], those['semester'], those['s_year'], rname1, affil1, email1,those['student_id'], those['semester'], those['s_year'],))
+       cursor.execute("UPDATE letter1 SET user_id = %s, l_semester = %s, l_year = %s, recommenderName1 = %s, recommenderEmail1 = %s, recommenderAffil1 = %s WHERE user_id = %s AND l_semester = %s AND l_year = %s", (those['student_id'], those['semester'], those['s_year'], rname1,email1, affil1,those['student_id'], those['semester'], those['s_year'],))
        db.commit()
-       cursor.execute("UPDATE letter2 SET user_id = %s, l_semester = %s, l_year = %s,recommenderName2 = %s, recommenderAffil2 = %s, recommenderEmail2 = %s WHERE user_id = %s AND l_semester = %s AND l_year = %s", (those['student_id'], those['semester'], those['s_year'], rname2, affil2, email2,those['student_id'], those['semester'], those['s_year'],))
+       cursor.execute("UPDATE letter2 SET user_id = %s, l_semester = %s, l_year = %s,recommenderName2 = %s, recommenderEmail2 = %s, recommenderAffil2 = %s WHERE user_id = %s AND l_semester = %s AND l_year = %s", (those['student_id'], those['semester'], those['s_year'], rname2,email2, affil2, those['student_id'], those['semester'], those['s_year'],))
        db.commit()
        return redirect('/welcome')
    return render_template("editApp.html", info = info)
@@ -2979,9 +3012,19 @@ def complete(user_id,l_semester,l_year):
     content = request.form["content"]
     content1 = request.form["content1"]
     content2 = request.form["content2"]
-    tcontent = request.form["tcontent"]
-    cursor.execute("UPDATE transcript SET contents = %s WHERE t_id = %s AND t_semester = %s AND t_year = %s",(tcontent,user_id,l_semester,l_year))
-    db.commit()
+    cursor.execute("SELECT decision FROM transcript where t_id = %s AND t_semester = %s AND t_year = %s", (user_id,l_semester,l_year,) )
+    upload = cursor.fetchone()
+    print(11,upload)
+    if upload['decision'] == 'Requested':
+      tcontent = request.form["tcontent"]
+      cursor.execute("UPDATE transcript SET contents = %s WHERE t_id = %s AND t_semester = %s AND t_year = %s",(tcontent,user_id,l_semester,l_year))
+      db.commit()
+    print(user_id)
+    print(l_semester)
+    print(l_year)
+    print(upload['decision'])
+    
+    
     cursor.execute("UPDATE letter SET contents = %s WHERE user_id = %s AND l_semester = %s AND l_year = %s",(content,user_id,l_semester,l_year))
     db.commit()
     cursor.execute("UPDATE letter1 SET contents = %s WHERE user_id = %s AND l_semester = %s AND l_year = %s",(content1,user_id,l_semester,l_year))
@@ -3032,7 +3075,7 @@ def review(student_id,semester,s_year):
     cursor.execute("SELECT student_id, semester, s_year FROM applications WHERE student_id = %s", (student_id,))
     info = cursor.fetchone()
     cursor.execute("SELECT letter.contents, letter1.contents, letter2.contents FROM letter INNER JOIN letter1 ON letter.user_id = letter1.user_id INNER JOIN letter2 ON letter2.user_id = letter1.user_id WHERE letter.user_id = %s AND letter.l_semester = %s AND letter.l_year = %s AND letter1.user_id = %s AND letter1.l_semester = %s AND letter1.l_year = %s AND letter2.user_id = %s AND letter2.l_semester = %s AND letter2.l_year = %s", (student_id, semester, s_year, student_id, semester, s_year, student_id, semester, s_year,))
-    letter = cursor.fetchall()
+    letter = cursor.fetchone()
     if request.method == 'POST':
         cursor = db.cursor(dictionary = True, buffered = True)
         if session["type"] == 7:
@@ -3048,7 +3091,8 @@ def review(student_id,semester,s_year):
         reason_reject = request.form['reason']
         GAS_comment = request.form['comment']
         advisor = request.form['radvisor']
-        cursor.execute("INSERT INTO review (student_id, review_id, p_semester, p_year, rev_rating, deficiency_course, reason_reject, GAS_comment, decision, recom_advisor) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)", (student_id, session['user_id'], semester,s_year, "1", deficiency_course, reason_reject, GAS_comment, decision, advisor))
+        cursor.execute("INSERT INTO review (student_id, review_id, p_semester, p_year, rev_rating, deficiency_course, reason_reject, GAS_comment, decision, recom_advisor,status) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s,'seen')", (student_id, session['user_id'], semester,s_year, "1", deficiency_course, reason_reject, GAS_comment, decision, advisor))
+        # cursor.execute("UPDATE review SET student_id = %s, review_id = %s, p_semester = %s, p_year = %s, rev_rating = %s, deficiency_course = %s, reason_reject = %s, GAS_comment = %s, decision = %s, recom_advisor = %s, status = 'seen' WHERE student_id = %s AND p_semester = %s AND p_year = %s", (student_id, session['user_id'], semester,s_year, "1", deficiency_course, reason_reject, GAS_comment, decision, advisor,student_id,semester,s_year))
         db.commit()
         # cursor.execute("UPDATE applications SET status = %s WHERE student_id = %s AND semester = %s AND s_year = %s", (fdecision, student_id,semester,s_year))
         return redirect('/')
@@ -3065,11 +3109,12 @@ def review(student_id,semester,s_year):
     print(info)
     return render_template("appreview.html", appinfo = info, names = names, letter = letter)
 
-@app.route('/gsview')
-def gsview():
+@app.route('/gsview/<student_id>')
+def gsview(student_id):
    _reconnect()
+   print(student_id)
    cursor = db.cursor(buffered = True)
-   cursor.execute("SELECT * from user INNER JOIN applications ON user_id = student_id WHERE user_type = 6")
+   cursor.execute("SELECT * from user INNER JOIN applications ON user_id = student_id WHERE user_type = 6 AND user_id = %s",(student_id,))
    appinfo = cursor.fetchone()
   #  cursor.execute("SELECT letter.content, letter1.content, letter2.content FROM letter INNER JOIN letter1 ON letter.user_id = letter1.user_id INNER JOIN letter2 ON letter2.user_id = letter1.user_id")
   #  data = cursor.fetchall()
@@ -3083,33 +3128,40 @@ def finalDecision(student_id,semester,s_year):
   this0 = student_id
   this1 = semester
   this2 = s_year
+  cursor.execute("SELECT decision FROM transcript WHERE t_id = %s AND t_semester = %s AND t_year = %s", (student_id,semester,s_year,))
+  decide = cursor.fetchone()
+  print(decide)
   if request.method == "POST": 
     cursor = db.cursor(dictionary=True, buffered = True)
     decision = request.form.getlist('Decision')
     decision = decision[0]
     print(decision)
-    Transcript = request.form.getlist('Transcript')
-    Transcript = Transcript[0]
-    print(Transcript)
-    cursor.execute("UPDATE applications SET status = %s, transcript = %s WHERE student_id = %s AND semester = %s AND s_year = %s", (decision, Transcript, student_id,semester,s_year))
+    # if decide["decision"] == "Requested":
+    #   print(decide["decision"])
+    #   Transcript = request.form.getlist('Transcript')
+    #   Transcript = Transcript[0]
+    #   print(Transcript)
+    #   cursor.execute("UPDATE applications SET status = %s, transcript = %s WHERE student_id = %s AND semester = %s AND s_year = %s", (decision, Transcript, student_id,semester,s_year))
+    #   print(student_id)
+    #   db.commit()
+    cursor.execute("UPDATE applications SET status = %s, transcript = %s WHERE student_id = %s AND semester = %s AND s_year = %s", (decision, 'Requested', student_id,semester,s_year))
     print(student_id)
     db.commit()
+    cursor.execute("SELECT * FROM applications WHERE student_id = %s AND semester = %s AND s_year = %s ", (student_id,semester,s_year))
+    data = cursor.fetchone()
+    print(2, data)
+    print(22, data['degree_type'])
+    if decision == 'Reject':
+      cursor.execute("INSERT INTO Rapplications VALUES ('Reject', %s, %s, %s, %s, '', %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, '', %s, %s, %s, %s,CURDATE(),'sent','not decided')", 
+                      (student_id, semester, s_year, data['degree_type'], data['prior_bac_deg_gpa'], data['prior_bac_deg_major'], data['prior_bac_deg_year'], data['prior_bac_deg_university'], '', '', '', '', '', '', '', data['interest'], data['experience'], data['prior_ms_deg_gpa'], data['prior_ms_deg_major'], data['prior_ms_deg_year'], ''))
+      db.commit()
+      cursor.execute("DELETE FROM applications WHERE student_id = %s AND semester = %s AND s_year = %s AND status = 'Reject'", (student_id,semester,s_year))      
+      db.commit()
+    cursor.execute("UPDATE review SET status = 'done' WHERE student_id = %s AND p_semester = %s AND p_year = %s", (student_id, semester,s_year))
+    db.commit()
     return redirect("/gradsec")
-  return render_template("final.html",this0 = this0, this1 = this1, this2 = this2 )
-  # if request.method == "POST": 
-  #   cursor = db.cursor(dictionary=True, buffered = True)
-  #   decision = request.form.getlist('Decision')
-  #   decision = decision[0]
-  #   print(decision)
-  #   Transcript = request.form.getlist('Transcript')
-  #   Transcript = Transcript[0]
-  #   print(Transcript)
-  #   cursor.execute("UPDATE applications SET status = %s, transcript = %s WHERE student_id = %s AND semester = %s AND s_year = %s", (decision, Transcript, student_id,semester,s_year))
-  #   print(student_id)
-  #   db.commit()
-  #   return redirect("/gradsec")
-  # return render_template("final.html",this0 = this0, this1 = this1, this2 = this2 )
-
+  return render_template("final.html",this0 = this0, this1 = this1, this2 = this2, decide = decide )
+  
 @app.route('/Decision/<student_id>/<semester>/<s_year>', methods = ["POST", "GET"])
 def Decision(student_id,semester,s_year):
   _reconnect()
@@ -3169,23 +3221,21 @@ def queryone():
     lname = request.form["lname"]
     ID = request.form["user_id"]
     print(lname,ID)
-    cursor.execute("SELECT fname, lname FROM user WHERE lname = %s OR user_id = %s", (lname,ID,))
-    # cursor.execute("SELECT fname, lname FROM user INNER JOIN application ON user_id = student_id WHERE lname = %s AND user_id = %s", (lname,ID,))
+    cursor.execute("SELECT fname, lname, user_id FROM user WHERE lname = %s OR user_id = %s", (lname,ID,))
+    print(lname,ID)
     appinfo = cursor.fetchone()
     if appinfo == None:
       flash("NO RESULTS","error")
-      return render_template("query.html")
+      return redirect("/queryone")
     return render_template("queryapp.html", appinfo = appinfo)
   return render_template("query.html", name = name)
 
-@app.route('/queryinfo')
-def queryinfo():
+@app.route('/queryinfo/<student_id>')
+def queryinfo(student_id):
    _reconnect()
    cursor = db.cursor(buffered = True)
-   cursor.execute("SELECT * from user INNER JOIN applications ON user_id = student_id WHERE user_type = 6")
+   cursor.execute("SELECT * from user INNER JOIN applications ON user_id = student_id WHERE user_type = 6 AND user_id = %s", (student_id,))
    appinfo = cursor.fetchone()
-  #  cursor.execute("SELECT letter.content, letter1.content, letter2.content FROM letter INNER JOIN letter1 ON letter.user_id = letter1.user_id INNER JOIN letter2 ON letter2.user_id = letter1.user_id")
-  #  data = cursor.fetchall()
    return render_template("queryinfo.html", appinfo = appinfo)
 
 @app.route('/querytwo', methods = ["POST", "GET"])
@@ -3197,11 +3247,11 @@ def querytwo():
     semester = request.form["semester"]
     year = request.form["year"]
     deg = request.form["degree_type"]
-    cursor.execute("SELECT fname, lname FROM user INNER JOIN applications ON user_id = student_id WHERE semester = %s OR s_year = %s OR degree_type = %s", (semester,year,deg,))
+    cursor.execute("SELECT fname, lname,user_id FROM user INNER JOIN applications ON user_id = student_id WHERE semester = %s OR s_year = %s OR degree_type = %s", (semester,year,deg,))
     appinfo = cursor.fetchone()
     if appinfo == None:
       flash("NO RESULTS","error")
-      return render_template("query.html")
+      return redirect("/queryone")
     return render_template("queryapp.html", appinfo = appinfo)
   return render_template("query.html", name = name)
 
@@ -3214,15 +3264,43 @@ def querythree():
     semester = request.form["semester"]
     year = request.form["year"]
     deg = request.form["degree_type"]
-    # cursor.execute("SELECT fname, lname FROM user INNER JOIN applications ON user_id = student_id WHERE semester = %s OR s_year = %s OR degree_type = %s AND status = 'Admit' OR status = 'Admit with aid' ", (semester,year,deg,))
-    cursor.execute("SELECT fname, lname FROM user INNER JOIN applications ON user_id = student_id WHERE status = 'Admit' OR status = 'Admit with aid' ")
+    cursor.execute("SELECT fname, lname,user_id FROM user INNER JOIN applications ON user_id = student_id WHERE status = 'Admit' OR status = 'Admit with aid' ")
     appinfo = cursor.fetchone()
     if appinfo == None:
       flash("NO RESULTS","error")
-      return render_template("query.html")
+      return redirect("/queryone")
     return render_template("queryapp.html", appinfo = appinfo)
   return render_template("query.html", name = name)
 
+@app.route('/queryfour', methods = ["POST", "GET"])
+def queryfour():
+  cursor = db.cursor(dictionary = True, buffered = True)
+  if request.method == "POST":
+    cursor = db.cursor(dictionary = True, buffered = True)
+    semester = request.form["semester"]
+    year = request.form["year"]
+    deg = request.form["degree_type"]
+    cursor.execute("SELECT COUNT(user_id) AS Applicants FROM user WHERE user_type = 6")
+    appinfo = cursor.fetchone()
+    cursor.execute("SELECT COUNT(student_id) AS Applicants FROM applications WHERE status = 'Admit'")
+    appinfo1 = cursor.fetchone()
+    cursor.execute("SELECT COUNT(student_id) AS Applicants FROM applications WHERE status = 'Reject'")
+    appinfo2 = cursor.fetchone()
+    cursor.execute("SELECT COUNT(student_id) AS Applicants FROM applications WHERE status = 'Admit with Aid'")
+    appinfo3 = cursor.fetchone()
+    cursor.execute("SELECT AVG(GRE_verbal) AS Applicants FROM applications")
+    appinfo4 = cursor.fetchone()
+    cursor.execute("SELECT AVG(GRE_quatitative) AS Applicants FROM applications")
+    appinfo5 = cursor.fetchone()
+    cursor.execute("SELECT AVG(GRE_advanced_score) AS Applicants FROM applications")
+    appinfo6 = cursor.fetchone()
+    cursor.execute("SELECT AVG(TOEFL_score) AS Applicants FROM applications")
+    appinfo7 = cursor.fetchone()
+    if appinfo == None:
+      flash("NO RESULTS","error")
+      return redirect("/queryone")
+    return render_template("queryfour.html", appinfo = appinfo, appinfo1 = appinfo1, appinfo2 = appinfo2,appinfo3 = appinfo3,appinfo4 = appinfo4,appinfo5 = appinfo5,appinfo6 = appinfo6,appinfo7 = appinfo7)
+  return render_template("query.html", name = name)
 
 @app.route('/cac')
 def cac():

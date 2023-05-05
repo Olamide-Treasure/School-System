@@ -78,6 +78,11 @@
             
         </ul>
 
+        <h1>Letter of recommendation</h1>
+            Letter 1: {{letter[0]}} <br>
+            Letter 2: {{letter[1]}} <br>
+            Letter 3: {{letter[2]}} <br>
+
         <form action ="/reviews/{{appinfo[1]}}/{{appinfo[2]}}/{{appinfo[3]}}" method="POST">
             <textarea id="comment" name="comment" rows="6" cols="30" placeholder="Comments for applicant" maxlength="150" textarea style="resize: none"></textarea><br>
             <input type="checkbox" id="reject" name="decision" value="reject" onclick="onlyOne(this);showDropdown()">
@@ -104,10 +109,7 @@
                 <input type="text" name="dcourse" placeholder=""><br>
             </div>
 
-            <h1>Letter of recommendation</h1>
-            Letter 1: {{letter[0]}} <br>
-            Letter 2: {{letter[1]}} <br>
-            Letter 2: {{letter[2]}} <br>
+            
 
          
 
@@ -119,7 +121,7 @@
             <option value = "Admit"> Admit </option>
             <option value = "Admit with aid"> Admit with aid </option> <br> 
             <br>
-            <input type = "submit"> </form>
+            <input type = "submit" formaction="/cac"> </form>
         </form>
         {% endif %}
         {% if session['type'] == 1 %}
