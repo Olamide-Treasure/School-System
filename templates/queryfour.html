@@ -62,19 +62,15 @@
               <div class="row">
                 <div class="col">
                   <div class="row mb-2" id="students">
-                    <h1>LIST OF APPLICANTS </h1>
-                        {% if appinfo[1] is not none %} 
-                            {{ appinfo[1] }} 
-                        {% endif %} 
-                        {% if appinfo[2] is not none %} 
-                            {{ appinfo[2] }} 
-                        {% endif %} 
-
-            <p> {{appinfo['fname']}} {{appinfo['lname']}}</a>
-                &nbsp&nbsp&nbsp <form action="/queryinfo/{{appinfo['user_id']}}"> 
-                <button type="submit">View information</button>
-                </form>
-            </p>
+                    <h1>Applicants Stats </h1>
+                        Number of applicants = {{appinfo['Applicants']}} <br>
+                        Number of Admitted Applicants = {{appinfo1['Applicants']}} <br>
+                        Number of Rejected Applicants = {{appinfo2['Applicants']}} <br>
+                        Number of Applicants admitted with aid =  {{appinfo3['Applicants']}} <br>
+                        Avergae Score of GRE Verbal =  {{appinfo4['Applicants']}} <br>
+                        Avergae Score of GRE Auantitative =  {{appinfo5['Applicants']}} <br>
+                        Avergae Score of GRE Advanced Score =  {{appinfo6['Applicants']}} <br>
+                        Avergae Score of TOEFL Score=  {{appinfo7['Applicants']}} <br>
 
                    <div class="row mb-2" id="logout">
                     <form action="/logout"> 

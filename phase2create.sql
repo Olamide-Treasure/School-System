@@ -76,6 +76,39 @@ CREATE TABLE applications (
   foreign key(student_id) references user(user_id) ON DELETE CASCADE
 );
 
+DROP TABLE IF EXISTS Rapplications;
+CREATE TABLE Rapplications ( 
+  status varchar(30), 
+  Rstudent_id int(8),
+  Rsemester varchar(10),
+  Rs_year year,
+  Rdegree_type varchar(10),
+  Rprior_bac_deg_name varchar(10),
+  Rprior_bac_deg_gpa float(4),
+  Rprior_bac_deg_major varchar(20),
+  Rprior_bac_deg_year varchar(4),
+  Rprior_bac_deg_university varchar(20),
+  RGRE_verbal int(10),
+  RGRE_year year,
+  RGRE_quatitative int(10),
+  RGRE_advanced_score int(10),
+  RGRE_advanced_subject varchar(20),
+  RTOEFL_score int(10),
+  RTOEFL_date date,
+  Rinterest varchar(50),
+  Rexperience varchar(50),
+  Rprior_ms_deg_name varchar(10),
+  Rprior_ms_deg_gpa float(4),
+  Rprior_ms_deg_major varchar(20),
+  Rprior_ms_deg_year varchar(4),
+  Rprior__deg_university varchar(20),
+  Rs_date date,
+  Rtranscript varchar(30),
+  Rstudent varchar(30),
+  primary key(Rstudent_id,Rsemester,Rs_year),
+  foreign key(Rstudent_id) references user(user_id) ON DELETE CASCADE
+);
+
 DROP TABLE IF EXISTS faculty;
 CREATE TABLE faculty (
   faculty_id      INT(8) NOT NULL,
@@ -99,6 +132,7 @@ CREATE TABLE review (
   GAS_comment varchar(100),
   decision varchar(30),
   recom_advisor varchar(30),
+  status varchar(10),
   primary key(review_id,student_id,p_year,p_semester),
   foreign key(student_id) references user(user_id) ON DELETE CASCADE,
   foreign key(review_id) references user(user_id) ON DELETE CASCADE,
@@ -114,6 +148,7 @@ CREATE TABLE transcript (
   school varchar(20),
   email varchar(20),
   contents varchar(600),
+  decision varchar(10),
   primary key(t_id,t_semester,t_year),
   foreign key(t_id) references user(user_id) ON DELETE CASCADE
 );

@@ -4,6 +4,9 @@
     <title> Update Personal Info </title>
     <link href="/static/style.css" rel="stylesheet" type="text/css" />
     <div class="buttons">
+      <form action='/logout'>  <input type="submit" class = "logout button" name="logout" value="logout"> </b> </form>
+      <form action='/userloggedin'>  <input type="submit" class = "button" value="Back to Account"> </b> </form>
+      <form action='/'>  <input type="submit" class = "button" value="Home"> </b> </form>
 
       <form action = "/updateinfo" method = "POST"> 
         <h3>University ID: {{ '{:08d}'.format(session['user_id']) }}</h3>

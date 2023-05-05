@@ -29,16 +29,19 @@
         }
       }
     </script>
+    
   </head>
   <body class = "bcolor">
     <form action='/logout'>  <input type="submit" class = "logout button" name="logout" value="logout"> </b> </form>
+    <form action='/userloggedin'>  <input type="submit" class = "button" value="Back to Account"> </b> </form>
+    <form action='/'>  <input type="submit" class = "button" value="Home"> </b> </form>
    <c class = "note"> <b> Note: if a field does not apply to you, fill in N/A </b></c> <br> 
 
    <br>
    <form action = '/application', method="POST">
     <fieldset> 
        <legend> Personal Information</legend> 
-      First Name <input type = "text" name = "fname" value = "{{ info['fname'] }}" readonly> 
+        First Name <input type = "text" name = "fname" value = "{{ info['fname'] }}" readonly> 
         Last Name<input type = "text" name = "lname" value = "{{ info['lname'] }}" readonly> <br>
         Address <input type = "text" name = "address" value = "{{ info['user_address'] }}" readonly> 
         SSN<input type = "text" onkeypress= "return onlyNumberKey(event)" name = "ssn" value = "{{ info['ssn'] }}" readonly> 
@@ -66,18 +69,22 @@
       <option value="Masters">MS</option>
       <option value="PHD">PhD</option>
     </select>
+
+    Previous Degree type: <select id="prev_degree_type" name="prev_degree_type" ><br>
+      <option value = "">Choose one</option>
+      <option value = "Masters">Masters</option>
+      <option value = "BS/BA">BS/BA</option>
+      <option value = "Both">Masters and BS/BA</option>
+
+    </select> 
+
   </fieldset>
 
     <br>
 
     <fieldset>
       <legend>Previous Degree Information</legend>
-      Degree type: <select id="prev_degree_type" name="prev_degree_type" ><br>
-        <option value = "">Choose one</option>
-        <option value = "Masters">Masters</option>
-        <option value = "BS/BA">BS/BA</option>
-
-      </select> 
+      
       <br>
       <div id="masters" style="display: none">
       Master's GPA: <input type="text" name="prior_ms_deg_gpa">
@@ -112,13 +119,14 @@
     </fieldset>
     <script>
       const degreeTypeSelect = document.querySelector('#degree_type');
+      const prevdegSelect = document.querySelector('#degree_type');
       const mastersFieldset = document.querySelector('#GRE');
       const GRE = document.getElementById("GRE");
 
       const bach = document.querySelector('#bach')
       const masters = document.querySelector('#masters')
       degreeTypeSelect.addEventListener('change', () => {
-        if (degreeTypeSelect.value === 'PHD') {
+        if ((degreeTypeSelect.value === 'PHD' ) && (degreeTypeSelect.value === 'Masters')) {
           mastersFieldset.style.display = 'block';
           bach.style.display ='block';
           masters.style.display = 'block';
@@ -144,6 +152,7 @@
       });
 
     </script>
+
     <script>
       const mySelect = document.getElementById("");
       const hiddenDiv = document.getElementById("hiddenDiv");
@@ -201,8 +210,8 @@
       
       <div id="mail" style="display: none">
       <a class="test"> Request Official Transcript  </a> <br>
-        <input type="text" name="field_rName" placeholder="Name of School" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
-        <input type="text" name="field_email" placeholder ="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+        <input type="text" name="schools" placeholder="Name of School" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+        <input type="text" name="emails" placeholder ="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
         <br>
       </div>
 
@@ -250,9 +259,27 @@
     <br>
     
     <button type="submit" class="button" name="submit" id = complete formaction="/application"> SUBMIT </button>
-    <button type="submit" class="button" name="submit" id = completes formaction="/incomplete"> Save and continue later </button>
-  </form>
+    <script>
+      function removeRequired(value){
+        $(".submit").prop('disabled', true);
+        $('.required').keyup(function () {
+        if ($(".fname").val() != "" && $(".lname").val() != "" && $(".userName").val() != "" && $(".familyRav").val() != "" && $(".birthday").val() != "" && $(".password").val() != '' && $(".confirm_password").val() != '' && $(".password").val() ===  $(".confirm_password").val()) {
+        $(".submit").prop("disabled", false);
 
+        }
+    });
+        //   // $.each(form, function(key, value) {
+        //   if ( value.hasAttribute("required")){
+        //     value.removeAttribute("required");
+        //     // document.getElementById(value).removeAttribute("required");
+        //   }
+        // // });
+      }
+    </script>
+    <button type="submit" class="button" name="submit" id = completes onClick = "removeRequired(this.form)" formaction="/incomplete"> Save and continue later </button>
+  </form>
+  
+  
      
   </body>
 </html>

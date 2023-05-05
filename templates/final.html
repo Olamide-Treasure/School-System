@@ -3,14 +3,16 @@
 <body>
     
       <form action ="/finalDecision/{{ this0 }}/{{ this1 }}/{{ this2 }}" method="POST">
+
+    {% if decide["decision"] == "Requested" %}
     Transcript Received? 
    <select name="Transcript" id="reasons">
     <option value="YES">YES</option>
     <option value="NO">NO</option>
    </select>
+   {% endif %}
     <br>
-    <br>
-
+    
     Final Decision:
     <select name = "Decision">
     <option value = "Reject"> Reject </option>
@@ -18,11 +20,6 @@
     <option value = "Admit with aid"> Admit with aid </option> 
     </select>
     <br> 
-    <br>
-
-    <br>
-    <br>
-
         <input type = "submit">  </form>
 </body>
 </html>
