@@ -335,11 +335,7 @@ def update_grade():
       csem = str(request.form['csem'])
       cyear = str(request.form['cyear'])
   
-      print(grade)
-      print(student_id)
-      print(class_id)
-      print(csem)
-      print(cyear)
+
   
       cursor.execute("UPDATE student_courses SET grade = %s WHERE student_id = %s AND class_id = %s AND csem = %s AND cyear = %s", (grade, student_id, class_id, csem, cyear))
       db.commit()
@@ -1777,7 +1773,7 @@ def faculty_login():
             try:
                 sql = '''SELECT * from user where username=%s AND user_password=%s '''
                 
-                print(f'DATA: {username}: {password}')
+          
                 cursor= db.cursor(dictionary=True)
                 cursor.execute(sql, (username, password))
                 result = cursor.fetchone()
