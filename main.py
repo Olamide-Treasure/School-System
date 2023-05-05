@@ -380,7 +380,7 @@ def login():
     try:
       cur.execute("SELECT username, user_password, user_type, user_id, fname, lname FROM user WHERE username = %s and user_password = %s", (uname, passwrd))
       data = cur.fetchone()
-      print(data)
+     
       if data:
         session['username'] = data['username']
         session['user_id'] = data['user_id']
@@ -625,7 +625,7 @@ def class_page(class_id, csem, cyear):
   JOIN user u ON c.faculty_id = u.user_id WHERE u.user_id = %s AND c.class_id = %s AND c.csem = %s AND c.cyear = %s''', 
               (session['user_id'], class_id, csem, cyear))
   course = cur.fetchone()
-  print(course)
+
 
   cur.execute('''SELECT * FROM student_courses s 
   JOIN class_section c ON s.class_id = c.class_id 
@@ -1455,7 +1455,6 @@ def coursehist(id):
       cur.execute("SELECT * FROM user u JOIN user_type t ON u.user_type = t.id JOIN students s ON u.user_id = s.student_id JOIN degrees d ON s.degree_id = d.degree_id WHERE u.user_id = %s", (id,))
     data = cur.fetchone()
 
-    print(data)
 
   
     #cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (id, ))
@@ -2001,15 +2000,14 @@ def faculty_form(user_id):
             cursor.execute(q,(user_id,) )
             phdapp =cursor.fetchall()
 
-            for r in result:
-              print(r)
+  
 
             return render_template('review_formone.html', form_one=result, phdapp = phdapp)
 
 
       elif request.method == "POST":
       # get the form values 
-        print("Student ID received:", request.form['student_id'])
+        
 
         student= int(request.form['student_id'])
         if request.form['status'] == None:
@@ -2077,8 +2075,7 @@ def faculty_form(user_id):
           '''
           cursor.execute(q,(user_id,) )
           phdapp =cursor.fetchall()
-          for r in result:
-            print(r)
+   
           db.commit()
           flash(f'Student Thesis has been approved!', category="success")
 
@@ -2128,8 +2125,7 @@ def faculty_form_masters(user_id):
 
             cursor.execute(query,(user_id,) )
             result =cursor.fetchall()
-            for r in result:
-              print(r)
+     
 
             return render_template('review_formone_masters.html', form_one=result)
   else:
@@ -2228,11 +2224,11 @@ def gs_student_data(student_id):
 
 
         db.commit()
-        if course_id == 100 or 101 or 102:
+        if course_id == 100 or course_id == 101 or course_id == 102:
           req_courses_ctr = req_courses_ctr + 1
-        if course_id == 119 or 120 or 121:
+        if course_id == 119 or course_id == 120 or course_id == 121:
           outside_courses_ctr = outside_courses_ctr + 1
-        if course_id != 119 or 120 or 121:
+        if course_id != 119 or course_id != 120 or course_id != 121:
           cs_courses_ctr = cs_courses_ctr + 1
           cs_credit_hours = cs_credit_hours + course_hours['credit_hours']
         total_credit_hours = total_credit_hours + course_hours['credit_hours']
@@ -2359,7 +2355,7 @@ def gs_student_data(student_id):
       cur.execute("SELECT advisorID FROM student_advisors WHERE studentID = %s", (student_id, ))
       advisor_id = cur.fetchall()
 
-      print(student_info[1]['reason'])
+
 
       if not advisor_id:
         advisor_name = [{'fname': "N/A"}]
