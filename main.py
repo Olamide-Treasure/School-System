@@ -2694,9 +2694,6 @@ def incomplete():
        db.commit()
        cursor.execute("INSERT INTO letter2 (user_id,l_semester,l_year,letter_id,recommenderName2, recommenderEmail2 , recommenderAffil2) VALUES (%s,%s,%s, '', %s, %s,%s)", (those['student_id'], those['semester'], those['s_year'], rname2,email2, affil2,)) 
        db.commit()
-      #  cursor.execute("SELECT recommenderName FROM letter INNER JOIN user on user.user_id = letter.user_id WHERE letter.user_id = %s", (uid,))
-      #  data = cursor.fetchone()
-      #  db.commit()
        return redirect('/welcome')
    return render_template("application.html", info = info)
 
@@ -2708,7 +2705,7 @@ def updateapplication():
    cursor.execute("SELECT * FROM user WHERE user_id = %s", (session['user_id'],))
    info = cursor.fetchone()
    if request.method == 'POST':
-       cursor = db.cursor(dictionary=True)
+       cursor = db.cursor(dictionary=True, buffered=True)
        prior_bac_deg_gpa = request.form["prior_bac_deg_gpa"]
        prior_bac_deg_major = request.form["prior_bac_deg_major"]
        prior_bac_deg_year = request.form["prior_bac_deg_year"]
@@ -2734,15 +2731,21 @@ def updateapplication():
        cursor.execute("UPDATE applications SET status = 'review', student_id = %s, semester = %s, s_year = %s, degree_type = %s, prior_bac_deg_name = '', prior_bac_deg_gpa = %s, prior_bac_deg_major = %s, prior_bac_deg_year = %s, prior_bac_deg_university = %s, GRE_verbal = %s, GRE_year = %s, GRE_quatitative = %s, GRE_advanced_score = %s, GRE_advanced_subject = %s, TOEFL_score = %s, TOEFL_date = %s, interest = %s, experience = %s, prior_ms_deg_name = '', prior_ms_deg_gpa = %s, prior_ms_deg_major = %s, prior_ms_deg_year = %s, prior__deg_university = %s, transcript= 'sent', student = 'not decided' WHERE student_id = %s AND semester = %s AND s_year = %s", 
                     (this, semester, s_year, degree_type, prior_bac_deg_gpa, prior_bac_deg_major, prior_bac_deg_year, prior_bac_deg_university, gre_verbal, 
                     gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university,this,semester, s_year))
-       
+       db.commit()
        cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
        those = cursor.fetchone()
 
-       if transcript == "Request Transcript":
-        school = request.form["field_rName"]
-        email =  request.form["field_email"]
-        cursor.execute("UPDATE transcript SET t_id = %s, t_semester = %s, t_year = %s, school = %s, email = %s WHERE t_id = %s AND t_semester = %s AND t_year = %s", (those['student_id'], those['semester'], those['s_year'],school, email,those['student_id'], those['semester'], those['s_year'],))
-       db.commit()
+       if transcript == 'Request':
+        school = request.form["schools"]
+        email =  request.form["emails"]
+        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email,decision) VALUES (%s,%s,%s,%s,%s,'Requested' )", (those['student_id'], those['semester'], those['s_year'], school,email,)) 
+        db.commit()
+
+       if transcript == 'Upload':
+        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email,decision) VALUES (%s,%s,%s,%s,%s,'Uploaded' )", (those['student_id'], those['semester'], those['s_year'], '','',)) 
+        db.commit()
+       cursor.execute("SELECT decision FROM transcript WHERE t_id = %s AND t_semester = %s AND t_year = %s",(this,semester,s_year,))
+       decide = cursor.fetchone()
 
        uid = session["user_id"]
        
@@ -2768,7 +2771,7 @@ def updateapplication():
        cursor.execute("SELECT recommenderName FROM letter INNER JOIN user on user.user_id = letter.user_id WHERE letter.user_id = %s", (uid,))
        data = cursor.fetchone()
        db.commit()
-       return render_template("complete.html",data = data,those = those)
+       return render_template("complete.html",data = data,those = those,decide = decide)
    return render_template("editApp.html", info = info)
 
 @app.route('/updateincomplete',  methods = ["POST", "GET"])
@@ -2813,14 +2816,26 @@ def updateincomplete():
                     gre_year, gre_quantitative, gre_advanced_score, gre_advanced_subject, toefl_score, toefl_date, interest, experience, prior_ms_deg_gpa, prior_ms_deg_major, prior_ms_deg_year, prior_ms_deg_university,this,just['semester'], just['s_year'],))
         db.commit()
 
-       cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s",(this,))
+       cursor.execute("SELECT student_id, semester,s_year FROM applications WHERE student_id = %s AND semester = %s AND s_year = %s",(this,semester,s_year,))
        those = cursor.fetchone()
-
-       if transcript == "Request Transcript":
-        school = request.form["field_rName"]
-        email =  request.form["field_email"]
-        cursor.execute("UPDATE transcript SET t_id = %s, t_semester = %s, t_year = %s, school = %s, email = %s WHERE t_id = %s AND t_semester = %s AND t_year = %s", (those['student_id'], those['semester'], those['s_year'],school, email,those['student_id'], those['semester'], those['s_year'],))
+       if those == None:
+        print(this)
+       
+       if transcript == 'Request':
+        print("this1")
+        school = request.form["schools"]
+        print("this2")
+        email =  request.form["emails"]
+        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email,decision) VALUES (%s,%s,%s,%s,%s,'Requested' )", (those['student_id'], those['semester'], those['s_year'], school,email,)) 
         db.commit()
+
+       if transcript == 'Upload':
+        school = request.form["schools"]
+        email =  request.form["emails"]
+        cursor.execute("INSERT INTO transcript (t_id,t_semester,t_year,school, email,decision) VALUES (%s,%s,%s,%s,%s,'Uploaded' )", (those['student_id'], those['semester'], those['s_year'], school,email,)) 
+        db.commit()
+       cursor.execute("SELECT decision FROM transcript WHERE t_id = %s AND t_semester = %s AND t_year = %s",(this,semester,s_year,))
+       decide = cursor.fetchone()
 
        uid = session["user_id"]
        
@@ -2857,15 +2872,13 @@ def complete(user_id,l_semester,l_year):
     content2 = request.form["content2"]
     cursor.execute("SELECT decision FROM transcript where t_id = %s AND t_semester = %s AND t_year = %s", (user_id,l_semester,l_year,) )
     upload = cursor.fetchone()
-    print(11,upload)
-    if upload['decision'] == 'Requested':
-      tcontent = request.form["tcontent"]
-      cursor.execute("UPDATE transcript SET contents = %s WHERE t_id = %s AND t_semester = %s AND t_year = %s",(tcontent,user_id,l_semester,l_year))
-      db.commit()
-    print(user_id)
-    print(l_semester)
-    print(l_year)
-    print(upload['decision'])
+    if upload == None:
+      print("this")
+    else:
+      if upload['decision'] == 'Requested':
+        tcontent = request.form["tcontent"]
+        cursor.execute("UPDATE transcript SET contents = %s WHERE t_id = %s AND t_semester = %s AND t_year = %s",(tcontent,user_id,l_semester,l_year))
+        db.commit()
     
     
     cursor.execute("UPDATE letter SET contents = %s WHERE user_id = %s AND l_semester = %s AND l_year = %s",(content,user_id,l_semester,l_year))
