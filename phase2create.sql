@@ -1,4 +1,4 @@
--- Active: 1682009432499@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
+-- Active: 1682346338578@@phase2-7.cgi21eqy7g91.us-east-1.rds.amazonaws.com@3306@integration
 
 
 use integration;
@@ -534,6 +534,8 @@ insert into student_courses values(99999999, 39, 'A', 'Fall', '2022');
 insert into student_courses values(99999999, 41, 'A', 'Fall', '2022');
 insert into student_courses values(99999999, 44, 'A', 'Fall', '2022');
 insert into student_courses values(99999999, 49, 'A', 'Fall', '2022');
+insert into student_courses values(99999999, 48, 'A', 'Fall', '2022');
+insert into student_courses values(99999999, 37, 'A', 'Fall', '2022');
 
 insert into student_courses values(77777777, 30, 'B', 'Fall', '2022');
 insert into student_courses values(77777777, 32, 'B', 'Fall', '2022');
