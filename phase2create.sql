@@ -534,6 +534,8 @@ insert into student_courses values(99999999, 39, 'A', 'Fall', '2022');
 insert into student_courses values(99999999, 41, 'A', 'Fall', '2022');
 insert into student_courses values(99999999, 44, 'A', 'Fall', '2022');
 insert into student_courses values(99999999, 49, 'A', 'Fall', '2022');
+insert into student_courses values(99999999, 48, 'A', 'Fall', '2022');
+insert into student_courses values(99999999, 37, 'A', 'Fall', '2022');
 
 insert into student_courses values(77777777, 30, 'B', 'Fall', '2022');
 insert into student_courses values(77777777, 32, 'B', 'Fall', '2022');
