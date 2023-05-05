@@ -958,6 +958,7 @@ def signup():
 
 
 
+
 @app.route('/form1', methods=['GET', 'POST'])
 def form():
   _reconnect()
@@ -971,12 +972,7 @@ def form():
 
     if request.method == 'POST':
       _reconnect()
-      courseselected = 0
-      totalcourse = 0
-      grade_points = 0
-      total_credit_hours = 0
-      num_courses = 0
-      bad_grade_ctr = 0
+      cur = db.cursor(dictionary = True)
       req_courses_ctr = 0
       outside_courses_ctr = 0
       cs_courses_ctr = 0
@@ -986,17 +982,27 @@ def form():
         checkboxes = request.form.getlist(str(i))
         for e in checkboxes:
           if(e == "yes"):
-            if i == 100 or 101 or 102:
+            if i == 100 or i == 101 or i == 102:
               req_courses_ctr = req_courses_ctr + 1
-            if i == 119 or 120 or 121:
+            if i == 119 or i == 120 or i == 121:
               outside_courses_ctr = outside_courses_ctr + 1
-            if i != 119 or 120 or 121:
+            if i != 119 or i != 120 or i != 121:
               cs_courses_ctr = cs_courses_ctr + 1
-              cs_credit_hours = cs_credit_hours + 3
-            total_credit_hours = total_credit_hours + 3
+            if i == 120 or i == 121:
+                cs_credit_hours += 2
+            else:
+              cs_credit_hours += 3
+        
             
 
-        
+
+      cur.execute("SELECT * FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id AND sc.csem = cs.csem AND sc.cyear = cs.cyear WHERE sc.student_id = %s", (studentid, ))
+      scourses = cur.fetchall()
+      for s in scourses:
+        if s['id'] == 100 or 101 or 102:
+          req_courses_ctr = req_courses_ctr + 1
+
+
       degree = list()
       cur.execute("SELECT fname, lname, user_id, user_address, user_phoneNUM, email FROM user WHERE user_id = %s", (studentid, ))
       student_name = cur.fetchall()
@@ -1011,167 +1017,23 @@ def form():
         degree = 0
       student_info.insert(2, degree[0])
 
-    # get courses and grades
-      cur.execute("SELECT class_id, grade FROM student_courses WHERE student_id = %s", (studentid, ))
-      student_grades = cur.fetchall()
-      if not student_grades:
-        student_grades = list()
-      student_info.insert(3, student_grades)
 
-      #db.commit()
-    # get gpa and credit hours
-    # counters for grades
-
-      for i in range(len(student_grades)):
-        #cur.execute("SELECT DISTINCT c.dept_name, c.id, c.course_num, c.course_name, c.credit_hours, sc.class_id, sc.grade FROM course c JOIN class_section cs ON cs.course_id = c.id JOIN student_courses sc ON sc.class_id = cs.class_id WHERE sc.student_id = %s", (id, ))
-        #courses = cur.fetchall()
-        cur.execute("SELECT DISTINCT credit_hours FROM course JOIN class_section ON course.id = class_section.course_id WHERE class_section.class_id = %s", (student_grades[i]['class_id'], ))
-        course_hours = cur.fetchone()
- 
-        
-        #db.commit()
-        cur.execute("SELECT DISTINCT course_id FROM class_section AS cs WHERE cs.class_id = %s", (student_grades[i]['class_id'], ))
-        course_id = cur.fetchone()
-        #course_id = c['course_id']
+      if(cs_credit_hours < 12):
+        student_info[1]['eligible'] = 'False'
+        student_info[1]['reason'].append('Less credit hours')
+        flash(f'Form Submission Unsuccessful! You have registered for less than 12 credit hours.', category="danger")
+        return redirect('/userloggedin')
 
 
-
-        db.commit()
-        if course_id == 100 or 101 or 102:
-          req_courses_ctr = req_courses_ctr + 1
-        if course_id == 119 or 120 or 121:
-          outside_courses_ctr = outside_courses_ctr + 1
-        if course_id != 119 or 120 or 121:
-          cs_courses_ctr = cs_courses_ctr + 1
-          cs_credit_hours = cs_credit_hours + course_hours['credit_hours']
-        total_credit_hours = total_credit_hours + course_hours['credit_hours']
-        grade = student_grades[i]['grade'] 
-        
-        if grade == 'A':
-          grade_points = grade_points + 4
-          num_courses = num_courses + 1
-        if grade == 'A-':
-          grade_points = grade_points + 3.7
-          num_courses = num_courses + 1
-        if grade == 'B+':
-          grade_points = grade_points + 3.3
-          num_courses = num_courses + 1
-        if grade == 'B':
-          grade_points = grade_points + 3
-          num_courses = num_courses + 1
-        if grade == 'B-':
-          grade_points = grade_points + 2.7
-          bad_grade_ctr = bad_grade_ctr + 1
-          num_courses = num_courses + 1
-        if grade == 'C+':
-          grade_points = grade_points + 2.3
-          bad_grade_ctr = bad_grade_ctr + 1
-          num_courses = num_courses + 1
-        if grade == 'C':
-          grade_points = grade_points + 2
-          bad_grade_ctr = bad_grade_ctr + 1
-          num_courses = num_courses + 1
-        if grade == 'C-':
-          grade_points = grade_points + 1.7
-          bad_grade_ctr = bad_grade_ctr + 1
-          num_courses = num_courses + 1
-        if grade == 'F':
-          grade_points = grade_points + 0
-          bad_grade_ctr = bad_grade_ctr + 1
-          num_courses = num_courses + 1
-      if num_courses == 0:
-        num_courses = 1
-      gpa = grade_points / num_courses
-      gpa = round(gpa, 2)
-      gpa_dict = {'gpa': gpa}
-      total_credit_hours_dict = {'total_credit_hours': total_credit_hours}
-      student_info.insert(4, gpa_dict)
-      student_info.insert(5, total_credit_hours_dict)
-
-
-    # requirements for master's students
       if student_info[2]['degree_id'] == 20:
-        # check gpa
-        if student_info[4]['gpa'] < 3.0:
-            student_info[1]['eligible'] = 'False'
-            student_info[1]['reason'].append('Has not met GPA requirement')
-            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
-            return redirect('/userloggedin')
-          
-        # check credit hours
-        if student_info[5]['total_credit_hours'] < 30:
-            student_info[1]['eligible'] = 'False'
-            student_info[1]['reason'].append('Has not met credit hour requirement')
-            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
-            return redirect('/userloggedin')
-        
-        # check for grades below a B
-        if bad_grade_ctr > 2:
-            student_info[1]['eligible'] = 'False'
-            student_info[1]['reason'].append('Has 2+ grades below a B')
-            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
-            return redirect('/userloggedin')
-          
         # check for required courses
         if req_courses_ctr < 3:
             student_info[1]['eligible'] = 'False'
             student_info[1]['reason'].append('Has not taken required courses')
-            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
+            flash(f'Form Submission Unsuccessful! You have not taken the required courses for your Master Degree', category="danger")
             return redirect('/userloggedin')
            
-        # check for outside courses
-        if outside_courses_ctr < 2:
-            student_info[1]['eligible'] = 'False'
-            student_info[1]['reason'].append('Has not taken enough classes outside of CS')
-            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
-            return redirect('/userloggedin')
             
-
-    # requirements for phd students
-      if student_info[2]['degree_id'] == 21:
-        # check gpa
-        if student_info[4]['gpa'] < 3.5:
-            student_info[1]['eligible'] = 'False'
-            student_info[1]['reason'].append('Has not met GPA requirement')
-            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
-            return redirect('/userloggedin')
-         
-        # check credit hours
-        if student_info[5]['total_credit_hours'] < 36:
-            student_info[1]['eligible'] = 'False'
-            student_info[1]['reason'].append('Has not met credit hour requirement')
-            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
-            return redirect('/userloggedin')
-           
-        # check for grades below a B
-        if bad_grade_ctr > 1:
-            student_info[1]['eligible'] = 'False'
-            student_info[1]['reason'].append('Has 1+ grades below a B')
-            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
-            return redirect('/userloggedin')
-       
-        # check for 30 credits of CS courses
-        if cs_credit_hours < 30:
-            student_info[1]['eligible'] = 'False'
-            student_info[1]['reason'].append('Has not met CS course credit requirement')
-            flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
-            return redirect('/userloggedin')
-     
-
-    # check if thesis is approved for phd 
-      if student_info[2]['degree_id'] == 21:
-        cur.execute("SELECT thesisapproved FROM phd_req WHERE student_id = %s", (studentid, ))
-        approved = cur.fetchall()
-        student_info.append(approved)
-        if approved[0]['thesisapproved'] == 'False':
-          student_info[1]['eligible'] = 'False'
-          student_info[1]['reason'].append('Thesis has not been approved')
-          flash(f'Form Submission Unsuccessful! You do not meet the degree requirements.', category="danger")
-          return redirect('/userloggedin')
-      
-
-  
-
 
       check = 0
       for i in range(100, 122):
@@ -1212,11 +1074,13 @@ def form():
             #cur.execute("SELECT * from student_courses WHERE class_id = %s and student_id = %s", (i,session['user_id']))
             #data = cur.fetchall()
             
-    return redirect('/')
+    flash(f'Form Submission Successful!', category="danger")
+    return redirect('/userloggedin')
 
   else:
     return redirect('/')
     #return render_template("form1.html")
+
 
 
 @app.route('/student_courseslist')
