@@ -52,13 +52,13 @@
    <fieldset>
     <legend>General Information</legend>
     <label for="semester">Semester:</label>
-    <select id="semester" name="semester">
+    <select id="semester" name="semester" >
       <option value="">Choose one</option>
       <option value="FALL">Fall</option>
       <option value="SPRING">Spring</option>
     </select><br>
     <label for="s_year">Year:</label>
-    <select id="s_year" name="s_year">
+    <select id="s_year" name="s_year" >
       <option value="">Choose one</option>
       <option value="2023">2023</option>
       <option value="2024">2024</option>
@@ -84,17 +84,15 @@
 
     <fieldset>
       <legend>Previous Degree Information</legend>
-      
-      <br>
       <div id="masters" style="display: none">
-      Master's GPA: <input type="text" name="prior_ms_deg_gpa">
-      Master's Major: <input type="text" name="prior_ms_deg_major">
-      Master's Graduation year: <input type="text" name="prior_ms_deg_year" onkeypress="return onlyNumberKey(event)" maxlength="4">
-      Master's University: <input type="text" name="prior_ms_deg_university">
+      Master's GPA: <input type="text" name="prior_ms_deg_gpa" >
+      Master's Major: <input type="text" name="prior_ms_deg_major" >
+      Master's Graduation year: <input type="text" name="prior_ms_deg_year" onkeypress="return onlyNumberKey(event)" maxlength="4" >
+      Master's University: <input type="text" name="prior_ms_deg_university" >
       </div>
       <div id="bach" style="display: none">
         Bachelor's GPA: <input type="text" name="prior_bac_deg_gpa" >
-        Bachelor's Major: <input type="text" name="prior_bac_deg_major">
+        Bachelor's Major: <input type="text" name="prior_bac_deg_major" >
         Bachelor's Graduation year: <input type="text" name="prior_bac_deg_year" onkeypress="return onlyNumberKey(event)"  maxlength="4">
         Bachelor's University: <input type="text" name="prior_bac_deg_university" >
       </div>
@@ -104,17 +102,17 @@
     
     <fieldset id="GRE", style="display: none">
       <legend>Credentials</legend>
-      <label for="GRE_year">Year GRE was taken:</label>
-      <input type="text" id="GRE_year" name="GRE_year" onkeypress="return onlyNumberKey(event)" maxlength="4"><br>
+      <label for="GRE_year" >Year GRE was taken:</label>
+      <input type="text" id="GRE_year" name="GRE_year" onkeypress="return onlyNumberKey(event)" maxlength="4" ><br>
       <label for="GRE_verbal">GRE Verbal:</label>
-      <input type="text" id="GRE_verbal" name="GRE_verbal" maxlength="3" onkeypress="return onlyNumberKey(event)"><br>
+      <input type="text" id="GRE_verbal" name="GRE_verbal" maxlength="3" onkeypress="return onlyNumberKey(event)" ><br>
       <label for="GRE_quatitative">GRE Quantitative:</label>
-      <input type="text" id="GRE_quantitative" name="GRE_quantitative" maxlength="3" onkeypress="return onlyNumberKey(event)"><br>
+      <input type="text" id="GRE_quantitative" name="GRE_quantitative" maxlength="3" onkeypress="return onlyNumberKey(event)" ><br>
       <label for="GRE_advanced_score">GRE Advanced Score:</label>
-      <input type="text" id="GRE_advanced_score" name="GRE_advanced_score" maxlength="3" onkeypress="return onlyNumberKey(event)">
+      <input type="text" id="GRE_advanced_score" name="GRE_advanced_score" maxlength="3" onkeypress="return onlyNumberKey(event)" >
       Subject: <input type="text" name="GRE_advanced_subject" ><br>
-      <label for="TOEFL_score">TOEFL - Score:</label>
-      <input type="text" id="TOEFL_score" name="TOEFL_score"  onkeypress="return onlyNumberKey(event)">
+      <label for="TOEFL_score" >TOEFL - Score:</label>
+      <input type="text" id="TOEFL_score" name="TOEFL_score"  onkeypress="return onlyNumberKey(event)" >
       Date of exam: <input type="text" name="TOEFL_date" >
     </fieldset>
     <script>
@@ -126,13 +124,13 @@
       const bach = document.querySelector('#bach')
       const masters = document.querySelector('#masters')
       degreeTypeSelect.addEventListener('change', () => {
-        if ((degreeTypeSelect.value === 'PHD' ) && (degreeTypeSelect.value === 'Masters')) {
+        if ((degreeTypeSelect.value === 'PHD' ) ) {
           mastersFieldset.style.display = 'block';
           bach.style.display ='block';
           masters.style.display = 'block';
         } else if (degreeTypeSelect.value === 'Masters') {
           bach.style.display = 'block';
-          mastersFieldset.style.display = 'block';
+          // mastersFieldset.style.display = 'block';
           masters.style.display = 'none';
           const resetInputs1 = GRE.getElementsByTagName("input");
           const resetInputs2 = masters.getElementsByTagName("input");
@@ -188,7 +186,7 @@
             <br>
       <a class="test">Letter 2</a> <br>
       <input type="text" name="field_rName1" placeholder="Name of recommender" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
-      <input type="text" name="field_email1" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
+      <input type="text" name="field_email1" placeholder ="Email of recommender" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address"><br>
       <input type="text" name="field_affil1" placeholder ="Affiliation" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
       <br>
       <a class="test">Letter 3</a> <br>
@@ -202,22 +200,22 @@
     <fieldset>
       <legend>Transcript</legend>
     <label for="transcript"></label>
-    <select id="transcript" name="transcript">
+    <select id="transcript" name="transcript" >
       <option value="">Choose one</option>
       <option value="Upload">Upload Transcript</option>
       <option value="Request">Request Transcript</option>
     </select><br>
       
       <div id="mail" style="display: none">
-      <a class="test"> Request Official Transcript  </a> <br>
-        <input type="text" name="schools" placeholder="Name of School" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed" ><br>
+      <a class="test"> Request Transcript  </a> <br>
+        <input type="text" name="schools" placeholder="Name of School" pattern="[a-zA-Z]+" title="Only valid alphabet characters are allowed"><br>
         <input type="text" name="emails" placeholder ="Email" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,3}$" title="Not a valid email address" ><br>
         <br>
       </div>
 
         <div id="upload" style="display: none">
-        <a class="test">Upload Unofficial Transcript  </a> <br>
-        <input type = "file" id = "myFile" name = "filename">
+        <a class="test">Upload Transcript  </a> <br>
+        <input type = "file" id = "myFile" name = "filename" >
        </div>
 
     </fieldset>
@@ -259,24 +257,7 @@
     <br>
     
     <button type="submit" class="button" name="submit" id = complete formaction="/application"> SUBMIT </button>
-    <script>
-      function removeRequired(value){
-        $(".submit").prop('disabled', true);
-        $('.required').keyup(function () {
-        if ($(".fname").val() != "" && $(".lname").val() != "" && $(".userName").val() != "" && $(".familyRav").val() != "" && $(".birthday").val() != "" && $(".password").val() != '' && $(".confirm_password").val() != '' && $(".password").val() ===  $(".confirm_password").val()) {
-        $(".submit").prop("disabled", false);
-
-        }
-    });
-        //   // $.each(form, function(key, value) {
-        //   if ( value.hasAttribute("required")){
-        //     value.removeAttribute("required");
-        //     // document.getElementById(value).removeAttribute("required");
-        //   }
-        // // });
-      }
-    </script>
-    <button type="submit" class="button" name="submit" id = completes onClick = "removeRequired(this.form)" formaction="/incomplete"> Save and continue later </button>
+    <button type="submit" class="button" name="submit" id = completes formaction="/incomplete" formnovalidate> Save and continue later </button>
   </form>
   
   
